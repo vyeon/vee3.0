@@ -10,6 +10,6 @@ void foo(int a, int b, float c, test::testobj& obj)
 
 int main()
 {
-    call_by_tuple(foo, make_tuple(1, 2, (float)3.0, test::testobj(4)));
+    tupleupk(foo, make_tuple(1, 2, (float)3.0, test::testobj(4)));
     return 0;
 }

@@ -38,32 +38,19 @@ inline RTy _do_call(CallableObj&& func, Tuple&& tuple, tm::sequence<S...>)
     return func(::std::forward<decltype(::std::get<S>(tuple))>(::std::get<S>(tuple)) ...);
 }
 
-template <class CallableObj, class Tuple, int ...S>
-inline void _do_call_noreturn(CallableObj&& func, Tuple&& tuple, tm::sequence<S...>)
-{
-    func(::std::forward<decltype(::std::get<S>(tuple))>(::std::get<S>(tuple)) ...);
-}
-
 } // !namespace tupleupk_impl
 
 template <
     class CallableObj,
     class Tuple,
     class RTy = tupleupk_impl::function_parser< ::std::remove_reference<CallableObj>::type >::return_type >
-        RTy call_by_tuple(CallableObj&& func, Tuple&& tuple)
+        RTy tupleupk(CallableObj&& func, Tuple&& tuple)
     {
         return tupleupk_impl::_do_call<RTy>(std::forward<CallableObj>(func),
                                               ::std::forward<Tuple>(tuple),
                                               typename tm::sequence_generator< ::std::tuple_size< ::std::remove_reference<Tuple>::type >::value/*sizeof...(Args)*/>::type());
     }
 
-    template < class CallableObj, class Tuple >
-    void call_by_tuple_noreturn(CallableObj&& func, Tuple&& tuple)
-    {
-        tupleupk_impl::_do_call_noreturn(std::forward<CallableObj>(func),
-                                           ::std::forward<Tuple>(tuple),
-                                           typename tm::sequence_generator< ::std::tuple_size< ::std::remove_reference<Tuple>::type >::value/*sizeof...(Args)*/>::type());
-    }
 #pragma warning(default:4100)
 
 } // !namespace vee
