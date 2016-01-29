@@ -1,0 +1,6 @@
+#ifndef _VEE_ENUMERATION_H_
+#define _VEE_ENUMERATION_H_
+
+//TODO
+
+#endif // !_VEE_ENUMERATION_H_

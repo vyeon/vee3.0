@@ -4,10 +4,51 @@
     <Filter Include="vee">
       <UniqueIdentifier>{b57af8a6-9f2a-4625-8a7c-748763084b6a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vee\test">
+      <UniqueIdentifier>{2d331f38-a827-4982-8802-0ceec8278653}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vee\io">
+      <UniqueIdentifier>{4ac09de9-37dd-4abf-8639-e2d0a5a6827a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="test">
+      <UniqueIdentifier>{3133e53b-e6ab-4ae0-8dfe-a938e4d11260}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="io">
+      <UniqueIdentifier>{3546bbf1-b078-4684-910d-d81abeaf0a18}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="vee\libbase.h">
       <Filter>vee</Filter>
     </ClInclude>
+    <ClInclude Include="vee\tmath.h">
+      <Filter>vee</Filter>
+    </ClInclude>
+    <ClInclude Include="vee\enumeration.h">
+      <Filter>vee</Filter>
+    </ClInclude>
+    <ClInclude Include="vee\delegate.h">
+      <Filter>vee</Filter>
+    </ClInclude>
+    <ClInclude Include="vee\tm.h">
+      <Filter>vee</Filter>
+    </ClInclude>
+    <ClInclude Include="vee\tupleupk.h">
+      <Filter>vee</Filter>
+    </ClInclude>
+    <ClInclude Include="vee\test\testobj.h">
+      <Filter>vee\test</Filter>
+    </ClInclude>
+    <ClInclude Include="vee\iobase.h">
+      <Filter>vee\io</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="test\testobj.cpp">
+      <Filter>test</Filter>
+    </ClCompile>
+    <ClCompile Include="io\iobase.cpp">
+      <Filter>io</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -19,7 +19,18 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="vee\delegate.h" />
+    <ClInclude Include="vee\enumeration.h" />
+    <ClInclude Include="vee\iobase.h" />
     <ClInclude Include="vee\libbase.h" />
+    <ClInclude Include="vee\test\testobj.h" />
+    <ClInclude Include="vee\tm.h" />
+    <ClInclude Include="vee\tmath.h" />
+    <ClInclude Include="vee\tupleupk.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="io\iobase.cpp" />
+    <ClCompile Include="test\testobj.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{A78FA93C-3A15-461D-BF81-F49D01DEFE35}</ProjectGuid>

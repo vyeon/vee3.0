@@ -53,5 +53,4 @@ void operator=(const TypeName&&) = delete;
 #define __constexpr
 #endif
 
-
 #endif // !_VEE_LIBBASE_H_
