@@ -21,16 +21,10 @@
     <ClInclude Include="vee\libbase.h">
       <Filter>vee</Filter>
     </ClInclude>
-    <ClInclude Include="vee\tmath.h">
-      <Filter>vee</Filter>
-    </ClInclude>
     <ClInclude Include="vee\enumeration.h">
       <Filter>vee</Filter>
     </ClInclude>
     <ClInclude Include="vee\delegate.h">
-      <Filter>vee</Filter>
-    </ClInclude>
-    <ClInclude Include="vee\tm.h">
       <Filter>vee</Filter>
     </ClInclude>
     <ClInclude Include="vee\tupleupk.h">
@@ -41,6 +35,12 @@
     </ClInclude>
     <ClInclude Include="vee\iobase.h">
       <Filter>vee\io</Filter>
+    </ClInclude>
+    <ClInclude Include="vee\mp.h">
+      <Filter>vee</Filter>
+    </ClInclude>
+    <ClInclude Include="vee\mpmath.h">
+      <Filter>vee</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

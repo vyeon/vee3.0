@@ -54,6 +54,21 @@ testobj& testobj::operator=(testobj&& other)
     return *this;
 }
 
+scope::scope(int count):
+cnt{ count }
+{
+    for (int i = 0; i < cnt; ++i)
+        printf("-");
+    printf("\n");
+}
+
+scope::~scope()
+{
+    for (int i = 0; i < cnt; ++i)
+        printf("-");
+    printf("\n");
+}
+
 } // !namespace test
 
 } // !namespace vee

@@ -24,8 +24,8 @@
     <ClInclude Include="vee\iobase.h" />
     <ClInclude Include="vee\libbase.h" />
     <ClInclude Include="vee\test\testobj.h" />
-    <ClInclude Include="vee\tm.h" />
-    <ClInclude Include="vee\tmath.h" />
+    <ClInclude Include="vee\mp.h" />
+    <ClInclude Include="vee\mpmath.h" />
     <ClInclude Include="vee\tupleupk.h" />
   </ItemGroup>
   <ItemGroup>

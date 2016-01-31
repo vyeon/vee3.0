@@ -1,7 +1,7 @@
 #ifndef _VEE_TUPLEUPK_H_
 #define _VEE_TUPLEUPK_H_
 
-#include <vee/tm.h>
+#include <vee/mpl.h>
 #include <tuple>
 #include <functional>
 
@@ -33,7 +33,7 @@ struct function_parser< ::std::function<FuncSig> >: function_parser<FuncSig>
 };
 
 template <class RTy, class CallableObj, class Tuple, int ...S>
-inline RTy _do_call(CallableObj&& func, Tuple&& tuple, tm::sequence<S...>)
+inline RTy _do_call(CallableObj&& func, Tuple&& tuple, mpl::sequence<S...>)
 {
     return func(::std::forward<decltype(::std::get<S>(tuple))>(::std::get<S>(tuple)) ...);
 }
@@ -48,7 +48,7 @@ template <
     {
         return tupleupk_impl::_do_call<RTy>(std::forward<CallableObj>(func),
                                               ::std::forward<Tuple>(tuple),
-                                              typename tm::sequence_generator< ::std::tuple_size< ::std::remove_reference<Tuple>::type >::value/*sizeof...(Args)*/>::type());
+                                              typename mpl::sequence_generator< ::std::tuple_size< ::std::remove_reference<Tuple>::type >::value/*sizeof...(Args)*/>::type());
     }
 
 #pragma warning(default:4100)

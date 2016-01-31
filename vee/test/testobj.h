@@ -22,6 +22,14 @@ public:
     const int id;
 };
 
+class scope
+{
+public:
+    scope(int count = 79);
+    ~scope();
+    int cnt;
+};
+
 } // !namespace test
 
 } // !namespace vee
