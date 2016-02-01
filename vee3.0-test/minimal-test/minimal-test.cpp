@@ -81,6 +81,15 @@ void test_delegate()
         e -= foo;
         puts("Call bar");
         e(2, ::vee::test::testobj());
+        e -= bar;
+        puts("Call nothing");
+        e += ::std::make_pair(100, foo);
+        e += ::std::make_pair(200, bar);
+        puts("Call foo and bar");
+        e(3, ::vee::test::testobj());
+        e -= e.usrkey(100);
+        puts("Call bar");
+        e(4, ::vee::test::testobj());
     }
 }
 

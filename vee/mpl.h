@@ -40,6 +40,18 @@ struct int_to_type
     };
 };
 
+template <class T>
+struct type_to_type
+{
+    using real_type = T;
+    template <class Arg>
+    explicit type_to_type(Arg&& arg):
+        value(::std::forward<Arg>(arg))
+    {
+    }
+    T value;
+};
+
 template <bool B>
 struct meta_branch
 {

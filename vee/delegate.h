@@ -175,6 +175,11 @@ public:
     {
         return gen_key(binder_t(::std::forward<CallableObj>(obj)));
     }
+    template <class UsrKeyRef>
+    inline static typename mpl::type_to_type<usrkey_t> usrkey(UsrKeyRef&& key)
+    {
+        return mpl::type_to_type<usrkey_t>{ ::std::forward<UsrKeyRef>(key) };
+    }
 
 /* Define Public member functinos */
 public:
@@ -291,8 +296,8 @@ public:
         using CallableObj = ::std::conditional< ::std::is_rvalue_reference<PairRef>::value,
             PairTy::second_type&&,
             PairTy::second_type >::type;
-        _cmpbinder_t cmpbinder{ static_cast<CallableObj>(binder) };
-        auto ret = _usrcont.insert(::std::make_pair(static_cast<UsrKeyRef>(key), ::std::move(cmpbinder)));
+        _cmpbinder_t cmpbinder{ static_cast<CallableObj>(pair.second) };
+        auto ret = _usrcont.insert(::std::make_pair(static_cast<UsrKeyRef>(pair.first), ::std::move(cmpbinder)));
         if (ret.second == false)
             throw exceptions::key_already_exist();
         return *this;
@@ -317,15 +322,19 @@ public:
             _cont.erase(target);
         return *this;
     }
-    ref_t operator-=(usrkey_t& key)
+    ref_t operator-=(mpl::type_to_type<usrkey_t>& wrapped_key)
     {
         ::std::lock_guard<lock_t> locker{ _mtx };
-        auto target = _usrcont.find(key);
+        auto target = _usrcont.find(wrapped_key.value);
         if (target == _usrcont.end())
             throw exceptions::target_not_found();
         else
             _usrcont.erase(target);
         return *this;
+    }
+    ref_t operator-=(mpl::type_to_type<usrkey_t>&& wrapped_key)
+    {
+        return operator-=(wrapped_key);
     }
     template <typename ...FwdArgs>
     void operator()(FwdArgs&& ...args)
