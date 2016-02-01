@@ -1,6 +1,8 @@
 #ifndef _VEE_MPL_H_
 #define _VEE_MPL_H_
 
+#include <utility>
+
 namespace vee {
 
 namespace mpl {
@@ -42,6 +44,18 @@ template <bool B>
 struct meta_branch
 {
     static const bool value = B;
+};
+
+template< class T >
+struct is_pair
+{
+    static const bool value = false;
+};
+
+template< class T1, class T2 >
+struct is_pair< std::pair< T1, T2 > >
+{
+    static const bool value = true;
 };
 
 } // !namespace mpl

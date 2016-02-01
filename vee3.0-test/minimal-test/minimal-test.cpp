@@ -57,15 +57,31 @@ void test_delegate()
         ::vee::test::scope scope;
         puts("Constructor with user key and binder pair (lvalue reference)");
         // Constructor with user key and binder pair, lvalue reference
-        ::vee::delegate<FUNCSIG> e{ 100, ::std::function<FUNCSIG>{ foo } };
+        int key = 100;
+        ::std::function<FUNCSIG> binder{ foo };
+        ::vee::delegate<FUNCSIG> e{ key, binder };
     }
 
-    //{
-    //    ::vee::test::scope scope;
-    //    puts("Constructor with user key and binder pair (rvalue reference)");
-    //    // Constructor with user key and binder pair, rvalue reference
-    //    ::vee::delegate<FUNCSIG> e{ ::std::make_pair(100, ::std::function<FUNCSIG>{ foo }) };
-    //}
+    {
+        ::vee::test::scope scope;
+        puts("Constructor with user key and binder pair (rvalue reference)");
+        // Constructor with user key and binder pair, rvalue reference
+        ::vee::delegate<FUNCSIG> e{ 101, ::std::function<FUNCSIG>{ foo } };
+    }
+
+    {
+        ::vee::test::scope scope;
+        ::vee::delegate<FUNCSIG> e;
+        puts("Test the operator +=, (), -=");
+        // Test the operator +=
+        e += foo; // standard function
+        e += ::std::function<FUNCSIG>(bar); // binder
+        puts("Call foo and bar");
+        e(1, ::vee::test::testobj());
+        e -= foo;
+        puts("Call bar");
+        e(2, ::vee::test::testobj());
+    }
 }
 
 int main()

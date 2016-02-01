@@ -36,10 +36,10 @@
     <ClInclude Include="vee\iobase.h">
       <Filter>vee\io</Filter>
     </ClInclude>
-    <ClInclude Include="vee\mp.h">
+    <ClInclude Include="vee\mpmath.h">
       <Filter>vee</Filter>
     </ClInclude>
-    <ClInclude Include="vee\mpmath.h">
+    <ClInclude Include="vee\mpl.h">
       <Filter>vee</Filter>
     </ClInclude>
   </ItemGroup>

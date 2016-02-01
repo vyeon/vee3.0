@@ -25,6 +25,32 @@ public:
     }
 };
 
+class target_not_found
+{
+public:
+    virtual const char* to_string()
+    {
+        return this->what();
+    }
+    const char* what()
+    {
+        return "target not found";
+    }
+};
+
+class key_already_exist
+{
+public:
+    virtual const char* to_string()
+    {
+        return this->what();
+    }
+    const char* what()
+    {
+        return "key already exist";
+    }
+};
+
 } // !namespace exceptions
 
 namespace delegate_impl {
@@ -121,7 +147,7 @@ public:
 private:
     using _cmpbinder_t = delegate_impl::compareable_function<RTy(Args ...)>;
     using _key_cmpbinder_pair = ::std::pair<usrkey_t, _cmpbinder_t>;
-    using _seq_container_t = ::std::map<key_t, _cmpbinder_t>;
+    using _seq_container_t = ::std::multimap<key_t, _cmpbinder_t>;
     using _usr_container_t = ::std::map<usrkey_t, _cmpbinder_t>;
     
 /* Define Public static member functions */
@@ -139,6 +165,15 @@ public:
             throw exceptions::key_generation_failed();
         printf("wrapper: %X, key: %X\n", ptr, *ptr);
         return mpl::pvoid_cast(*ptr);
+    }
+    inline static key_t gen_key(binder_t&& dst) throw(...)
+    {
+        return gen_key(dst);
+    }
+    template <class CallableObj>
+    inline static key_t gen_key(CallableObj&& obj)
+    {
+        return gen_key(binder_t(::std::forward<CallableObj>(obj)));
     }
 
 /* Define Public member functinos */
@@ -243,10 +278,10 @@ public:
     template <class URef>
     ref_t operator+=(URef&& uref)
     {
-        //mpl::meta_branch<::std::is_same<URef, >::type >;
+        return this->_register(::std::forward<URef>(uref), mpl::meta_branch< mpl::is_pair<::std::remove_reference<URef>::type >::value>());
     }
     template <class PairRef>
-    ref_t _register(PairRef&& pair, mpl::meta_branch<true>/*is_tuple == true*/)
+    ref_t _register(PairRef&& pair, mpl::meta_branch<true>/*is_pair == true*/)
     {
         ::std::lock_guard<lock_t> locker{ _mtx };
         using PairTy = ::std::remove_reference<PairRef>::type;
@@ -257,16 +292,70 @@ public:
             PairTy::second_type&&,
             PairTy::second_type >::type;
         _cmpbinder_t cmpbinder{ static_cast<CallableObj>(binder) };
-        _usrcont.insert(::std::make_pair(static_cast<UsrKeyRef>(key), ::std::move(cmpbinder)));
+        auto ret = _usrcont.insert(::std::make_pair(static_cast<UsrKeyRef>(key), ::std::move(cmpbinder)));
+        if (ret.second == false)
+            throw exceptions::key_already_exist();
         return *this;
     }
     template <class CallableObj>
-    ref_t _register(CallableObj&& obj, mpl::meta_branch<false>/*is_tuple == false*/)
+    ref_t _register(CallableObj&& obj, mpl::meta_branch<false>/*is_pair == false*/)
     {
         ::std::lock_guard<lock_t> locker{ _mtx };
         _cmpbinder_t cmpbinder{ ::std::forward<CallableObj>(obj) };
         _cont.insert(::std::make_pair(gen_key(cmpbinder), ::std::move(cmpbinder)));
         return *this;
+    }
+    template <class CallableObj>
+    ref_t operator-=(CallableObj&& obj)
+    {
+        ::std::lock_guard<lock_t> locker{ _mtx };
+        key_t key = gen_key( binder_t{ ::std::forward<CallableObj>(obj) });
+        auto  target = _cont.find(key);
+        if (target == _cont.end())
+            throw exceptions::target_not_found();
+        else
+            _cont.erase(target);
+        return *this;
+    }
+    ref_t operator-=(usrkey_t& key)
+    {
+        ::std::lock_guard<lock_t> locker{ _mtx };
+        auto target = _usrcont.find(key);
+        if (target == _usrcont.end())
+            throw exceptions::target_not_found();
+        else
+            _usrcont.erase(target);
+        return *this;
+    }
+    template <typename ...FwdArgs>
+    void operator()(FwdArgs&& ...args)
+    {
+        ::std::lock_guard<lock_t> locker{ _mtx };
+        for (auto& it : _cont)
+        {
+            it.second.operator()(args...);
+        }
+        for (auto& it : _usrcont)
+        {
+            it.second.operator()(args...);
+        }
+    }
+    void clear()
+    {
+        ::std::lock_guard<lock_t> locker{ _mtx };
+        _cont.clear();
+        _usrcont.clear();
+    }
+
+/* Define Protected static member functions */
+protected:
+    inline static key_t gen_key(_cmpbinder_t& binder)
+    {
+        return gen_key(static_cast<binder_t&>(binder));
+    }
+    inline static key_t gen_key(_cmpbinder_t&& binder)
+    {
+        return gen_key(static_cast<binder_t&&>(binder));
     }
 
 /* Define Protected member variables */
