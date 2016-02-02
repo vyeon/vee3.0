@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -36,6 +36,7 @@
     <ProjectGuid>{A78FA93C-3A15-461D-BF81-F49D01DEFE35}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>vee20</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -84,13 +85,13 @@
     <OutDir>$(SolutionDir)\lib\x32\</OutDir>
     <IntDir>$(SolutionDir)\obj\x32\Debug\$(ProjectName)\</IntDir>
     <TargetName>$(ProjectName)-vc120-sgd-300</TargetName>
-    <IncludePath>$(SolutionDir);$(BOOST_1_59_0);$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\lib\x32;$(BOOST_1_59_0)\stage32_lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir);$(BOOST_1_60_0);$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\lib\x32;$(BOOST_1_60_0)\stage\x32;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <TargetName>$(ProjectName)-vc120-sgd-300</TargetName>
-    <IncludePath>$(SolutionDir);$(BOOST_1_59_0);$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\lib\x64;$(BOOST_1_59_0)\stage64_lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir);$(BOOST_1_60_0);$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\lib\x64;$(BOOST_1_60_0)\stage\x64;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)\lib\x64\</OutDir>
     <IntDir>$(SolutionDir)\obj\x64\Debug\$(ProjectName)\</IntDir>
   </PropertyGroup>
@@ -98,13 +99,13 @@
     <OutDir>$(SolutionDir)\lib\x32\</OutDir>
     <IntDir>$(SolutionDir)\obj\x32\Release\$(ProjectName)\</IntDir>
     <TargetName>$(ProjectName)-vc120-s-300</TargetName>
-    <IncludePath>$(SolutionDir);$(BOOST_1_59_0);$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\lib\x32;$(BOOST_1_59_0)\stage32_lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir);$(BOOST_1_60_0);$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\lib\x32;$(BOOST_1_60_0)\stage\x32;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <TargetName>$(ProjectName)-vc120-s-300</TargetName>
-    <IncludePath>$(SolutionDir);$(BOOST_1_59_0);$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\lib\x64;$(BOOST_1_59_0)\stage64_lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir);$(BOOST_1_60_0);$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\lib\x64;$(BOOST_1_60_0)\stage\x64;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)\lib\x64\</OutDir>
     <IntDir>$(SolutionDir)\obj\x64\Release\$(ProjectName)\</IntDir>
   </PropertyGroup>
@@ -124,7 +125,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>libboost_system-vc120-mt-sgd-1_59.lib;libboost_locale-vc120-mt-sgd-1_59.lib;libboost_date_time-vc120-mt-sgd-1_59.lib;libboost_filesystem-vc120-mt-sgd-1_59.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libboost_system-vc120-mt-sgd-1_60.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -144,7 +145,7 @@
     </Link>
     <Lib />
     <Lib>
-      <AdditionalDependencies>libboost_system-vc120-mt-sgd-1_59.lib;libboost_locale-vc120-mt-sgd-1_59.lib;libboost_date_time-vc120-mt-sgd-1_59.lib;libboost_filesystem-vc120-mt-sgd-1_59.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libboost_system-vc120-mt-sgd-1_60.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -166,7 +167,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>libboost_system-vc120-mt-s-1_59.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libboost_system-vc120-mt-s-1_60.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -188,7 +189,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>libboost_system-vc120-mt-s-1_59.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libboost_system-vc120-mt-s-1_60.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
