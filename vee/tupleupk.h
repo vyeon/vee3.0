@@ -48,7 +48,7 @@ template <
     {
         return tupleupk_impl::_do_call<RTy>(std::forward<CallableObj>(func),
                                               ::std::forward<Tuple>(tuple),
-                                              typename mpl::sequence_generator< ::std::tuple_size< ::std::remove_reference<Tuple>::type >::value/*sizeof...(Args)*/>::type());
+                                              typename mpl::sequence_generator< ::std::tuple_size< typename ::std::remove_reference<Tuple>::type >::value/*sizeof...(Args)*/>::type());
     }
 
 #pragma warning(default:4100)

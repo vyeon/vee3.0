@@ -2,7 +2,6 @@
 #define _VEE_DELEGATE_H_
 
 #include <functional>
-#include <vector>
 #include <memory>
 #include <mutex>
 #include <map>
@@ -15,11 +14,12 @@ namespace exceptions {
 class key_generation_failed
 {
 public:
+	virtual ~key_generation_failed() = default;
     virtual const char* to_string()
     {
         return this->what();
     }
-    const char* what()
+    static const char* what()
     {
         return "function key gerneration failed";
     }
@@ -28,11 +28,12 @@ public:
 class target_not_found
 {
 public:
+	virtual ~target_not_found() = default;
     virtual const char* to_string()
     {
         return this->what();
     }
-    const char* what()
+    static const char* what()
     {
         return "target not found";
     }
@@ -41,11 +42,12 @@ public:
 class key_already_exist
 {
 public:
+	virtual ~key_already_exist() = default;
     virtual const char* to_string()
     {
         return this->what();
     }
-    const char* what()
+    static const char* what()
     {
         return "key already exist";
     }
@@ -79,19 +81,19 @@ class compareable_function: public ::std::function < FTy >
     bool(*_type_holder)(const function_t&, const function_t&);
 public:
     compareable_function() = default;
-    compareable_function(function_t& f):
+    explicit compareable_function(function_t& f):
         function_t(f),
         _type_holder(compare_function< FTy, function_t >)
     {
 
     }
-    compareable_function(function_t&& f):
+    explicit compareable_function(function_t&& f):
         function_t(::std::move(f)),
         _type_holder(compare_function< FTy, function_t >)
     {
 
     }
-    template <typename CallableObj> compareable_function(CallableObj&& f):
+    template <typename CallableObj> explicit compareable_function(CallableObj&& f):
         function_t(::std::forward<CallableObj>(f)),
         _type_holder(compare_function< ::std::remove_reference<CallableObj>::type, function_t >)
     {
@@ -163,7 +165,7 @@ public:
         auto ptr = dst.template target<target_type>();
         if (!ptr)
             throw exceptions::key_generation_failed();
-        printf("wrapper: %X, key: %X\n", ptr, *ptr);
+        //printf("wrapper: %X, key: %X\n", ptr, *ptr);
         return mpl::pvoid_cast(*ptr);
     }
     inline static key_t gen_key(binder_t&& dst) throw(...)
@@ -176,7 +178,7 @@ public:
         return gen_key(binder_t(::std::forward<CallableObj>(obj)));
     }
     template <class UsrKeyRef>
-    inline static typename mpl::type_to_type<usrkey_t> usrkey(UsrKeyRef&& key)
+    inline static mpl::type_to_type<usrkey_t> usrkey(UsrKeyRef&& key)
     {
         return mpl::type_to_type<usrkey_t>{ ::std::forward<UsrKeyRef>(key) };
     }
@@ -283,19 +285,19 @@ public:
     template <class URef>
     ref_t operator+=(URef&& uref)
     {
-        return this->_register(::std::forward<URef>(uref), mpl::meta_branch< mpl::is_pair<::std::remove_reference<URef>::type >::value>());
+        return this->_register(::std::forward<URef>(uref), mpl::meta_branch< mpl::is_pair<typename ::std::remove_reference<URef>::type >::value>());
     }
     template <class PairRef>
     ref_t _register(PairRef&& pair, mpl::meta_branch<true>/*is_pair == true*/)
     {
         ::std::lock_guard<lock_t> locker{ _mtx };
-        using PairTy = ::std::remove_reference<PairRef>::type;
-        using UsrKeyRef = ::std::conditional< ::std::is_rvalue_reference<PairRef>::value,
+        using PairTy = typename ::std::remove_reference<PairRef>::type;
+        using UsrKeyRef = typename ::std::conditional< ::std::is_rvalue_reference<PairRef>::value,
             usrkey_t&&,
             usrkey_t >::type;
-        using CallableObj = ::std::conditional< ::std::is_rvalue_reference<PairRef>::value,
-            PairTy::second_type&&,
-            PairTy::second_type >::type;
+        using CallableObj = typename ::std::conditional< ::std::is_rvalue_reference<PairRef>::value,
+            typename PairTy::second_type&&,
+            typename PairTy::second_type >::type;
         _cmpbinder_t cmpbinder{ static_cast<CallableObj>(pair.second) };
         auto ret = _usrcont.insert(::std::make_pair(static_cast<UsrKeyRef>(pair.first), ::std::move(cmpbinder)));
         if (ret.second == false)
@@ -318,8 +320,7 @@ public:
         auto  target = _cont.find(key);
         if (target == _cont.end())
             throw exceptions::target_not_found();
-        else
-            _cont.erase(target);
+        _cont.erase(target);
         return *this;
     }
     ref_t operator-=(mpl::type_to_type<usrkey_t>& wrapped_key)
@@ -328,8 +329,7 @@ public:
         auto target = _usrcont.find(wrapped_key.value);
         if (target == _usrcont.end())
             throw exceptions::target_not_found();
-        else
-            _usrcont.erase(target);
+        _usrcont.erase(target);
         return *this;
     }
     ref_t operator-=(mpl::type_to_type<usrkey_t>&& wrapped_key)

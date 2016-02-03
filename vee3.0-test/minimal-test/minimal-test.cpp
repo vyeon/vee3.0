@@ -1,6 +1,5 @@
 #include <vee/test/testobj.h>
 #include <vee/delegate.h>
-using namespace std;
 
 #define FUNCSIG void(int, ::vee::test::testobj&)
 
@@ -17,7 +16,7 @@ void bar(int i, ::vee::test::testobj& obj)
 void test_tupleupk()
 {
     printf("*********************** TUPLEUPK TEST CODE BEGIN ***********************\n");
-    ::vee::tupleupk(foo, make_tuple(1, ::vee::test::testobj(4)));
+    ::vee::tupleupk(foo, ::std::make_tuple(1, ::vee::test::testobj(4)));
 }
 
 void test_delegate()
