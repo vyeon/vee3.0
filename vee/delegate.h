@@ -5,55 +5,10 @@
 #include <memory>
 #include <mutex>
 #include <map>
+#include <vee/exl.h>
 #include <vee/tupleupk.h>
 
 namespace vee {
-
-namespace exceptions {
-
-class key_generation_failed
-{
-public:
-	virtual ~key_generation_failed() = default;
-    virtual const char* to_string()
-    {
-        return this->what();
-    }
-    static const char* what()
-    {
-        return "function key gerneration failed";
-    }
-};
-
-class target_not_found
-{
-public:
-	virtual ~target_not_found() = default;
-    virtual const char* to_string()
-    {
-        return this->what();
-    }
-    static const char* what()
-    {
-        return "target not found";
-    }
-};
-
-class key_already_exist
-{
-public:
-	virtual ~key_already_exist() = default;
-    virtual const char* to_string()
-    {
-        return this->what();
-    }
-    static const char* what()
-    {
-        return "key already exist";
-    }
-};
-
-} // !namespace exceptions
 
 namespace delegate_impl {
 
@@ -164,7 +119,7 @@ public:
             > ::type;
         auto ptr = dst.template target<target_type>();
         if (!ptr)
-            throw exceptions::key_generation_failed();
+            throw exl::key_generation_failed();
         //printf("wrapper: %X, key: %X\n", ptr, *ptr);
         return mpl::pvoid_cast(*ptr);
     }
@@ -182,18 +137,17 @@ public:
     {
         return mpl::type_to_type<usrkey_t>{ ::std::forward<UsrKeyRef>(key) };
     }
-
 /* Define Public member functinos */
 public:
     delegate() = default;
     ~delegate() = default;
-    delegate(const ref_t other)
+    explicit delegate(const ref_t other)
     {
         ::std::lock_guard<lock_t> locker(other._mtx);
         _cont = other._cont;
         _usrcont = other._usrcont;
     }
-    delegate(rref_t other)
+    explicit delegate(rref_t other)
     {
         ::std::lock_guard<lock_t> locker(other._mtx);
         _cont = ::std::move(other._cont);
@@ -301,7 +255,7 @@ public:
         _cmpbinder_t cmpbinder{ static_cast<CallableObj>(pair.second) };
         auto ret = _usrcont.insert(::std::make_pair(static_cast<UsrKeyRef>(pair.first), ::std::move(cmpbinder)));
         if (ret.second == false)
-            throw exceptions::key_already_exist();
+            throw exl::key_already_exist();
         return *this;
     }
     template <class CallableObj>
@@ -319,7 +273,7 @@ public:
         key_t key = gen_key( binder_t{ ::std::forward<CallableObj>(obj) });
         auto  target = _cont.find(key);
         if (target == _cont.end())
-            throw exceptions::target_not_found();
+            throw exl::target_not_found();
         _cont.erase(target);
         return *this;
     }
@@ -328,7 +282,7 @@ public:
         ::std::lock_guard<lock_t> locker{ _mtx };
         auto target = _usrcont.find(wrapped_key.value);
         if (target == _usrcont.end())
-            throw exceptions::target_not_found();
+            throw exl::target_not_found();
         _usrcont.erase(target);
         return *this;
     }

@@ -16,6 +16,9 @@
     <Filter Include="io">
       <UniqueIdentifier>{3546bbf1-b078-4684-910d-d81abeaf0a18}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ex">
+      <UniqueIdentifier>{143e12bd-f93d-4e4c-af21-4dbf49168aa2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="vee\libbase.h">
@@ -42,6 +45,12 @@
     <ClInclude Include="vee\mpl.h">
       <Filter>vee</Filter>
     </ClInclude>
+    <ClInclude Include="vee\exception.h">
+      <Filter>vee</Filter>
+    </ClInclude>
+    <ClInclude Include="vee\exl.h">
+      <Filter>vee</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="test\testobj.cpp">
@@ -49,6 +58,12 @@
     </ClCompile>
     <ClCompile Include="io\iobase.cpp">
       <Filter>io</Filter>
+    </ClCompile>
+    <ClCompile Include="ex\exception.cpp">
+      <Filter>ex</Filter>
+    </ClCompile>
+    <ClCompile Include="ex\exl.cpp">
+      <Filter>ex</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

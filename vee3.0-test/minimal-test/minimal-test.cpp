@@ -1,100 +1,35 @@
 #include <vee/test/testobj.h>
 #include <vee/delegate.h>
 
-#define FUNCSIG void(int, ::vee::test::testobj&)
+#define FUNCSIG void(int)
 
-void foo(int i, ::vee::test::testobj& obj)
+void foo(int i)
 {
-    printf("%s (id = %d, testobj = %d)\n", __FUNCTION__, i, obj.id);
+	printf("%s(int i = %d)\n", __FUNCTION__, i);
 }
 
-void bar(int i, ::vee::test::testobj& obj)
+void bar(int i)
 {
-    printf("%s (id = %d, testobj = %d)\n", __FUNCTION__, i, obj.id);
-}
-
-void test_tupleupk()
-{
-    printf("*********************** TUPLEUPK TEST CODE BEGIN ***********************\n");
-    ::vee::tupleupk(foo, ::std::make_tuple(1, ::vee::test::testobj(4)));
+	printf("%s(int i = %d)\n", __FUNCTION__, i);
 }
 
 void test_delegate()
 {
-    printf("*********************** DELEGATE TEST CODE BEGIN ***********************\n");
-
-    {
-        ::vee::test::scope scope;
-        puts("Default Constructor");
-        // Default constructor
-        ::vee::delegate<FUNCSIG> e;
-    }
-
-    {
-        ::vee::test::scope scope;
-        puts("Constructor with normal function parameter");
-        // Constructor with normal function parameter
-        ::vee::delegate<FUNCSIG> e{ foo };
-    }
-
-    {
-        ::vee::test::scope scope;
-        puts("Constructor with binder type (lvalue reference) (standard function class)");
-        // Constructor with binder type, lvalue reference (standard function class)
-        ::std::function<FUNCSIG> f{ foo };
-        ::vee::delegate<FUNCSIG> e{ f };
-    }
-
-    {
-        ::vee::test::scope scope;
-        puts("Constructor with binder type (rvalue reference) (standard function class)");
-        // Constructor with binder type, rvalue reference (standard function class)
-        ::vee::delegate<FUNCSIG> e{ ::std::function<FUNCSIG>{ foo } };
-    }
-
-    {
-        ::vee::test::scope scope;
-        puts("Constructor with user key and binder pair (lvalue reference)");
-        // Constructor with user key and binder pair, lvalue reference
-        int key = 100;
-        ::std::function<FUNCSIG> binder{ foo };
-        ::vee::delegate<FUNCSIG> e{ key, binder };
-    }
-
-    {
-        ::vee::test::scope scope;
-        puts("Constructor with user key and binder pair (rvalue reference)");
-        // Constructor with user key and binder pair, rvalue reference
-        ::vee::delegate<FUNCSIG> e{ 101, ::std::function<FUNCSIG>{ foo } };
-    }
-
-    {
-        ::vee::test::scope scope;
-        ::vee::delegate<FUNCSIG> e;
-        puts("Test the operator +=, (), -=");
-        // Test the operator +=
-        e += foo; // standard function
-        e += ::std::function<FUNCSIG>(bar); // binder
-        puts("Call foo and bar");
-        e(1, ::vee::test::testobj());
-        e -= foo;
-        puts("Call bar");
-        e(2, ::vee::test::testobj());
-        e -= bar;
-        puts("Call nothing");
-        e += ::std::make_pair(100, foo);
-        e += ::std::make_pair(200, bar);
-        puts("Call foo and bar");
-        e(3, ::vee::test::testobj());
-        e -= e.usrkey(100);
-        puts("Call bar");
-        e(4, ::vee::test::testobj());
-    }
+	using namespace vee;
+	delegate<FUNCSIG> e;
+	try
+	{
+		e += ::std::make_pair(100, foo);
+		e += ::std::make_pair(100, bar);
+	}
+	catch (::vee::exception& ex)
+	{
+		printf("exception occured! detail: %s\n", ex.to_string());
+	}
 }
 
 int main()
 {
-    test_tupleupk();
     test_delegate();
     return 0;
 }

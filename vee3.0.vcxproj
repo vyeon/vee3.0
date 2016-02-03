@@ -37,6 +37,8 @@
   <ItemGroup>
     <ClInclude Include="vee\delegate.h" />
     <ClInclude Include="vee\enumeration.h" />
+    <ClInclude Include="vee\exception.h" />
+    <ClInclude Include="vee\exl.h" />
     <ClInclude Include="vee\iobase.h" />
     <ClInclude Include="vee\libbase.h" />
     <ClInclude Include="vee\test\testobj.h" />
@@ -45,6 +47,8 @@
     <ClInclude Include="vee\tupleupk.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ex\exception.cpp" />
+    <ClCompile Include="ex\exl.cpp" />
     <ClCompile Include="io\iobase.cpp" />
     <ClCompile Include="test\testobj.cpp" />
   </ItemGroup>

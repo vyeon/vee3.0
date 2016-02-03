@@ -43,6 +43,8 @@ void operator=(const TypeName&&) = delete;
 #endif
 #endif
 
+#define __PURE = 0
+
 #define PRINT_LINE for(int i = 0; i < 7; ++i) printf("----------");printf("\n");
 
 #if (_MSC_VER == 1900) // VS2015
