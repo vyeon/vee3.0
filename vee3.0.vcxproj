@@ -41,6 +41,8 @@
     <ClInclude Include="vee\exl.h" />
     <ClInclude Include="vee\iobase.h" />
     <ClInclude Include="vee\libbase.h" />
+    <ClInclude Include="vee\lockfree.h" />
+    <ClInclude Include="vee\lockfree\queue.h" />
     <ClInclude Include="vee\test\testobj.h" />
     <ClInclude Include="vee\mpl.h" />
     <ClInclude Include="vee\mpmath.h" />

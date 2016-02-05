@@ -15,7 +15,7 @@ public:
 	explicit exception(const exception&) = default;
 	exception& operator=(const exception&) = default;
 	virtual ~exception() = default;
-	virtual char const* to_string() __PURE;
+	virtual char const* to_string() const __noexcept __PURE;
 };
 	
 } // !namespace vee

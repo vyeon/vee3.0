@@ -109,7 +109,7 @@ private:
     
 /* Define Public static member functions */
 public:
-    inline static key_t gen_key(binder_t& dst) throw(...)
+    inline static key_t gen_key(binder_t& dst)
     {
         using target_type = typename ::std::conditional
             <
@@ -123,7 +123,7 @@ public:
         //printf("wrapper: %X, key: %X\n", ptr, *ptr);
         return mpl::pvoid_cast(*ptr);
     }
-    inline static key_t gen_key(binder_t&& dst) throw(...)
+    inline static key_t gen_key(binder_t&& dst)
     {
         return gen_key(dst);
     }
@@ -137,23 +137,23 @@ public:
     {
         return mpl::type_to_type<usrkey_t>{ ::std::forward<UsrKeyRef>(key) };
     }
-/* Define Public member functinos */
+/* Define Public member functions */
 public:
     delegate() = default;
     ~delegate() = default;
-    explicit delegate(const ref_t other)
+    explicit delegate(const ref_t other) __noexcept
     {
         ::std::lock_guard<lock_t> locker(other._mtx);
         _cont = other._cont;
         _usrcont = other._usrcont;
     }
-    explicit delegate(rref_t other)
+    explicit delegate(rref_t other) __noexcept
     {
         ::std::lock_guard<lock_t> locker(other._mtx);
         _cont = ::std::move(other._cont);
         _usrcont = ::std::move(other._usrcont);
     }
-    ref_t operator=(const ref_t other)
+    ref_t operator=(const ref_t other) __noexcept
     {
         // lock both mutexes without deadlock
         ::std::lock(_mtx, other._mtx);
@@ -166,7 +166,7 @@ public:
 
         return *this;
     }
-    ref_t operator=(rref_t other)
+    ref_t operator=(rref_t other) __noexcept
     {
         // lock both mutexes without deadlock
         ::std::lock(_mtx, other._mtx);

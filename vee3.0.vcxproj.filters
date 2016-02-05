@@ -19,6 +19,9 @@
     <Filter Include="ex">
       <UniqueIdentifier>{143e12bd-f93d-4e4c-af21-4dbf49168aa2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vee\lockfree">
+      <UniqueIdentifier>{1c137e37-8330-4cc0-a126-2a8acbda6c0a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="vee\libbase.h">
@@ -36,9 +39,6 @@
     <ClInclude Include="vee\test\testobj.h">
       <Filter>vee\test</Filter>
     </ClInclude>
-    <ClInclude Include="vee\iobase.h">
-      <Filter>vee\io</Filter>
-    </ClInclude>
     <ClInclude Include="vee\mpmath.h">
       <Filter>vee</Filter>
     </ClInclude>
@@ -51,6 +51,13 @@
     <ClInclude Include="vee\exl.h">
       <Filter>vee</Filter>
     </ClInclude>
+    <ClInclude Include="vee\lockfree\queue.h">
+      <Filter>vee\lockfree</Filter>
+    </ClInclude>
+    <ClInclude Include="vee\iobase.h">
+      <Filter>vee</Filter>
+    </ClInclude>
+    <ClInclude Include="vee\lockfree.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="test\testobj.cpp">
