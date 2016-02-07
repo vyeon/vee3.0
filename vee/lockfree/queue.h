@@ -6,6 +6,8 @@
 #include <atomic>
 #include <vee/lockfree.h>
 
+#pragma warning(disable:4127)
+
 namespace vee {
 
 namespace lockfree {
@@ -29,6 +31,7 @@ public:
 	{
 		_cont = new data_t[capacity];
 		_ptrs = new data_t*[capacity];
+		memset(_ptrs, 0, sizeof(data_t*) * capacity);
 	}
 	~queue()
 	{
@@ -49,8 +52,8 @@ public:
 				size_t next = (front + 1) % capacity;
 				if (::std::atomic_compare_exchange_strong(&_front, &front, next))
 				{
-					_cont[front + capacity] = ::std::forward<DataRef>(value);
-					_ptrs[front] = &_cont[front + capacity];
+					_cont[front] = ::std::forward<DataRef>(value);
+					_ptrs[front] = &_cont[front];
 					return true;
 				}
 			}
@@ -88,7 +91,7 @@ public:
 		return false;
 	}
 	
-	const int capacity;
+	const size_t capacity;
 private:
 	::std::atomic<size_t> _front; // enqueue index
 	::std::atomic<size_t> _rear;  // dequeue index
@@ -99,5 +102,7 @@ private:
 } // !namespace lockfree
 
 } // !namespace vee
+
+#pragma warning(default:4127)
 
 #endif // !_VEE_LOCKFREE_QUEUE_H_
