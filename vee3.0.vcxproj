@@ -46,6 +46,7 @@
     <ClInclude Include="vee\test\testobj.h" />
     <ClInclude Include="vee\mpl.h" />
     <ClInclude Include="vee\mpmath.h" />
+    <ClInclude Include="vee\test\timerec.h" />
     <ClInclude Include="vee\tupleupk.h" />
   </ItemGroup>
   <ItemGroup>
@@ -53,6 +54,7 @@
     <ClCompile Include="ex\exl.cpp" />
     <ClCompile Include="io\iobase.cpp" />
     <ClCompile Include="test\testobj.cpp" />
+    <ClCompile Include="test\timerec.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{A78FA93C-3A15-461D-BF81-F49D01DEFE35}</ProjectGuid>

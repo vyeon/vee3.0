@@ -57,7 +57,7 @@ public:
 		}
 		return false;
 	}
-
+	
 	bool dequeue(data_t& out)
 	{
 		while (true)

@@ -58,6 +58,9 @@
       <Filter>vee</Filter>
     </ClInclude>
     <ClInclude Include="vee\lockfree.h" />
+    <ClInclude Include="vee\test\timerec.h">
+      <Filter>vee\test</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="test\testobj.cpp">
@@ -71,6 +74,9 @@
     </ClCompile>
     <ClCompile Include="ex\exl.cpp">
       <Filter>ex</Filter>
+    </ClCompile>
+    <ClCompile Include="test\timerec.cpp">
+      <Filter>test</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
