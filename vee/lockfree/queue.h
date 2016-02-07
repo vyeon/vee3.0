@@ -1,7 +1,6 @@
 #ifndef _VEE_LOCKFREE_QUEUE_H_
 #define _VEE_LOCKFREE_QUEUE_H_
 
-#include <cstdint>
 #include <array>
 #include <atomic>
 #include <vee/lockfree.h>
@@ -13,14 +12,7 @@ namespace vee {
 namespace lockfree {
 
 template <typename DataTy>
-class ptrqueue
-{
-public:
-
-};
-
-template <typename DataTy>
-class queue
+class queue final
 {
 public:
 	using data_t = DataTy;
@@ -97,6 +89,68 @@ private:
 	::std::atomic<size_t> _rear;  // dequeue index
 	data_t* _cont;
 	data_t** _ptrs;
+};
+
+template <typename DataTy>
+class queue2 final
+{
+public:
+	using data_t = DataTy;
+	queue2(size_t capacity_):
+		capacity { capacity_ },
+		_cont_queue { capacity },
+		_out_queue { capacity }
+	{
+		_cont = new data_t[capacity];
+		for (size_t i = 0; i < capacity; )
+		{
+			if (_cont_queue.enqueue(i))
+				++i;
+			else
+				throw ::std::runtime_error("queue2 initialization failed!");
+		}
+	}
+	~queue2()
+	{
+		delete[] _cont;
+	}
+	template <typename DataRef>
+	bool enqueue(DataRef&& data, size_t retries = 1000)
+	{
+		size_t counter = 0;
+
+		while(counter < retries)
+		{
+			size_t block_id = 0;
+			if (_cont_queue.dequeue(block_id))
+			{
+				_cont[block_id] = ::std::forward<DataRef>(data);
+				while(!_out_queue.enqueue(block_id));
+				return true;
+			}
+			else
+			{
+				++counter;
+			}
+		}
+		return false;
+	}
+
+	bool dequeue(data_t& out)
+	{
+		size_t block_id = 0;
+		if (!_out_queue.dequeue(block_id))
+			return false;
+		out = ::std::move(_cont[block_id]);
+		while (!_cont_queue.enqueue(block_id));
+		return true;
+	}
+
+	const size_t capacity;
+private:
+	data_t* _cont;
+	queue<size_t> _cont_queue;
+	queue<size_t> _out_queue;
 };
 
 } // !namespace lockfree

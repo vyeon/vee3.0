@@ -1,9 +1,15 @@
 #include <vee/test/testobj.h>
 #include <vee/delegate.h>
 #include <vee/lockfree/queue.h>
+#include <ctime>
 #include <thread>
+#include <vector>
+#include <mutex>
+#include <iostream>
 
 #define FUNCSIG void(int)
+
+::std::mutex log_mutex;
 
 void foo(int i)
 {
@@ -35,61 +41,99 @@ void test_queue()
 {
 	using namespace std;
 	using namespace vee;
-	const int test_boundary = INT_MAX / 256;
-	lockfree::queue<int> queue{ 1000 };	
-	::std::atomic<int> produced = 0;
-	auto producer = [&]()->void
+
+	chrono::time_point<chrono::system_clock> start, end;
+	start = chrono::system_clock::now();
+
+	lockfree::queue<int> queue { 10000 };
+	const size_t produce_per_thread = 5000000;
+	const size_t number_of_procducers = 5;
+	const size_t number_of_consumers = 5;
+	
+	auto producer = [&]() -> void
 	{
-		int produced_local = 0;
-		for (int i = 0; produced.load() < test_boundary; ++i)
+		{		
+			::std::lock_guard<::std::mutex> locker{ log_mutex };
+			cout << "producer " << this_thread::get_id() << " start." << endl;
+		}
+		size_t produced = 0;
+		size_t tries = 0;
+		size_t fails = 0;
+		for (size_t i = 0; produced != produce_per_thread; ++i)
 		{
-			if (queue.enqueue(i))
+			++tries;
+			if(queue.enqueue(i))
 			{
 				++produced;
-				++produced_local;
-			}
-		}
-		printf("Produced %d times\n", produced_local);
-	};
-	thread producer1{producer};
-	thread producer2{producer};
-
-	::std::atomic<int> consumed = 0;
-
-	auto consumer = [&]()->void
-	{
-		int consumed_local = 0;
-		while (true)
-		{
-			int r;
-			if (queue.dequeue(r))
-			{
-				++consumed;
-				++consumed_local;
 			}
 			else
 			{
-				//printf("dequeue failed!\n");
+				++fails;
 			}
-			if (consumed > test_boundary)
+		}
+		double ratio = (1.0 - static_cast<double>(fails) / static_cast<double>(tries)) * 100.0;
+		{
+			::std::lock_guard<::std::mutex> locker{ log_mutex };
+			cout << "producer " << this_thread::get_id() << " is done." << endl
+				<< tries << " times tried, "
+				<< fails << " times failed ("
+				<< ratio << "%)" << endl;
+		}
+		return;
+	};	
+
+	auto consumer = [&]() -> void
+	{
+		static atomic<size_t> consumed_all = 0;
+		{
+			::std::lock_guard<::std::mutex> locker{ log_mutex };
+			cout << "consumer " << this_thread::get_id() << " start." << endl;
+		}
+		size_t consumed = 0;
+		size_t tries = 0;
+		size_t fails = 0;
+		while (true)
+		{
+			int val;
+			++tries;
+			if (queue.dequeue(val))
+			{
+				++consumed;
+				++consumed_all;
+			}
+			else
+			{
+				++fails;
+			}
+			if (consumed_all.load() == number_of_procducers * produce_per_thread)
 				break;
 		}
-		printf("Consumed %d times\n", consumed_local);
+		double ratio = (1.0 - static_cast<double>(fails) / static_cast<double>(tries)) * 100.0;
+		{
+			::std::lock_guard<::std::mutex> locker{ log_mutex };
+			cout << "consumer " << this_thread::get_id() << " is done." << endl
+				<< tries << " times tried, "
+				<< fails << " times failed ("
+				<< ratio << "%)" << endl;
+		}
+		return;
 	};
 
-	thread consumer1(consumer);
-	thread consumer2(consumer);
-	thread consumer3(consumer);
-	if (consumer1.joinable())
-		consumer1.join();
-	if (consumer2.joinable())
-		consumer2.join();
-	if (consumer3.joinable())
-		consumer3.join();
-	if (producer1.joinable()) 
-		producer1.join();
-	if (producer2.joinable())
-		producer2.join();
+	vector<thread> threads;
+	for (int i = 0; i < number_of_procducers; ++i)
+		threads.push_back(thread{producer});
+	for (int i = 0; i < number_of_consumers; ++i)
+		threads.push_back(thread{consumer});
+	for (auto& thr : threads)
+		if(thr.joinable()) 
+			thr.join();
+
+	end = chrono::system_clock::now();
+	chrono::duration<double> elapsed_seconds = end - start;
+	time_t end_time = chrono::system_clock::to_time_t(end);
+
+	cout << "finished computation at " << ctime(&end_time)
+		<< "elapsed time: " << elapsed_seconds.count() << "s\n";
 }
 
 int main()
