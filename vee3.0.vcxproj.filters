@@ -61,6 +61,10 @@
     <ClInclude Include="vee\test\timerec.h">
       <Filter>vee\test</Filter>
     </ClInclude>
+    <ClInclude Include="vee\lock.h">
+      <Filter>vee</Filter>
+    </ClInclude>
+    <ClInclude Include="vee\queue.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="test\testobj.cpp">

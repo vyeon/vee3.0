@@ -3,7 +3,6 @@
 
 #include <array>
 #include <atomic>
-#include <vee/lockfree.h>
 
 #pragma warning(disable:4127)
 
@@ -15,6 +14,9 @@ template <typename DataTy>
 class queue final
 {
 public:
+	using this_t = queue<DataTy>;
+	using ref_t = this_t&;
+	using rref_t = this_t&&;
 	using data_t = DataTy;
 	explicit queue(size_t capacity_):
 		capacity { capacity_ },
@@ -38,14 +40,14 @@ public:
 		while (counter < retries)
 		{
 			::std::atomic_thread_fence(std::memory_order_release);
-			size_t front = _front.load();
-			if (_ptrs[front] == nullptr)
+			size_t rear = _rear.load();
+			if (_ptrs[rear] == nullptr)
 			{
-				size_t next = (front + 1) % capacity;
-				if (::std::atomic_compare_exchange_strong(&_front, &front, next))
+				size_t next = (rear + 1) % capacity;
+				if (::std::atomic_compare_exchange_strong(&_rear, &rear, next))
 				{
-					_cont[front] = ::std::forward<DataRef>(value);
-					_ptrs[front] = &_cont[front];
+					_cont[rear] = ::std::forward<DataRef>(value);
+					_ptrs[rear] = &_cont[rear];
 					return true;
 				}
 			}
@@ -63,14 +65,18 @@ public:
 		while (true)
 		{
 			std::atomic_thread_fence(std::memory_order_acquire);
-			size_t rear = _rear.load();
-			if(_ptrs[rear] != nullptr)
+			size_t front = _front.load();
+			if(_ptrs[front] != nullptr)
 			{
-				size_t next = (rear + 1) % capacity;
-				if(::std::atomic_compare_exchange_strong(&_rear, &rear, next))
+				size_t next = (front + 1) % capacity;
+				if(::std::atomic_compare_exchange_strong(&_front, &front, next))
 				{
-					out = ::std::move(_cont[rear]);
-					_ptrs[rear] = nullptr;
+					using request_t = ::std::conditional_t<
+						::std::is_trivially_move_assignable<data_t>::value,
+						::std::add_rvalue_reference_t<data_t>,
+						::std::add_lvalue_reference_t<data_t> >;
+					out = static_cast<request_t>(_cont[front]);
+					_ptrs[front] = nullptr;
 					return true;
 				}
 			}
@@ -85,16 +91,25 @@ public:
 	
 	const size_t capacity;
 private:
-	::std::atomic<size_t> _front; // enqueue index
-	::std::atomic<size_t> _rear;  // dequeue index
+	::std::atomic<size_t> _front; // dequeue index
+	::std::atomic<size_t> _rear;  // enqueue index
 	data_t* _cont;
 	data_t** _ptrs;
+
+	queue() = delete;
+	queue(const ref_t) = delete;
+	queue(rref_t) = delete;
+	ref_t operator=(const ref_t) = delete;
+	ref_t operator=(rref_t) = delete;
 };
 
 template <typename DataTy>
 class queue2 final
 {
 public:
+	using this_t = queue<DataTy>;
+	using ref_t = this_t&;
+	using rref_t = this_t&&;
 	using data_t = DataTy;
 	queue2(size_t capacity_):
 		capacity { capacity_ },
@@ -151,6 +166,12 @@ private:
 	data_t* _cont;
 	queue<size_t> _cont_queue;
 	queue<size_t> _out_queue;
+
+	queue2() = delete;
+	queue2(const ref_t) = delete;
+	queue2(rref_t) = delete;
+	ref_t operator=(const ref_t) = delete;
+	ref_t operator=(rref_t) = delete;
 };
 
 } // !namespace lockfree

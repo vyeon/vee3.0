@@ -15,7 +15,7 @@ timerec::~timerec()
 	
 }
 
-::std::pair<time_t, double> timerec::timelab()
+::std::pair<time_t, double> timerec::timelab() const
 {
 	::std::chrono::time_point<::std::chrono::system_clock> end = ::std::chrono::system_clock::now();
 	::std::chrono::duration<double> elapsed_seconds = end - start;

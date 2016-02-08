@@ -12,7 +12,7 @@ class timerec
 public:
 	timerec();
 	~timerec();
-	::std::pair<time_t, double> timelab();
+	::std::pair<time_t, double> timelab() const;
 private:
 	::std::chrono::time_point<std::chrono::system_clock> start;
 };

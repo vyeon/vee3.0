@@ -1,7 +1,7 @@
 #include <vee/test/testobj.h>
 #include <vee/delegate.h>
 #include <vee/lockfree/queue.h>
-#include <ctime>
+#include <vee/queue.h>
 #include <thread>
 #include <vector>
 #include <mutex>
@@ -45,10 +45,11 @@ void test_queue()
 	chrono::time_point<chrono::system_clock> start, end;
 	start = chrono::system_clock::now();
 
-	lockfree::queue2<int> queue { 10000 };
+	//queue<size_t, mutex> queue { 10000 };
+	lockfree::queue<size_t> queue{ 100000 };
 	const size_t produce_per_thread = 5000000;
 	const size_t number_of_procducers = 5;
-	const size_t number_of_consumers = 5;
+	const size_t number_of_consumers = 2;
 	
 	auto producer = [&]() -> void
 	{
@@ -94,7 +95,7 @@ void test_queue()
 		size_t fails = 0;
 		while (true)
 		{
-			int val;
+			size_t val;
 			++tries;
 			if (queue.dequeue(val))
 			{
