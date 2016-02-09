@@ -57,14 +57,27 @@
     <ClInclude Include="vee\iobase.h">
       <Filter>vee</Filter>
     </ClInclude>
-    <ClInclude Include="vee\lockfree.h" />
     <ClInclude Include="vee\test\timerec.h">
       <Filter>vee\test</Filter>
     </ClInclude>
     <ClInclude Include="vee\lock.h">
       <Filter>vee</Filter>
     </ClInclude>
-    <ClInclude Include="vee\queue.h" />
+    <ClInclude Include="vee\signal.h">
+      <Filter>vee</Filter>
+    </ClInclude>
+    <ClInclude Include="vee\worker.h">
+      <Filter>vee</Filter>
+    </ClInclude>
+    <ClInclude Include="vee\lockfree.h">
+      <Filter>vee</Filter>
+    </ClInclude>
+    <ClInclude Include="vee\queue.h">
+      <Filter>vee</Filter>
+    </ClInclude>
+    <ClInclude Include="vee\lockfree\stack.h">
+      <Filter>vee\lockfree</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="test\testobj.cpp">

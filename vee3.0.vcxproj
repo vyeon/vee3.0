@@ -44,12 +44,15 @@
     <ClInclude Include="vee\lock.h" />
     <ClInclude Include="vee\lockfree.h" />
     <ClInclude Include="vee\lockfree\queue.h" />
+    <ClInclude Include="vee\lockfree\stack.h" />
     <ClInclude Include="vee\queue.h" />
+    <ClInclude Include="vee\signal.h" />
     <ClInclude Include="vee\test\testobj.h" />
     <ClInclude Include="vee\mpl.h" />
     <ClInclude Include="vee\mpmath.h" />
     <ClInclude Include="vee\test\timerec.h" />
     <ClInclude Include="vee\tupleupk.h" />
+    <ClInclude Include="vee\worker.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ex\exception.cpp" />
