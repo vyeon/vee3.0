@@ -1,11 +1,12 @@
 #include <vee/test/testobj.h>
 #include <vee/delegate.h>
-#include <vee/lockfree/queue.h>
-#include <vee/queue.h>
+#include <vee/lockfree/stack.h>
 #include <thread>
 #include <vector>
 #include <mutex>
 #include <iostream>
+
+#pragma warning(default:4127)
 
 #define FUNCSIG void(int)
 
@@ -137,9 +138,33 @@ void test_queue()
 		<< "elapsed time: " << elapsed_seconds.count() << "s\n";
 }
 
+void test_stack()
+{
+	using namespace std;
+	using namespace vee;
+	lockfree::stack<int> stack{ 20 };
+	for (int i = 0; i < 30; ++i)
+	{
+		printf("push %d : %s\n", i, stack.push(i)?"success":"failed");
+	}
+	for (int i = 0; i < 30; ++i)
+	{
+		int out;
+		if(stack.pop(out))
+		{
+			printf("pop success, val: %d\n", out);
+		}
+		else
+		{
+			printf("pop failed\n");
+		}
+	}
+}
+
 int main()
 {
     //test_delegate();
-	test_queue();
+	//test_queue();
+	test_stack();
     return 0;
 }

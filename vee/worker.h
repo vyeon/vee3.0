@@ -38,7 +38,7 @@ private:
 
 	const size_t job_queue_size;
 private:
-	lockfree::queue2<job_t> _job_queue;
+	lockfree::queue<job_t> _job_queue;
 	::std::thread _thr;
 
 private:
