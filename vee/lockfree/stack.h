@@ -2,7 +2,6 @@
 #define _VEE_LOCKFREE_STACK_H_
 
 #include <vee/lockfree/queue.h>
-#include <stdexcept>
 #include <atomic>
 
 #pragma warning(disable:4127)
@@ -51,7 +50,10 @@ public:
 		{
 			_cont[block_id] = ::std::forward<DataRef>(data);
 			size_t outidx = _top.fetch_add(1);
-			while (_outarr[outidx] != nullptr);
+			while (_outarr[outidx] != nullptr)
+			{
+				
+			}
 			_outarr[outidx] = &_cont[block_id];
 		}
 		else

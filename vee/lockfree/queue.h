@@ -1,6 +1,7 @@
 #ifndef _VEE_LOCKFREE_QUEUE_H_
 #define _VEE_LOCKFREE_QUEUE_H_
 
+#include <stdexcept>
 #include <atomic>
 
 #pragma warning(disable:4127)
@@ -34,11 +35,11 @@ public:
 			delete[] _ptrs;
 	}
 	template <typename DataRef>
-	bool enqueue(DataRef&& value, size_t retries = 1000)
+	bool enqueue(DataRef&& value, size_t retries = 0)
 	{
 		size_t counter = 0;
 
-		while (counter < retries)
+		while (counter <= retries)
 		{
 			::std::atomic_thread_fence(std::memory_order_release);
 			size_t rear = _rear.load();
@@ -131,17 +132,20 @@ public:
 		delete[] _cont;
 	}
 	template <typename DataRef>
-	bool enqueue(DataRef&& data, size_t retries = 1000)
+	bool enqueue(DataRef&& data, size_t retries = 0)
 	{
 		size_t counter = 0;
 
-		while(counter < retries)
+		while(counter <= retries)
 		{
 			size_t block_id = 0;
 			if (_cont_queue.dequeue(block_id))
 			{
 				_cont[block_id] = ::std::forward<DataRef>(data);
-				while(!_out_queue.enqueue(block_id));
+				while(!_out_queue.enqueue(block_id))
+				{
+					
+				}
 				return true;
 			}
 			else
@@ -162,7 +166,10 @@ public:
 			::std::add_rvalue_reference_t<data_t>,
 			::std::add_lvalue_reference_t<data_t> >;
 		out = static_cast<request_t>(_cont[block_id]);
-		while (!_cont_queue.enqueue(block_id));
+		while (!_cont_queue.enqueue(block_id))
+		{
+			
+		}
 		return true;
 	}
 

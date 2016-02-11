@@ -1,10 +1,13 @@
 #include <vee/test/testobj.h>
 #include <vee/delegate.h>
 #include <vee/lockfree/stack.h>
+#include <vee/test/timerec.h>
+#include <vee/queue.h>
 #include <thread>
 #include <vector>
 #include <mutex>
 #include <iostream>
+#include <stack>
 
 #pragma warning(default:4127)
 
@@ -161,10 +164,68 @@ void test_stack()
 	}
 }
 
+void lockfree_queue_input()
+{
+	static ::vee::lockfree::queue<int> lfqueue{ 100000 };
+	for (int i = 0; i < 5000000; ++i)
+	{
+		lfqueue.enqueue(i);
+	}
+}
+
+void lock_queue_input()
+{
+	static ::vee::queue<int, ::std::mutex, ::std::mutex> lqueue{ 100000 };
+	for (int i = 0; i < 5000000; ++i)
+	{
+		lqueue.enqueue(i);
+	}
+}
+
+void test()
+{
+	using namespace vee;
+	{
+		test::scope sc;
+		printf("Locked queue (::std::mutex)\n");
+		test::timerec tr;
+		::std::vector<std::thread> thrs;
+		for (auto i = 0; i < 20; ++i)
+			thrs.push_back(::std::thread(lock_queue_input));
+		for(auto& thr : thrs)
+		{
+			if(thr.joinable())
+				thr.join();
+		}
+		auto result = tr.timelab();
+		::std::cout << "finished computation at " << ctime(&result.first)
+			<< "elapsed time: " << result.second << "s\n";
+	}
+
+	{
+		test::scope sc;
+		printf("Lockfree queue\n");
+		test::timerec tr;
+		::std::vector<std::thread> thrs;
+		for (auto i = 0; i < 20; ++i)
+			thrs.push_back(::std::thread(lockfree_queue_input));
+		for (auto& thr : thrs)
+		{
+			if (thr.joinable())
+				thr.join();
+		}
+		auto result = tr.timelab();
+		::std::cout << "finished computation at " << ctime(&result.first)
+			<< "elapsed time: " << result.second << "s\n";
+	}
+	return;
+}
+
 int main()
 {
     //test_delegate();
 	//test_queue();
-	test_stack();
+	//test_stack();
+	test();
     return 0;
 }
