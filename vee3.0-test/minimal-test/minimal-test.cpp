@@ -7,7 +7,7 @@
 #include <vector>
 #include <mutex>
 #include <iostream>
-#include <stack>
+#include <vee/signal.h>
 
 #pragma warning(default:4127)
 
@@ -137,7 +137,9 @@ void test_queue()
 	chrono::duration<double> elapsed_seconds = end - start;
 	time_t end_time = chrono::system_clock::to_time_t(end);
 
-	cout << "finished computation at " << ctime(&end_time)
+	char buffer[512];
+	ctime_s(buffer, 512, &end_time);
+	cout << "finished computation at " << buffer
 		<< "elapsed time: " << elapsed_seconds.count() << "s\n";
 }
 
@@ -198,7 +200,9 @@ void test()
 				thr.join();
 		}
 		auto result = tr.timelab();
-		::std::cout << "finished computation at " << ctime(&result.first)
+		char buffer[512];
+		ctime_s(buffer, 512, &result.first);
+		::std::cout << "finished computation at " << buffer
 			<< "elapsed time: " << result.second << "s\n";
 	}
 
@@ -215,10 +219,107 @@ void test()
 				thr.join();
 		}
 		auto result = tr.timelab();
-		::std::cout << "finished computation at " << ctime(&result.first)
+		char buffer[512];
+		ctime_s(buffer, 512, &result.first);
+		::std::cout << "finished computation at " << buffer
 			<< "elapsed time: " << result.second << "s\n";
 	}
 	return;
+}
+
+void test_lfqueue_data_integrity()
+{
+	using namespace std;
+	using namespace vee;
+	test::timerec tr;
+
+	lockfree::queue<int> queue{ 5000000 };
+	const size_t number_of_producers = 5;
+	const size_t inputs_per_thread = queue.capacity / 5;
+	const size_t number_of_consumers = 3;
+	auto producer = [&](int id) -> void
+	{
+		for (auto i = 0; i < inputs_per_thread;)
+		{
+			if (queue.enqueue(id))
+				++i;
+		};
+	};
+	void* raw_memory = operator new[](number_of_producers * sizeof(atomic<int>));
+	atomic<int>* counters = static_cast<atomic<int>*>(raw_memory);
+	for (int i = 0; i < number_of_producers; ++i)
+	{
+		new (&counters[i])atomic<int>(0);
+	}
+
+	auto consumer = [&]()
+	{
+		static atomic<int> consumed;
+		int buf;
+		while (true)
+		{
+			if (queue.dequeue(buf))
+			{
+				++(counters[buf]);
+				++consumed;
+			}
+			if (consumed == queue.capacity)
+				break;
+		}
+	};
+	vector<thread> thrs;
+	for (auto i = 0; i < number_of_producers; ++i)
+		thrs.push_back(thread(producer, i));
+	for (auto i = 0; i < number_of_consumers; ++i)
+		thrs.push_back(thread(consumer));
+	for (auto& thr : thrs)
+		if (thr.joinable())
+			thr.join();
+
+	auto result = tr.timelab();
+	char buffer[512];
+	ctime_s(buffer, 512, &result.first);
+	for (auto i = 0; i < number_of_producers; ++i)
+		printf("counters[%d] = %d\n", i, counters[i].load());
+
+	::std::cout << "finished computation at " << buffer
+		<< "elapsed time: " << result.second << "s\n";
+	
+	// destruct in inverse order    
+	for (int i = number_of_producers - 1; i >= 0; --i)
+	{
+		counters[i].~atomic();
+	}
+	operator delete[](raw_memory);
+}
+
+void signal_test()
+{
+	using namespace std;
+	using namespace vee;
+
+	::vee::p2psignal<int> p2psig;
+	auto producer = [&](int sig) -> void
+	{
+		printf("Signal delay ....\n");
+		this_thread::sleep_for(chrono::milliseconds::duration(3000));
+		p2psig.set_value(sig);
+	};
+	auto consumer = [&]() -> void
+	{
+		int out;
+		p2psig.wait(out);
+		printf("signal received: %d\n", out);
+	};
+	{
+		thread thr(producer, 1);
+
+		int out;
+		p2psig.wait(out);
+		printf("signal received: %d\n", out);
+
+		thr.join();
+	}
 }
 
 int main()
@@ -226,6 +327,8 @@ int main()
     //test_delegate();
 	//test_queue();
 	//test_stack();
-	test();
+	//test();
+	//test_lfqueue_data_integrity();
+	signal_test();
     return 0;
 }

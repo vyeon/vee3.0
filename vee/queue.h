@@ -16,14 +16,14 @@ public:
 	using blocklock_t = BlockLockTy;
 	using idxlock_t = IndexLockTy;
 	
-	queue(const size_t capacity_, bool overwrite_flag = false):
+	explicit queue(const size_t capacity_, bool overwrite_flag = false):
 		capacity { capacity_ },
 		_overwrite_flag { overwrite_flag }
 	{
 		_blocks = new data_t[capacity];
 		_blocklcks = new blocklock_t[capacity];
 	}
-	queue(const ref_t other):
+	explicit queue(const ref_t other):
 		queue{ other.capacity, other._overwrite_flag }
 	{
 		
@@ -46,7 +46,7 @@ public:
 	template <class DataRef>
 	bool enqueue(DataRef&& val)
 	{
-		size_t rear = 0;
+		size_t rear;
 		::std::unique_lock<blocklock_t> block_locker;
 		{
 			::std::lock_guard<idxlock_t> idx_locker{ _idxlck };
@@ -71,7 +71,7 @@ public:
 	}
 	bool dequeue(data_t& out)
 	{
-		size_t front = 0;
+		size_t front;
 		::std::unique_lock<blocklock_t> block_locker;
 		{
 			::std::lock_guard<idxlock_t> idx_locker{ _idxlck };
