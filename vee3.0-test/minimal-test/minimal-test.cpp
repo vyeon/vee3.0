@@ -7,7 +7,6 @@
 #include <vector>
 #include <mutex>
 #include <iostream>
-#include <vee/signal.h>
 
 #pragma warning(default:4127)
 
@@ -52,7 +51,7 @@ void test_queue()
 	//queue<size_t, mutex> queue { 10000 };
 	lockfree::queue<size_t> queue{ 100000 };
 	const size_t produce_per_thread = 5000000;
-	const size_t number_of_procducers = 5;
+	const size_t number_of_procducers = 3;
 	const size_t number_of_consumers = 2;
 	
 	auto producer = [&]() -> void
@@ -293,42 +292,13 @@ void test_lfqueue_data_integrity()
 	operator delete[](raw_memory);
 }
 
-void signal_test()
-{
-	using namespace std;
-	using namespace vee;
-
-	::vee::p2psignal<int> p2psig;
-	auto producer = [&](int sig) -> void
-	{
-		printf("Signal delay ....\n");
-		this_thread::sleep_for(chrono::milliseconds::duration(3000));
-		p2psig.set_value(sig);
-	};
-	auto consumer = [&]() -> void
-	{
-		int out;
-		p2psig.wait(out);
-		printf("signal received: %d\n", out);
-	};
-	{
-		thread thr(producer, 1);
-
-		int out;
-		p2psig.wait(out);
-		printf("signal received: %d\n", out);
-
-		thr.join();
-	}
-}
-
 int main()
 {
     //test_delegate();
-	//test_queue();
+	test_queue();
 	//test_stack();
 	//test();
 	//test_lfqueue_data_integrity();
-	signal_test();
+	//signal_test();
     return 0;
 }
