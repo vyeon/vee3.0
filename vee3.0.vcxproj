@@ -46,7 +46,6 @@
     <ClInclude Include="vee\lockfree\queue.h" />
     <ClInclude Include="vee\lockfree\stack.h" />
     <ClInclude Include="vee\queue.h" />
-    <ClInclude Include="vee\signal.h" />
     <ClInclude Include="vee\test\testobj.h" />
     <ClInclude Include="vee\mpl.h" />
     <ClInclude Include="vee\mpmath.h" />

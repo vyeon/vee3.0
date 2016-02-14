@@ -63,9 +63,6 @@
     <ClInclude Include="vee\lock.h">
       <Filter>vee</Filter>
     </ClInclude>
-    <ClInclude Include="vee\signal.h">
-      <Filter>vee</Filter>
-    </ClInclude>
     <ClInclude Include="vee\worker.h">
       <Filter>vee</Filter>
     </ClInclude>

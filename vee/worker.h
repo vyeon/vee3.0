@@ -7,28 +7,47 @@
 
 namespace vee {
 
-namespace worker_impl {
-
 template <class FTy>
 class packaged_task;
 
 template <class RTy, class ...Args>
 class packaged_task
 {
+	packaged_task() = delete;
 public:
 	using this_t = packaged_task<RTy(Args...)>;
 	using ref_t = this_t&;
 	using rref_t = this_t&&;
 	using delegate_t = delegate<RTy(Args...)>;
 	using argstup_t = ::std::tuple<Args...>;
-	//template <class>
-	//explicit packaged_task()
-	//{
-	//	
-	//}
+	template <class Delegate, class Arguments>
+	explicit packaged_task(Delegate&& e, Arguments&& ...args):
+		task{ ::std::forward<Delegate>(e) },
+		args{ ::std::make_tuple(::std::forward<Arguments>(args)...) }
+	{
+
+	}
+	template <class Delegate>
+	explicit packaged_task(Delegate&& e, argstup_t&& tup):
+		task{ ::std::forward<Delegate>(e) },
+		args{ ::std::move(tup) }
+	{
+
+	}
+	template <class Delegate>
+	explicit packaged_task(Delegate&& e, argstup_t& tup):
+		task{ ::std::forward<Delegate>(e) },
+		args{ tup }
+	{
+
+	}
+	~packaged_task()
+	{
+
+	}
+	delegate_t task;
+	argstup_t  args;
 };
-	
-} // !namespace worker_impl
 
 template <class FTy>
 class worker;
@@ -56,11 +75,11 @@ public:
 	{
 			
 	}
-	template <typename Delegate>
+	/*template <typename Delegate>
 	bool request(Delegate&& task, Args&& ...args)
 	{
 		
-	}
+	}*/
 	const size_t job_queue_size;
 private:
 	/*::std::atomic<size_t> _remained;
