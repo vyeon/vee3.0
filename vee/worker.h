@@ -2,7 +2,6 @@
 #define _VEE_WORKER_H_
 
 #include <vee/delegate.h>
-#include <vee/tupleupk.h>
 #include <vee/lockfree/queue.h>
 #include <thread>
 #include <future>
@@ -13,16 +12,16 @@ template <class FTy>
 class packaged_task;
 
 template <class RTy, class ...Args>
-class packaged_task
+class packaged_task<RTy(Args...)> final
 {
-    packaged_task() = delete;
 public:
     using this_t = packaged_task<RTy(Args...)>;
     using ref_t = this_t&;
     using rref_t = this_t&&;
     using delegate_t = delegate<RTy(Args...)>;
-    using argstup_t = ::std::tuple<Args...>;
-    template <class Delegate, class Arguments>
+    using argstup_t = ::std::tuple< ::std::remove_reference_t<Args>... >;
+    packaged_task() = default;
+    template <class Delegate, class ...Arguments>
     explicit packaged_task(Delegate&& e, Arguments&& ...args):
         task{ ::std::forward<Delegate>(e) },
         args{ ::std::make_tuple(::std::forward<Arguments>(args)...) }
@@ -59,6 +58,11 @@ public:
         args = ::std::move(rhs.args);
         return *this;
     }
+    void run()
+    {
+        if (!task.empty())
+            task.operator()(args);
+    }
     delegate_t task;
     argstup_t  args;
 };
@@ -85,8 +89,9 @@ public:
         shutdown
     };
 
-    explicit worker(size_t job_queue_size_, bool autorun = true):
-        job_queue_size { job_queue_size_ },
+    explicit worker(size_t __job_queue_size, bool autorun = true):
+        job_queue_size { __job_queue_size },
+        _job_queue { job_queue_size },
         _remained { 0 },
         _state { state_t::standby }
     {
@@ -109,10 +114,11 @@ public:
         if (!result)
             return 0; // request failed, job queue is full
         size_t remained = _remained.fetch_add(1);
-        if ((remained == 1) && (_state.load != state_t::standby))
+        if ((remained == 0) && (_state.load() != state_t::standby))
         {
-            while (!this->_promise.get() == nullptr){ }; // waiting until promise ready
-            this->_promise->set_value(); // signalling
+            while (this->_promise == nullptr){ }; // waiting until promise ready
+            ::std::promise<void>* promise = const_cast<::std::promise<void>*>(_promise);
+            promise->set_value(); // signalling
         }
         return remained;
     }
@@ -122,7 +128,7 @@ public:
         bool result = ::std::atomic_compare_exchange_strong(&_state, &cmp, state_t::running);
         if (result == false)
             return false; // worker is already in the running state
-        _thr = ::std::thread{ _worker_main };
+        _thr = ::std::thread{ &this_t::_worker_main, this };
         return true;
     }
     bool shutdown(bool sync)
@@ -132,17 +138,18 @@ public:
         if (result == false)
             return false; // worker isn't in the running state
 
-        if (_remained == 0)
+        if (_remained.load() == 0)
         {
             // generate dummy job for wakeup the worker
             request(
-                job_t{ [](Args ...) -> RTy { },
-                ::std::make_tuple<Args{}...> }
+                job_t{ }
             );
         }
 
         if (sync && _thr.joinable())
             _thr.join();
+        else
+            _thr.detach();
         return true;
     }
 
@@ -154,11 +161,12 @@ private:
         {
             if (remained == 0)
             {
-
-                this->_promise = ::std::make_shared<::std::promise<void>>();
-                auto&& future = this->_promise->get_future();
+                auto promise = new std::promise<void>();
+                this->_promise = promise;
+                auto future = promise->get_future();
                 future.wait();
-                this->_promise.reset();
+                _promise = nullptr;
+                delete promise;
             }
             _epoch();
             remained = _remained.fetch_sub(1);
@@ -174,7 +182,7 @@ private:
     {
         if (!_job_queue.dequeue(_current_job))
             return false;
-        tupleupk(::std::move(_current_job.task), ::std::move(_current_job.args));
+        _current_job.run();
         return true;
     }
 
@@ -184,7 +192,7 @@ public:
 private:
     ::std::atomic<size_t>  _remained;
     ::std::atomic<state_t> _state;
-    volatile ::std::shared_ptr<::std::promise<void>> _promise;
+    ::std::promise<void> volatile* _promise;
     lockfree::queue<job_t> _job_queue;
     ::std::thread _thr;
 

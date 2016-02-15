@@ -322,7 +322,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="minimal-test.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="unused.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -7,6 +7,7 @@
 #include <map>
 #include <vee/exl.h>
 #include <vee/tupleupk.h>
+#include "lock.h"
 
 namespace vee {
 
@@ -32,7 +33,9 @@ bool compare_function(const _Function& lhs, const _Function& rhs)
 template <typename FTy>
 class compareable_function: public ::std::function < FTy >
 {
+public:
     using function_t = ::std::function<FTy>;
+private:
     bool(*_type_holder)(const function_t&, const function_t&);
 public:
     compareable_function() = default;
@@ -73,7 +76,7 @@ public:
 } // !namespace delegate_impl
 
 template <class FTy, 
-          class LockTy = ::std::mutex, 
+          class LockTy = lock::empty_lock, 
           class UsrKeyTy = int32_t >
 class delegate
 {
@@ -94,7 +97,7 @@ public:
     using rref_t = this_t&&;
     using shared_ptr = ::std::shared_ptr<this_t>;
     using unique_ptr = ::std::shared_ptr<this_t>;
-    using args_tuple_t = ::std::tuple<Args...>;
+    using args_tuple_t = ::std::tuple<::std::remove_reference_t<Args>...>;
     using lock_t = LockTy;
     using key_t = void*;
     using usrkey_t = UsrKeyTy;
@@ -141,19 +144,19 @@ public:
 public:
     delegate() = default;
     ~delegate() = default;
-    explicit delegate(const ref_t other) __noexcept
+    explicit delegate(const ref_t other)
     {
         ::std::lock_guard<lock_t> locker(other._mtx);
         _cont = other._cont;
         _usrcont = other._usrcont;
     }
-    explicit delegate(rref_t other) __noexcept
+    delegate(rref_t other) __noexcept
     {
         ::std::lock_guard<lock_t> locker(other._mtx);
         _cont = ::std::move(other._cont);
         _usrcont = ::std::move(other._usrcont);
     }
-    ref_t operator=(const ref_t other) __noexcept
+    ref_t operator=(const ref_t other)
     {
         // lock both mutexes without deadlock
         ::std::lock(_mtx, other._mtx);
@@ -179,13 +182,13 @@ public:
 
         return *this;
     }
-    friend this_t operator+(const ref_t lhs, const ref_t rhs)
+    /*friend static this_t operator+(const ref_t lhs, const ref_t rhs)
     {
         this_t ret{ lhs };
         ::std::lock_guard<lock_t> locker{ rhs._mtx };
         ret += rhs;
         return ret;
-    }
+    }*/
     ref_t operator+=(const ref_t rhs)
     {
         // lock both mutexes without deadlock
@@ -290,6 +293,30 @@ public:
     {
         return operator-=(wrapped_key);
     }
+    void operator()(args_tuple_t& args)
+    {
+        ::std::lock_guard<lock_t> locker{ _mtx };
+        for (auto& it : _cont)
+        {
+            tupleupk(static_cast<binder_t&>(it.second), args);
+        }
+        for (auto& it : _usrcont)
+        {
+            tupleupk(static_cast<binder_t&>(it.second), args);
+        }
+    }
+    void operator()(args_tuple_t&& args)
+    {
+        ::std::lock_guard<lock_t> locker{ _mtx };
+        for (auto& it : _cont)
+        {
+            tupleupk(static_cast<binder_t&>(it.second), static_cast<args_tuple_t&&>(args));
+        }
+        for (auto& it : _usrcont)
+        {
+            tupleupk(static_cast<binder_t&>(it.second), static_cast<args_tuple_t&&>(args));
+        }
+    }
     template <typename ...FwdArgs>
     void operator()(FwdArgs&& ...args)
     {
@@ -309,6 +336,13 @@ public:
         _cont.clear();
         _usrcont.clear();
     }
+    bool empty() const
+    {
+        ::std::lock_guard<lock_t> locker{ _mtx };
+        if (_cont.empty() && _usrcont.empty())
+            return true;
+        return false;
+    }
 
 /* Define Protected static member functions */
 protected:
@@ -323,28 +357,29 @@ protected:
 
 /* Define Protected member variables */
 protected:
-    lock_t _mtx;
+    mutable lock_t _mtx;
     _seq_container_t _cont;
     _usr_container_t _usrcont;
 };
 
 template <class FTy,
-          class LockTy = ::std::mutex,
-          class UsrKeyTy = uint32_t >
-delegate<FTy, LockTy, UsrKeyTy> make_delegate(::std::function<FTy> func)
+          class LockTy = lock::empty_lock,
+          class UsrKeyTy = int32_t,
+          class CallableObj >
+              delegate<FTy, LockTy, UsrKeyTy> make_delegate(CallableObj&& func)
 {
     //TODO: Implementation
-    return delegate<FTy, LockTy, UsrKeyTy >{ (func) };
+    return delegate<FTy, LockTy, UsrKeyTy>{ ::std::forward<CallableObj>(func) };
+
 }
 
 template <class FTy,
-          class LockTy = ::std::mutex,
-          class UsrKeyTy = uint32_t,
-          class Arg >
-              delegate<FTy, LockTy, UsrKeyTy> make_delegate(Arg&& func)
+class LockTy = lock::empty_lock,
+class UsrKeyTy = int32_t >
+    delegate<FTy, LockTy, UsrKeyTy > make_delegate(::std::function<FTy> func)
 {
     //TODO: Implementation
-    return delegate<FTy, LockTy, UsrKeyTy >{ ::std::forward<Arg>(func) };
+    return delegate<FTy, LockTy, UsrKeyTy >{ (func) };
 }
 
 } // !namespace vee

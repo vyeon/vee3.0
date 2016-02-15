@@ -9,6 +9,7 @@ namespace lock {
 
 class empty_lock
 {
+public:
 	inline static void lock()
 	{
 		

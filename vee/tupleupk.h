@@ -43,7 +43,7 @@ inline RTy _do_call(CallableObj&& func, Tuple&& tuple, mpl::sequence<S...>)
 template <
     class CallableObj,
     class Tuple,
-    class RTy = tupleupk_impl::function_parser< ::std::remove_reference<CallableObj>::type >::return_type >
+    class RTy = typename tupleupk_impl::function_parser< typename ::std::remove_reference<CallableObj>::type >::return_type >
         RTy tupleupk(CallableObj&& func, Tuple&& tuple)
     {
         return tupleupk_impl::_do_call<RTy>(std::forward<CallableObj>(func),
