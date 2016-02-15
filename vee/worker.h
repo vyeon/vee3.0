@@ -45,6 +45,18 @@ public:
 	{
 
 	}
+	ref_t operator=(const ref_t rhs)
+	{
+		task = rhs.task;
+		args = rhs.args;
+		return *this;
+	}
+	ref_t operator=(rref_t rhs)
+	{
+		task = ::std::move(rhs.task);
+		args = ::std::move(rhs.args);
+		return *this;
+	}
 	delegate_t task;
 	argstup_t  args;
 };
@@ -62,7 +74,7 @@ public:
 	using rref_t = this_t&&;
 	using delegate_t = delegate<RTy(Args...)>;
 	using argstup_t = ::std::tuple<Args...>;
-	//using job_t = ::std::pair<delegate_t, argstup_t>;
+	using job_t = packaged_task<RTy(Args...)>;
 	explicit worker(size_t job_queue_size_, bool autorun = true):
 		job_queue_size { job_queue_size_ }
 	{
@@ -82,8 +94,8 @@ public:
 	}*/
 	const size_t job_queue_size;
 private:
-	/*::std::atomic<size_t> _remained;
-	lockfree::queue<job_t> _job_queue;*/
+	::std::atomic<size_t> _remained;
+	lockfree::queue<job_t> _job_queue;
 	::std::thread _thr;
 
 private:
