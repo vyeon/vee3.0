@@ -2,9 +2,10 @@
 #define _VEE_WORKER_H_
 
 #include <vee/delegate.h>
-#include <vee/lockfree/queue.h>
+#include <vee/lockfree/stack.h>
 #include <thread>
 #include <future>
+#include <list>
 
 namespace vee {
 
@@ -140,7 +141,7 @@ public:
 
         if (_remained.load() == 0)
         {
-            // generate dummy job for wakeup the worker
+            // generate a dummy job for wakeup the worker
             request(
                 job_t{ }
             );
@@ -151,6 +152,14 @@ public:
         else
             _thr.detach();
         return true;
+    }
+    size_t guess_remined_jobs() const
+    {
+        return _remained.load();
+    }
+    state_t guess_state() const
+    {
+        return _state.load();
     }
 
 private:
@@ -203,6 +212,46 @@ private:
     worker(rref_t) = delete;
     ref_t operator=(const ref_t) = delete;
     rref_t operator=(rref_t) = delete;
+};
+
+template <class FTy>
+class worker_group;
+
+template <class RTy, class ...Args>
+class worker_group<RTy(Args ...)>
+{
+    using worker_handle = ::std::shared_ptr<worker<RTy(Args ...)>>;
+public:
+    using worker_t = worker<RTy(Args ...)>;
+    using this_t = worker_group<RTy(Args...)>;
+    using ref_t = this_t&;
+    using rref_t = this_t&&;
+    using delegate_t = delegate<RTy(Args...)>;
+    using argstup_t = ::std::tuple<Args...>;
+    using job_t = packaged_task<RTy(Args...)>;
+    using index_t = size_t;
+
+    explicit worker_group(size_t initial_workers, size_t maximum_workers, size_t job_queue_size):
+        _stack { maximum_workers }
+    {
+        _workers.reserve(maximum_workers);
+        for (size_t i = 0; i < maximum_workers; ++i)
+        {
+            _workers.push_back( ::std::make_shared<worker_t>(job_queue_size), true/*autorun*/ );
+            _stack.push(i);
+        }
+    }
+
+private:
+    ::std::vector<worker_handle> _workers;
+    lockfree::stack<index_t> _stack;
+
+    // DISALLOW DEFAULT CONSTRUCTOR AND COPY & MOVE OPERATIONS
+    worker_group() = delete;
+    worker_group(const ref_t) = delete;
+    worker_group(rref_t) = delete;
+    ref_t operator=(const ref_t) = delete;
+    ref_t operator=(rref_t) = delete;
 };
 
 } // !namespace vee

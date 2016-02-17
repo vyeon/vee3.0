@@ -20,12 +20,5 @@ int main()
     ::vee::packaged_task<FUNC_SIG> task{ ::vee::make_delegate<FUNC_SIG>(foo), vee::test::testobj{ 55 } };
     //::vee::packaged_task<FUNC_SIG> task{ ::vee::delegate<FUNC_SIG>(foo), vee::test::testobj{ 55 } };
     worker.request(task);
-    worker.request(task);
-    worker.request(task);
-    worker.request(task);
-    worker.request(task);
-    worker.request(task);
-    worker.request(task);
-    worker.request(task);
     return 0;
 }

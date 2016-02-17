@@ -7,7 +7,7 @@
 #include <map>
 #include <vee/exl.h>
 #include <vee/tupleupk.h>
-#include "lock.h"
+#include <vee/lock.h>
 
 namespace vee {
 
