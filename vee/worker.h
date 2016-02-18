@@ -83,6 +83,12 @@ public:
     using argstup_t = ::std::tuple<Args...>;
     using job_t = packaged_task<RTy(Args...)>;
 
+    struct events_wrapper
+    {
+        using sleep_event_t = delegate<void(), lock::spin_lock>;
+        sleep_event_t sleep;
+    };
+
     enum class state_t: int
     {
         standby = 0,
@@ -173,6 +179,7 @@ private:
                 auto promise = new std::promise<void>();
                 this->_promise = promise;
                 auto future = promise->get_future();
+                events.sleep.operator()();
                 future.wait();
                 _promise = nullptr;
                 delete promise;
@@ -197,6 +204,7 @@ private:
 
 public:
     const size_t job_queue_size;
+    events_wrapper events;
 
 private:
     ::std::atomic<size_t>  _remained;
@@ -231,13 +239,20 @@ public:
     using job_t = packaged_task<RTy(Args...)>;
     using index_t = size_t;
 
+    static void callback_test()
+    {
+        puts("Worker goes sleep");
+    }
+
     explicit worker_group(size_t initial_workers, size_t maximum_workers, size_t job_queue_size):
         _stack { maximum_workers }
     {
         _workers.reserve(maximum_workers);
         for (size_t i = 0; i < maximum_workers; ++i)
         {
-            _workers.push_back( ::std::make_shared<worker_t>(job_queue_size), true/*autorun*/ );
+            _workers.push_back( ::std::make_shared<worker_t>(job_queue_size, false)/*autorun*/ );
+            _workers[i]->events.sleep += callback_test;
+            _workers[i]->start();
             _stack.push(i);
         }
     }
