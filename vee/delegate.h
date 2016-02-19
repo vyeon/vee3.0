@@ -106,9 +106,9 @@ public:
 /* Define Private types */
 private:
     using _cmpbinder_t = delegate_impl::compareable_function<RTy(Args ...)>;
-    using _key_cmpbinder_pair = ::std::pair<usrkey_t, _cmpbinder_t>;
+    using _key_cmpbinder_pair = ::std::pair<usrkey_t, binder_t>;
     using _seq_container_t = ::std::multimap<key_t, _cmpbinder_t>;
-    using _usr_container_t = ::std::map<usrkey_t, _cmpbinder_t>;
+    using _usr_container_t = ::std::map<usrkey_t, binder_t>;
     
 /* Define Public static member functions */
 public:
@@ -236,8 +236,7 @@ public:
     template <class UsrKeyRef, class CallableObj>
     explicit delegate(UsrKeyRef&& key, CallableObj&& binder)
     {
-        _cmpbinder_t cmpbinder{ ::std::forward<CallableObj>(binder) };
-        _usrcont.insert(::std::make_pair(::std::forward<UsrKeyRef>(key), ::std::move(cmpbinder)));
+        _usrcont.insert(::std::make_pair(::std::forward<UsrKeyRef>(key), ::std::forward<CallableObj>(binder)));
     }
     template <class URef>
     ref_t operator+=(URef&& uref)
@@ -255,8 +254,8 @@ public:
         using CallableObj = typename ::std::conditional< ::std::is_rvalue_reference<PairRef>::value,
             typename PairTy::second_type&&,
             typename PairTy::second_type >::type;
-        _cmpbinder_t cmpbinder{ static_cast<CallableObj>(pair.second) };
-        auto ret = _usrcont.insert(::std::make_pair(static_cast<UsrKeyRef>(pair.first), ::std::move(cmpbinder)));
+        binder_t binder{ static_cast<CallableObj>(pair.second) };
+        auto ret = _usrcont.insert(::std::make_pair(static_cast<UsrKeyRef>(pair.first), binder));
         if (ret.second == false)
             throw exl::key_already_exist();
         return *this;

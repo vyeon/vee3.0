@@ -239,19 +239,24 @@ public:
     using job_t = packaged_task<RTy(Args...)>;
     using index_t = size_t;
 
-    static void callback_test()
+    void on_worker_sleep(index_t id)
     {
-        puts("Worker goes sleep");
+        if (!_stackables[id].test_and_set())
+        {
+            if (!_stack.push(id))
+                throw ::std::runtime_error("stack::push failed in the worker group!");
+        }
+
     }
 
     explicit worker_group(size_t initial_workers, size_t maximum_workers, size_t job_queue_size):
         _stack { maximum_workers }
     {
         _workers.reserve(maximum_workers);
-        for (size_t i = 0; i < maximum_workers; ++i)
+        for (size_t i = 0; i < initial_workers; ++i)
         {
             _workers.push_back( ::std::make_shared<worker_t>(job_queue_size, false)/*autorun*/ );
-            _workers[i]->events.sleep += callback_test;
+            _workers[i]->events.sleep += ::std::make_pair(i, ::std::bind(&this_t::on_worker_sleep, this, i));
             _workers[i]->start();
             _stack.push(i);
         }
@@ -260,6 +265,7 @@ public:
 private:
     ::std::vector<worker_handle> _workers;
     lockfree::stack<index_t> _stack;
+    ::std::vector<::std::atomic_flag> _stackables;
 
     // DISALLOW DEFAULT CONSTRUCTOR AND COPY & MOVE OPERATIONS
     worker_group() = delete;
