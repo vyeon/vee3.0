@@ -241,10 +241,12 @@ public:
 
     void on_worker_sleep(index_t id)
     {
-        if (!_stackables[id].test_and_set())
+        if (!_stackables[id]->test_and_set())
         {
             if (!_stack.push(id))
                 throw ::std::runtime_error("stack::push failed in the worker group!");
+            else
+                puts("success to store worker to group stack"); // logs for debug
         }
 
     }
@@ -253,19 +255,21 @@ public:
         _stack { maximum_workers }
     {
         _workers.reserve(maximum_workers);
+        _stackables.reserve(maximum_workers);
         for (size_t i = 0; i < initial_workers; ++i)
         {
             _workers.push_back( ::std::make_shared<worker_t>(job_queue_size, false)/*autorun*/ );
+            _stackables.push_back( ::std::make_shared<::std::atomic_flag>() );
+
             _workers[i]->events.sleep += ::std::make_pair(i, ::std::bind(&this_t::on_worker_sleep, this, i));
             _workers[i]->start();
-            _stack.push(i);
         }
     }
 
 private:
     ::std::vector<worker_handle> _workers;
     lockfree::stack<index_t> _stack;
-    ::std::vector<::std::atomic_flag> _stackables;
+    ::std::vector< ::std::shared_ptr< ::std::atomic_flag > > _stackables;
 
     // DISALLOW DEFAULT CONSTRUCTOR AND COPY & MOVE OPERATIONS
     worker_group() = delete;

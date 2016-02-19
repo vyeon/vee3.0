@@ -81,6 +81,10 @@ public:
 						::std::add_lvalue_reference_t<data_t> >;
 					out = static_cast<request_t>(_cont[dst]);
 					_outarr[dst] = nullptr;
+                    while (!_cont_queue.enqueue(dst))
+                    {
+
+                    }
 					return true;
 				}
 			}

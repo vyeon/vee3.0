@@ -234,9 +234,9 @@ public:
         _cont.insert(::std::make_pair(gen_key(cmpbinder), ::std::move(cmpbinder)));
     }
     template <class UsrKeyRef, class CallableObj>
-    explicit delegate(UsrKeyRef&& key, CallableObj&& binder)
+    explicit delegate(UsrKeyRef&& key, CallableObj&& obj)
     {
-        _usrcont.insert(::std::make_pair(::std::forward<UsrKeyRef>(key), ::std::forward<CallableObj>(binder)));
+        _usrcont.insert(::std::make_pair(::std::forward<UsrKeyRef>(key), ::std::forward<CallableObj>(obj)));
     }
     template <class URef>
     ref_t operator+=(URef&& uref)
@@ -251,10 +251,10 @@ public:
         using UsrKeyRef = typename ::std::conditional< ::std::is_rvalue_reference<PairRef>::value,
             usrkey_t&&,
             usrkey_t >::type;
-        using CallableObj = typename ::std::conditional< ::std::is_rvalue_reference<PairRef>::value,
+        using CallableObjRef = typename ::std::conditional< ::std::is_rvalue_reference<PairRef>::value,
             typename PairTy::second_type&&,
             typename PairTy::second_type >::type;
-        binder_t binder{ static_cast<CallableObj>(pair.second) };
+        binder_t binder{ static_cast<CallableObjRef>(pair.second) };
         auto ret = _usrcont.insert(::std::make_pair(static_cast<UsrKeyRef>(pair.first), binder));
         if (ret.second == false)
             throw exl::key_already_exist();
