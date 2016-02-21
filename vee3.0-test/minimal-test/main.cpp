@@ -15,7 +15,7 @@ void foo(::vee::test::testobj& arg)
 int main()
 {
     ::vee::test::scope scope;
-    ::vee::worker_group<FUNC_SIG> worker_group{ ::std::thread::hardware_concurrency(), ::std::thread::hardware_concurrency(), 10 };
+    ::vee::nonscalable_worker_group<FUNC_SIG> worker_group{ ::std::thread::hardware_concurrency(), 10 };
     //::vee::make_delegate<FUNC_SIG>(foo);
     //::vee::packaged_task<FUNC_SIG> task{ ::vee::make_delegate<FUNC_SIG>(foo), vee::test::testobj{ 55 } };
     //::vee::packaged_task<FUNC_SIG> task{ ::vee::delegate<FUNC_SIG>(foo), vee::test::testobj{ 55 } };

@@ -87,6 +87,10 @@ public:
     {
         using sleep_event_t = delegate<void(), lock::spin_lock>;
         sleep_event_t sleep;
+        using job_processed_event_t = delegate<void(), lock::spin_lock>;
+        job_processed_event_t job_processed;
+        using job_requested_event_t = delegate<void(), lock::spin_lock>;
+        job_requested_event_t job_requested;
     };
 
     enum class state_t: int
@@ -199,6 +203,7 @@ private:
         if (!_job_queue.dequeue(_current_job))
             return false;
         _current_job.run();
+        events.job_processed.operator()();
         return true;
     }
 
@@ -223,21 +228,40 @@ private:
 };
 
 template <class FTy>
-class worker_group;
+class nonscalable_worker_group;
 
 template <class RTy, class ...Args>
-class worker_group<RTy(Args ...)>
+class nonscalable_worker_group<RTy(Args ...)>
 {
     using worker_handle = ::std::shared_ptr<worker<RTy(Args ...)>>;
 public:
     using worker_t = worker<RTy(Args ...)>;
-    using this_t = worker_group<RTy(Args...)>;
+    using this_t = nonscalable_worker_group<RTy(Args...)>;
     using ref_t = this_t&;
     using rref_t = this_t&&;
     using delegate_t = delegate<RTy(Args...)>;
     using argstup_t = ::std::tuple<Args...>;
     using job_t = packaged_task<RTy(Args...)>;
     using index_t = size_t;
+
+    explicit nonscalable_worker_group(size_t __number_of_workers, size_t __job_queue_size):
+        total_job_queue_capacity{ __number_of_workers * __job_queue_size },
+        number_of_workers { __number_of_workers },
+        _stack { __number_of_workers },
+        _job_counter { 0 }
+    {
+        _workers.reserve(__number_of_workers);
+        _stackables.reserve(__number_of_workers);
+        for (size_t i = 0; i < __number_of_workers; ++i)
+        {
+            _workers.push_back( ::std::make_shared<worker_t>(__job_queue_size, false)/*autorun*/ );
+            _stackables.push_back( ::std::make_shared<::std::atomic_flag>() );
+
+            _workers[i]->events.sleep += ::std::make_pair(i, ::std::bind(&this_t::on_worker_sleep, this, i));
+            _workers[i]->events.job_processed += ::std::make_pair(i, ::std::bind(&this_t::on_job_processed, this, i));
+            _workers[i]->start();
+        }
+    }
 
     void on_worker_sleep(index_t id)
     {
@@ -248,33 +272,55 @@ public:
             else
                 puts("success to store worker to group stack"); // logs for debug
         }
-
     }
 
-    explicit worker_group(size_t initial_workers, size_t maximum_workers, size_t job_queue_size):
-        _stack { maximum_workers }
+    void on_job_processed(index_t id)
     {
-        _workers.reserve(maximum_workers);
-        _stackables.reserve(maximum_workers);
-        for (size_t i = 0; i < initial_workers; ++i)
-        {
-            _workers.push_back( ::std::make_shared<worker_t>(job_queue_size, false)/*autorun*/ );
-            _stackables.push_back( ::std::make_shared<::std::atomic_flag>() );
-
-            _workers[i]->events.sleep += ::std::make_pair(i, ::std::bind(&this_t::on_worker_sleep, this, i));
-            _workers[i]->start();
-        }
+        _job_counter.fetch_sub(1);
     }
 
+    void on_job_requested(index_t id)
+    {
+        _job_counter.fetch_add(1);
+    }
+
+    template <class JobRef>
+    bool request(JobRef&& job)
+    {
+        index_t id;
+        if (_stack.pop(id))
+        {
+            _stackables[id]->clear();
+            return _workers[id]->request(::std::forward<JobRef>(job));
+        }
+        else
+        {
+            // Add the schedule algorithms
+            long double average = _job_counter.load() / number_of_workers;
+            for (index_t id = 0; id < number_of_workers; ++id)
+            {
+                if (_workers[id]->guess_remined_jobs() <= average)
+                {
+                    
+                }
+            }
+        }
+        return false;
+    }
+
+
+    const size_t total_job_queue_capacity;
+    const size_t number_of_workers;
 private:
     ::std::vector<worker_handle> _workers;
     lockfree::stack<index_t> _stack;
     ::std::vector< ::std::shared_ptr< ::std::atomic_flag > > _stackables;
+    ::std::atomic<size_t> _job_counter;
 
     // DISALLOW DEFAULT CONSTRUCTOR AND COPY & MOVE OPERATIONS
-    worker_group() = delete;
-    worker_group(const ref_t) = delete;
-    worker_group(rref_t) = delete;
+    nonscalable_worker_group() = delete;
+    nonscalable_worker_group(const ref_t) = delete;
+    nonscalable_worker_group(rref_t) = delete;
     ref_t operator=(const ref_t) = delete;
     ref_t operator=(rref_t) = delete;
 };
