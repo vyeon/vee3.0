@@ -131,7 +131,7 @@ public:
             ::std::promise<void>* promise = const_cast<::std::promise<void>*>(_promise);
             promise->set_value(); // signalling
         }
-        return remained;
+        return remained + 1;
     }
     bool start()
     {
@@ -189,7 +189,7 @@ private:
                 delete promise;
             }
             _epoch();
-            remained = _remained.fetch_sub(1);
+            remained = _remained.fetch_sub(1) - 1;
         }
         state_t cmp{ state_t::shutdown };
         bool result = ::std::atomic_compare_exchange_strong(&_state, &cmp, state_t::standby);
@@ -247,15 +247,15 @@ public:
     explicit nonscalable_worker_group(size_t __number_of_workers, size_t __job_queue_size):
         total_job_queue_capacity{ __number_of_workers * __job_queue_size },
         number_of_workers { __number_of_workers },
-        _stack { __number_of_workers },
+        /*_stack { __number_of_workers },*/
         _job_counter { 0 }
     {
         _workers.reserve(__number_of_workers);
-        _stackables.reserve(__number_of_workers);
+        /*_stackables.reserve(__number_of_workers);*/
         for (size_t i = 0; i < __number_of_workers; ++i)
         {
             _workers.push_back( ::std::make_shared<worker_t>(__job_queue_size, false)/*autorun*/ );
-            _stackables.push_back( ::std::make_shared<::std::atomic_flag>() );
+            /*_stackables.push_back( ::std::make_shared<::std::atomic_flag>() );*/
 
             _workers[i]->events.sleep += ::std::make_pair(i, ::std::bind(&this_t::on_worker_sleep, this, i));
             _workers[i]->events.job_processed += ::std::make_pair(i, ::std::bind(&this_t::on_job_processed, this, i));
@@ -263,23 +263,23 @@ public:
         }
     }
 
-    void on_worker_sleep(index_t id)
+    void on_worker_sleep(index_t /*id*/)
     {
-        if (!_stackables[id]->test_and_set())
-        {
-            if (!_stack.push(id))
-                throw ::std::runtime_error("stack::push failed in the worker group!");
-            else
-                puts("success to store worker to group stack"); // logs for debug
-        }
+        //if (!_stackables[id]->test_and_set())
+        //{
+        //    if (!_stack.push(id))
+        //        throw ::std::runtime_error("stack::push failed in the worker group!");
+        //    else
+        //        puts("success to store worker to group stack"); // logs for debug
+        //}
     }
 
-    void on_job_processed(index_t id)
+    void on_job_processed(index_t /*id*/)
     {
         _job_counter.fetch_sub(1);
     }
 
-    void on_job_requested(index_t id)
+    void on_job_requested(index_t /*id*/)
     {
         _job_counter.fetch_add(1);
     }
@@ -287,25 +287,24 @@ public:
     template <class JobRef>
     bool request(JobRef&& job)
     {
-        index_t id;
+        /*index_t id;
         if (_stack.pop(id))
         {
             _stackables[id]->clear();
             return _workers[id]->request(::std::forward<JobRef>(job));
-        }
-        else
+        }*/
+        // Add the schedule algorithms -> current: temporary linear search algorithm
+        long double average = _job_counter.load() / number_of_workers;
+        for (index_t id = 0; id < number_of_workers; ++id)
         {
-            // Add the schedule algorithms
-            long double average = _job_counter.load() / number_of_workers;
-            for (index_t id = 0; id < number_of_workers; ++id)
+            if (_workers[id]->guess_remined_jobs() <= average)
             {
-                if (_workers[id]->guess_remined_jobs() <= average)
-                {
-                    
-                }
+                size_t result = _workers[id]->request(::std::forward<JobRef>(job));
+                if (result)
+                    return true;
             }
         }
-        return false;
+        return false; // all of workers are busy
     }
 
 
@@ -313,8 +312,8 @@ public:
     const size_t number_of_workers;
 private:
     ::std::vector<worker_handle> _workers;
-    lockfree::stack<index_t> _stack;
-    ::std::vector< ::std::shared_ptr< ::std::atomic_flag > > _stackables;
+    /*lockfree::stack<index_t> _stack;
+    ::std::vector< ::std::shared_ptr< ::std::atomic_flag > > _stackables;*/
     ::std::atomic<size_t> _job_counter;
 
     // DISALLOW DEFAULT CONSTRUCTOR AND COPY & MOVE OPERATIONS
