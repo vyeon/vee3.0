@@ -92,5 +92,8 @@
     <ClCompile Include="test\timerec.cpp">
       <Filter>test</Filter>
     </ClCompile>
+    <ClCompile Include="ex\exl_worker.cpp">
+      <Filter>ex</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -3,11 +3,28 @@
 
 #include <vee/delegate.h>
 #include <vee/lockfree/stack.h>
+#include <vee/exception.h>
 #include <thread>
 #include <future>
 #include <list>
 
 namespace vee {
+
+namespace exl {
+    
+class worker_is_busy: public ::vee::exception
+{
+public:
+    using base_t = ::vee::exception;
+    worker_is_busy():
+        base_t{ "worker is busy" }
+    {
+    }
+    virtual ~worker_is_busy() = default;
+    virtual char const* to_string() const __noexcept override;
+};
+
+} // !namespace exl
 
 template <class FTy>
 class packaged_task;
@@ -121,13 +138,23 @@ public:
     template <class Job>
     size_t request(Job&& job)
     {
+        size_t result = nothrow_request(::std::forward<Job>(job));
+        if (!result)
+            throw exl::worker_is_busy{};
+        return result;
+    }
+    template <class Job>
+    size_t nothrow_request(Job&& job)
+    {
         bool result = _job_queue.enqueue(::std::forward<Job>(job));
         if (!result)
             return 0; // request failed, job queue is full
         size_t remained_old = _remained.fetch_add(1);
         if ((remained_old == 0) && (_state.load() != state_t::standby))
         {
-            while (this->_promise == nullptr){ }; // waiting until promise ready
+            while (this->_promise == nullptr)
+            {
+            }; // waiting until promise ready
             ::std::promise<void>* promise = const_cast<::std::promise<void>*>(_promise);
             promise->set_value(); // signalling
         }
@@ -278,18 +305,27 @@ public:
 
     void on_job_processed(index_t id)
     {
-        printf("Worker %d comsumed the job\n", id);
+        printf("Worker %u comsumed the job\n", id);
         _job_counter.fetch_sub(1);
     }
 
     void on_job_requested(index_t id)
     {
-        printf("Worker %d accepted the job\n", id);
+        printf("Worker %u accepted the job\n", id);
         _job_counter.fetch_add(1);
     }
 
     template <class JobRef>
     bool request(JobRef&& job)
+    {
+        bool result = nothrow_request(::std::forward<JobRef>(job));
+        if (!result)
+            throw exl::worker_is_busy{};
+        return true;
+    }
+
+    template <class JobRef>
+    bool nothrow_request(JobRef&& job)
     {
         /*index_t id;
         if (_stack.pop(id))
@@ -303,7 +339,7 @@ public:
         {
             if (_workers[id]->guess_remined_jobs() <= average)
             {
-                size_t result = _workers[id]->request(::std::forward<JobRef>(job));
+                size_t result = _workers[id]->nothrow_request(::std::forward<JobRef>(job));
                 if (result)
                     return true;
             }
