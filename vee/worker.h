@@ -124,14 +124,15 @@ public:
         bool result = _job_queue.enqueue(::std::forward<Job>(job));
         if (!result)
             return 0; // request failed, job queue is full
-        size_t remained = _remained.fetch_add(1);
-        if ((remained == 0) && (_state.load() != state_t::standby))
+        size_t remained_old = _remained.fetch_add(1);
+        if ((remained_old == 0) && (_state.load() != state_t::standby))
         {
             while (this->_promise == nullptr){ }; // waiting until promise ready
             ::std::promise<void>* promise = const_cast<::std::promise<void>*>(_promise);
             promise->set_value(); // signalling
         }
-        return remained + 1;
+        events.job_requested.operator()();
+        return remained_old + 1;
     }
     bool start()
     {
@@ -258,6 +259,7 @@ public:
             /*_stackables.push_back( ::std::make_shared<::std::atomic_flag>() );*/
 
             _workers[i]->events.sleep += ::std::make_pair(i, ::std::bind(&this_t::on_worker_sleep, this, i));
+            _workers[i]->events.job_requested += ::std::make_pair(i, ::std::bind(&this_t::on_job_requested, this, i));
             _workers[i]->events.job_processed += ::std::make_pair(i, ::std::bind(&this_t::on_job_processed, this, i));
             _workers[i]->start();
         }
@@ -274,13 +276,15 @@ public:
         //}
     }
 
-    void on_job_processed(index_t /*id*/)
+    void on_job_processed(index_t id)
     {
+        printf("Worker %d comsumed the job\n", id);
         _job_counter.fetch_sub(1);
     }
 
-    void on_job_requested(index_t /*id*/)
+    void on_job_requested(index_t id)
     {
+        printf("Worker %d accepted the job\n", id);
         _job_counter.fetch_add(1);
     }
 
