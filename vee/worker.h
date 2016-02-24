@@ -39,24 +39,41 @@ public:
     using delegate_t = delegate<RTy(Args...)>;
     using argstup_t = ::std::tuple< ::std::remove_reference_t<Args>... >;
     packaged_task() = default;
+    packaged_task(ref_t other):
+        task{ other.task },
+        args{ other.args },
+        is_valid{ other.is_valid }
+    {
+        
+    }
+    packaged_task(rref_t other):
+        task{ ::std::move(other.task) },
+        args{ ::std::move(other.args) },
+        is_valid{ ::std::move(other.is_valid) }
+    {
+        
+    }
     template <class Delegate, class ...Arguments>
     explicit packaged_task(Delegate&& e, Arguments&& ...args):
         task{ ::std::forward<Delegate>(e) },
-        args{ ::std::make_tuple(::std::forward<Arguments>(args)...) }
+        args{ ::std::make_tuple(::std::forward<Arguments>(args)...) },
+        is_valid { true }
     {
 
     }
     template <class Delegate>
     explicit packaged_task(Delegate&& e, argstup_t&& tup):
         task{ ::std::forward<Delegate>(e) },
-        args{ ::std::move(tup) }
+        args{ ::std::move(tup) },
+        is_valid { true }
     {
 
     }
     template <class Delegate>
     explicit packaged_task(Delegate&& e, argstup_t& tup):
         task{ ::std::forward<Delegate>(e) },
-        args{ tup }
+        args{ tup },
+        is_valid { true }
     {
 
     }
@@ -68,12 +85,14 @@ public:
     {
         task = rhs.task;
         args = rhs.args;
+        is_valid = rhs.is_valid;
         return *this;
     }
     ref_t operator=(rref_t rhs)
     {
         task = ::std::move(rhs.task);
         args = ::std::move(rhs.args);
+        is_valid = rhs.is_valid;
         return *this;
     }
     void run()
@@ -83,6 +102,7 @@ public:
     }
     delegate_t task;
     argstup_t  args;
+    volatile bool is_valid;
 };
 
 template <class FTy>
