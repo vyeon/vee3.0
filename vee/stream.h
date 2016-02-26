@@ -53,6 +53,12 @@ public:
     virtual void async_write_some(io::async_output_info::shared_ptr info, async_write_delegate::shared_ptr callback);
 };
 
+class vee_stream abstract: public sync_stream, public async_stream
+{
+public:
+    virtual ~vee_stream() = default;
+};
+
 } // !namespace vee
 
 #endif // !_VEE_STREAM_H_
