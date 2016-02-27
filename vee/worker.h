@@ -81,7 +81,7 @@ public:
     }
     ~packaged_task()
     {
-        puts(__FUNCTION__);
+        //puts(__FUNCTION__);
     }
     ref_t operator=(const ref_t rhs)
     {
@@ -235,6 +235,7 @@ private:
                 this->_promise = promise;
                 auto future = promise->get_future();
                 events.sleep.operator()();
+                puts("worker wait");
                 future.wait();
                 _promise = nullptr;
                 delete promise;
@@ -246,6 +247,7 @@ private:
         bool result = ::std::atomic_compare_exchange_strong(&_state, &cmp, state_t::standby);
         if (result == false)
             throw ::std::runtime_error("unexpected worker state is detected while shutdown process");
+        puts("worker main exit");
     }
 
     job_t _current_job;
@@ -316,6 +318,14 @@ public:
         }
     }
 
+    ~nonscalable_worker_group()
+    {
+        for (auto& it : _workers)
+        {
+            it->shutdown(false);
+        }
+    }
+
     void on_worker_sleep(index_t /*id*/)
     {
         //if (!_stackables[id]->test_and_set())
@@ -329,13 +339,13 @@ public:
 
     void on_job_processed(index_t id)
     {
-        printf("Worker %llu comsumed the job\n", id);
+        printf("Worker %u comsumed the job\n", id);
         _job_counter.fetch_sub(1);
     }
 
     void on_job_requested(index_t id)
     {
-        printf("Worker %llu accepted the job\n", id);
+        printf("Worker %u accepted the job\n", id);
         _job_counter.fetch_add(1);
     }
 
