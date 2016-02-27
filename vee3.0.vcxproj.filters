@@ -81,7 +81,9 @@
     <ClInclude Include="vee\lockfree\list.h">
       <Filter>vee\lockfree</Filter>
     </ClInclude>
-    <ClInclude Include="vee\net.h" />
+    <ClInclude Include="vee\net.h">
+      <Filter>vee</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="test\testobj.cpp">

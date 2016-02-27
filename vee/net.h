@@ -10,21 +10,17 @@ using port_t = unsigned short;
 
 namespace net {
 
-struct operation_result
-{
-    bool    is_success = false;
-};
-
 struct async_connect_info
 {
     using shared_ptr = ::std::shared_ptr<async_connect_info>;
-    operation_result result;
+    bool is_success;
 };
 
-class net_stream abstract: public vee_stream
+class net_stream abstract: public io_stream
 {
 public:
     using async_connect_delegate = delegate<void(async_connect_info::shared_ptr)>;
+    
 };
     
 } // !namespace net

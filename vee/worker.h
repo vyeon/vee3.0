@@ -38,6 +38,8 @@ public:
     using rref_t = this_t&&;
     using delegate_t = delegate<RTy(Args...)>;
     using argstup_t = ::std::tuple< ::std::remove_reference_t<Args>... >;
+    using shared_ptr = ::std::shared_ptr<this_t>;
+    using unique_ptr = ::std::unique_ptr<this_t>;
     packaged_task() = default;
     packaged_task(ref_t other):
         task{ other.task },
@@ -79,7 +81,7 @@ public:
     }
     ~packaged_task()
     {
-
+        puts(__FUNCTION__);
     }
     ref_t operator=(const ref_t rhs)
     {
@@ -118,7 +120,8 @@ public:
     using rref_t = this_t&&;
     using delegate_t = delegate<RTy(Args...)>;
     using argstup_t = ::std::tuple<Args...>;
-    using job_t = packaged_task<RTy(Args...)>;
+    using task_t = packaged_task<RTy(Args...)>;
+    using job_t = typename task_t::shared_ptr;
 
     struct events_wrapper
     {
@@ -201,7 +204,7 @@ public:
         {
             // generate a dummy job for wakeup the worker
             request(
-                job_t{ }
+                ::std::make_shared<task_t>()
             );
         }
 
@@ -250,7 +253,8 @@ private:
     {
         if (!_job_queue.dequeue(_current_job))
             return false;
-        _current_job.run();
+        _current_job->run();
+        _current_job.reset();
         events.job_processed.operator()();
         return true;
     }
@@ -325,13 +329,13 @@ public:
 
     void on_job_processed(index_t id)
     {
-        printf("Worker %u comsumed the job\n", id);
+        printf("Worker %llu comsumed the job\n", id);
         _job_counter.fetch_sub(1);
     }
 
     void on_job_requested(index_t id)
     {
-        printf("Worker %u accepted the job\n", id);
+        printf("Worker %llu accepted the job\n", id);
         _job_counter.fetch_add(1);
     }
 
@@ -354,7 +358,7 @@ public:
             return _workers[id]->request(::std::forward<JobRef>(job));
         }*/
         // Add the schedule algorithms -> current: temporary linear search algorithm
-        long double average = _job_counter.load() / number_of_workers;
+        long double average = static_cast<long double>(_job_counter.load() / number_of_workers);
         for (index_t id = 0; id < number_of_workers; ++id)
         {
             if (_workers[id]->guess_remined_jobs() <= average)
