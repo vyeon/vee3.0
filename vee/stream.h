@@ -22,6 +22,18 @@ struct async_input_info
     io_result result;
     buffer_t  buffer;
     size_t    capacity;
+    async_input_info(buffer_t __buffer, size_t __capacity): // TODO: deleter extend
+        buffer { __buffer },
+        capacity { __capacity }
+    {
+        
+    }
+    ~async_input_info()
+    {
+        // TODO: deleter
+    }
+private:
+    async_input_info() = delete;
 };
 
 struct async_output_info
@@ -31,6 +43,19 @@ struct async_output_info
     buffer_t  buffer;
     size_t    capacity;
     size_t    requested_size;
+    async_output_info(buffer_t __buffer, size_t __requested_size, size_t __capacity): // TODO: deleter extend
+        buffer{ __buffer },
+        requested_size { __requested_size },
+        capacity{ __capacity }
+    {
+
+    }
+    ~async_output_info()
+    {
+        // TODO: deleter
+    }
+private:
+    async_output_info() = delete;
 };
 
 } // !namespace io
