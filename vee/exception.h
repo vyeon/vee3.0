@@ -1,6 +1,7 @@
 #ifndef _VEE_EXCEPTION_H_
 #define _VEE_EXCEPTION_H_
 
+#include <vee/platform.h>
 #include <vee/libbase.h>
 #include <exception>
 

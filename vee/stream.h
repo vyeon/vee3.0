@@ -2,6 +2,7 @@
 #define _VEE_STREAM_H_
 
 #include <vee/delegate.h>
+#include <vee/libbase.h>
 
 namespace vee {
 
@@ -13,7 +14,7 @@ struct io_result
 {
     bool    is_success = false;
     bool    eof = false;
-    size_t  bytes_transferred = 0;
+    size_t  bytes_transferred __PURE;
 };
 
 struct async_input_info
@@ -22,7 +23,7 @@ struct async_input_info
     io_result result;
     buffer_t  buffer;
     size_t    capacity;
-    async_input_info(buffer_t __buffer, size_t __capacity): // TODO: deleter extend
+    async_input_info(buffer_t __buffer, size_t __capacity):
         buffer { __buffer },
         capacity { __capacity }
     {
@@ -30,7 +31,7 @@ struct async_input_info
     }
     ~async_input_info()
     {
-        // TODO: deleter
+        
     }
 private:
     async_input_info() = delete;
@@ -41,9 +42,9 @@ struct async_output_info
     using shared_ptr = ::std::shared_ptr<async_output_info>;
     io_result result;
     buffer_t  buffer;
-    size_t    capacity;
     size_t    requested_size;
-    async_output_info(buffer_t __buffer, size_t __requested_size, size_t __capacity): // TODO: deleter extend
+    size_t    capacity;
+    async_output_info(buffer_t __buffer, size_t __requested_size, size_t __capacity):
         buffer{ __buffer },
         requested_size { __requested_size },
         capacity{ __capacity }
@@ -52,7 +53,7 @@ struct async_output_info
     }
     ~async_output_info()
     {
-        // TODO: deleter
+        
     }
 private:
     async_output_info() = delete;
@@ -64,8 +65,8 @@ class sync_stream abstract
 {
 public:
     virtual ~sync_stream() = default;
-    virtual size_t write_some(const uint8_t* buffer, const size_t size) = 0;
-    virtual size_t read_some(uint8_t* const buffer, const size_t size) = 0;
+    virtual size_t write_some(const uint8_t* buffer, const size_t size) __PURE;
+    virtual size_t read_some(uint8_t* const buffer, const size_t size) __PURE;
 };
 
 class async_stream abstract
