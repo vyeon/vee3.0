@@ -3,7 +3,6 @@
 
 #include <vee/stream.h>
 #include <vee/platform.h>
-#include <string>
 
 namespace vee {
    
@@ -16,10 +15,16 @@ using socketfd_t = uint32_t;
 using socketfd_t = uint64_t;
 #endif // VEE_PLATFORM
 
+// Forward declaration
+class net_stream;
+
+using session_t = ::std::shared_ptr<net_stream>;
+
 struct async_connect_info
 {
     using shared_ptr = ::std::shared_ptr<async_connect_info>;
     bool is_success;
+    session_t session;
 };
 
 class net_stream abstract: public io_stream
@@ -34,11 +39,39 @@ public:
     virtual ~net_stream() = default;
     virtual void connect(const char* ip, port_t port) __PURE;
     virtual void disconnect() __PURE;
-    virtual void async_connect(async_connect_delegate::shared_ptr info);
+    virtual void async_connect(async_connect_delegate::shared_ptr info) __noexcept __PURE;
+    virtual socketfd_t native() __noexcept __PURE;
 };
+
+namespace tcp {
+
+struct async_accept_info
+{
+    using shared_ptr = ::std::shared_ptr<async_accept_info>;
+    bool is_success;
+    session_t session;
+};
+
+class server abstract
+{
+public:
+    using this_t = server;
+    using ref_t = this_t&;
+    using rref_t = this_t&&;
+    using shared_ptr = ::std::shared_ptr<this_t>;
+    using unique_ptr = ::std::unique_ptr<this_t>;
+    using async_accept_delegate = delegate<void(async_accept_info::shared_ptr)>;
+    virtual ~server() = default;
+    virtual void open() __PURE;
+    virtual void close() __PURE;
+    virtual ::std::pair<bool, session_t> accept() __PURE;
+    virtual void async_accept(async_accept_delegate::shared_ptr e);
+};
+
+} // !namespace tcp
     
 } // !namespace net
 
 } // !namespace vee
 
-#endif _VEE_NET_H_
+#endif // !_VEE_NET_H_

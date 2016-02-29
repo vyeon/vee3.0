@@ -1,3 +1,4 @@
+#if 0
 #include <vee/test/testobj.h>
 #include <vee/delegate.h>
 #include <vee/lockfree/stack.h>
@@ -294,4 +295,5 @@ void test_lfqueue_data_integrity()
     operator delete[](raw_memory);
 }
 
-} // !namespace unused
+} // !namespace unused  
+#endif // 0

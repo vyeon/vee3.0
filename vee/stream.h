@@ -64,6 +64,11 @@ private:
 class sync_stream abstract
 {
 public:
+    using this_t = sync_stream;
+    using ref_t = this_t&;
+    using rref_t = this_t&&;
+    using shared_ptr = ::std::shared_ptr<this_t>;
+    using unique_ptr = ::std::unique_ptr<this_t>;
     virtual ~sync_stream() = default;
     virtual size_t write_some(const uint8_t* buffer, const size_t size) __PURE;
     virtual size_t read_some(uint8_t* const buffer, const size_t size) __PURE;
@@ -72,6 +77,11 @@ public:
 class async_stream abstract
 {
 public:
+    using this_t = async_stream;
+    using ref_t = this_t&;
+    using rref_t = this_t&&;
+    using shared_ptr = ::std::shared_ptr<this_t>;
+    using unique_ptr = ::std::unique_ptr<this_t>;
     using async_read_delegate  = delegate<void(io::async_input_info::shared_ptr), lock::spin_lock>;
     using async_write_delegate = delegate<void(io::async_output_info::shared_ptr), lock::spin_lock>;
     virtual ~async_stream() = default;
@@ -82,6 +92,11 @@ public:
 class io_stream abstract: public sync_stream, public async_stream
 {
 public:
+    using this_t = io_stream;
+    using ref_t = this_t&;
+    using rref_t = this_t&&;
+    using shared_ptr = ::std::shared_ptr<this_t>;
+    using unique_ptr = ::std::unique_ptr<this_t>;
     virtual ~io_stream() = default;
 };
 

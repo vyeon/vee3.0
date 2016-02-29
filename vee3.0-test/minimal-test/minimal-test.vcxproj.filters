@@ -10,6 +10,9 @@
     <ClCompile Include="unused.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="worker_test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
