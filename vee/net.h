@@ -65,11 +65,27 @@ public:
     virtual void open() __PURE;
     virtual void close() __PURE;
     virtual ::std::pair<bool, session_t> accept() __PURE;
-    virtual void async_accept(async_accept_delegate::shared_ptr e);
+    virtual void async_accept(async_accept_delegate::shared_ptr callback) __PURE;
 };
+
+session_t create_session();
+server::shared_ptr create_server(port_t port);
 
 } // !namespace tcp
     
+namespace udp {
+
+session_t create_stream();
+
+} // !namespace udp
+
+namespace rfc6455 {
+
+session_t create_session();
+tcp::server::shared_ptr create_server(port_t port);
+
+} // !namespace rfc6455
+
 } // !namespace net
 
 } // !namespace vee
