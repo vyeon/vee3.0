@@ -8,6 +8,22 @@ namespace vee {
    
 namespace net {
 
+namespace exl {
+
+class protocol_mismatch: public ::vee::exception
+{
+public:
+    using base_t = ::vee::exception;
+    protocol_mismatch():
+        base_t{ "protocol mismatch" }
+    {
+    }
+    virtual ~protocol_mismatch() = default;
+    virtual char const* to_string() const __noexcept override;
+};
+    
+} // !namespace exl
+
 using port_t = unsigned short;
 #if VEE_PLATFORM_X32
 using socketfd_t = uint32_t;
@@ -68,21 +84,27 @@ public:
     virtual void async_accept(async_accept_delegate::shared_ptr callback) __PURE;
 };
 
-session_t create_session();
-server::shared_ptr create_server(port_t port);
+session_t create_session() __noexcept;
+server::shared_ptr create_server(port_t port) __noexcept;
 
 } // !namespace tcp
     
 namespace udp {
 
-session_t create_stream();
+session_t create_stream() __noexcept;
 
 } // !namespace udp
 
 namespace rfc6455 {
 
-session_t create_session();
-tcp::server::shared_ptr create_server(port_t port);
+namespace exl {
+
+// TODO
+
+} // !namespace exl
+
+session_t create_session() __noexcept;
+tcp::server::shared_ptr create_server(port_t port) __noexcept;
 
 } // !namespace rfc6455
 
