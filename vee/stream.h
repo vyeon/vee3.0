@@ -10,11 +10,18 @@ namespace io {
 
 using buffer_t = uint8_t*;
 
+enum class io_issue: uint32_t
+{
+    clear,
+    eof = 1,
+    timeout,
+};
+
 struct io_result
 {
-    bool    is_success = false;
-    bool    eof = false;
-    size_t  bytes_transferred __PURE;
+    bool     is_success = false;
+    io_issue issue = io_issue::clear;
+    size_t   bytes_transferred __PURE;
 };
 
 struct async_input_info
@@ -70,8 +77,8 @@ public:
     using shared_ptr = ::std::shared_ptr<this_t>;
     using unique_ptr = ::std::unique_ptr<this_t>;
     virtual ~sync_stream() = default;
-    virtual size_t write_some(const uint8_t* buffer, const size_t size) __PURE;
-    virtual size_t read_some(uint8_t* const buffer, const size_t size) __PURE;
+    virtual size_t write_some(const uint8_t* buffer, const size_t size, const size_t timeout) __PURE;
+    virtual size_t read_some(uint8_t* const buffer, const size_t size, const size_t timeout) __PURE;
 };
 
 class async_stream abstract
@@ -85,8 +92,8 @@ public:
     using async_read_delegate  = delegate<void(io::async_input_info::shared_ptr), lock::spin_lock>;
     using async_write_delegate = delegate<void(io::async_output_info::shared_ptr), lock::spin_lock>;
     virtual ~async_stream() = default;
-    virtual void async_read_some(io::async_input_info::shared_ptr info, async_read_delegate::shared_ptr callback);
-    virtual void async_write_some(io::async_output_info::shared_ptr info, async_write_delegate::shared_ptr callback);
+    virtual void async_read_some(io::async_input_info::shared_ptr info, async_read_delegate::shared_ptr callback, const size_t timeout);
+    virtual void async_write_some(io::async_output_info::shared_ptr info, async_write_delegate::shared_ptr callback, const size_t timeout);
 };
 
 class io_stream abstract: public sync_stream, public async_stream
