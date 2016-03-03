@@ -92,8 +92,8 @@ public:
     using async_read_delegate  = delegate<void(io::async_input_info::shared_ptr), lock::spin_lock>;
     using async_write_delegate = delegate<void(io::async_output_info::shared_ptr), lock::spin_lock>;
     virtual ~async_stream() = default;
-    virtual void async_read_some(io::async_input_info::shared_ptr info, async_read_delegate::shared_ptr callback, const size_t timeout);
-    virtual void async_write_some(io::async_output_info::shared_ptr info, async_write_delegate::shared_ptr callback, const size_t timeout);
+    virtual void async_read_some(io::async_input_info::shared_ptr info, async_read_delegate::shared_ptr callback, const size_t timeout) __noexcept __PURE;
+    virtual void async_write_some(io::async_output_info::shared_ptr info, async_write_delegate::shared_ptr callback, const size_t timeout) __noexcept __PURE;
 };
 
 class io_stream abstract: public sync_stream, public async_stream

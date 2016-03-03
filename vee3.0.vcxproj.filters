@@ -22,6 +22,9 @@
     <Filter Include="vee\lockfree">
       <UniqueIdentifier>{1c137e37-8330-4cc0-a126-2a8acbda6c0a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vee\net">
+      <UniqueIdentifier>{b855bb26-4925-46d5-9917-30f8f4fcc699}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="vee\libbase.h">
@@ -86,6 +89,9 @@
     </ClInclude>
     <ClInclude Include="vee\platform.h">
       <Filter>vee</Filter>
+    </ClInclude>
+    <ClInclude Include="vee\net\tcp.h">
+      <Filter>vee\net</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

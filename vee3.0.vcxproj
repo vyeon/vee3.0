@@ -42,6 +42,7 @@
     <ClInclude Include="vee\iobase.h" />
     <ClInclude Include="vee\lockfree\list.h" />
     <ClInclude Include="vee\net.h" />
+    <ClInclude Include="vee\net\tcp.h" />
     <ClInclude Include="vee\platform.h" />
     <ClInclude Include="vee\stream.h" />
     <ClInclude Include="vee\libbase.h" />
