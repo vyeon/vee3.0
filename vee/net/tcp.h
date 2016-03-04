@@ -32,11 +32,11 @@ private:
 /* Public member functions */
 public:
     virtual ~tcp_stream();
-    tcp_stream();
     tcp_stream(tcp_stream&& other);
     explicit tcp_stream(tcp_socket&& socket);
     explicit tcp_stream(io_service& iosvc);
-    tcp_stream& operator=(tcp_stream&& rhs);
+    tcp_stream& operator=(tcp_stream&& rhs) __noexcept;
+    void swap(tcp_stream& other) __noexcept;
     virtual void connect(const char* ip, port_t port, const size_t timeout) override;
     virtual void disconnect() override;
     virtual void async_connect(async_connect_delegate::shared_ptr info, const size_t timeout) __noexcept override;
@@ -48,11 +48,12 @@ public:
 
 /* Protected member variables */
 protected:
-    io_service& _iosvc;
+    io_service* _iosvc;
     tcp_socket _socket;
 /* Disallow member functions */
 private:
     // DISALLOW COPY OPERATIONS
+    tcp_stream() = delete;
     tcp_stream(const tcp_stream&) = delete;
     void operator=(const tcp_stream&) = delete;
 };

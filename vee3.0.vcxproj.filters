@@ -25,6 +25,9 @@
     <Filter Include="vee\net">
       <UniqueIdentifier>{b855bb26-4925-46d5-9917-30f8f4fcc699}</UniqueIdentifier>
     </Filter>
+    <Filter Include="net">
+      <UniqueIdentifier>{13b3740b-6262-48b8-9932-5f1e79b517ea}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="vee\libbase.h">
@@ -112,6 +115,9 @@
     </ClCompile>
     <ClCompile Include="ex\exl_worker.cpp">
       <Filter>ex</Filter>
+    </ClCompile>
+    <ClCompile Include="net\tcp.cpp">
+      <Filter>net</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

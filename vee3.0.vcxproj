@@ -63,6 +63,7 @@
     <ClCompile Include="ex\exl.cpp" />
     <ClCompile Include="ex\exl_worker.cpp" />
     <ClCompile Include="io\iobase.cpp" />
+    <ClCompile Include="net\tcp.cpp" />
     <ClCompile Include="test\testobj.cpp" />
     <ClCompile Include="test\timerec.cpp" />
   </ItemGroup>
