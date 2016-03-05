@@ -1,7 +1,6 @@
 #ifndef _VEE_NET_TCP_H_
 #define _VEE_NET_TCP_H_
 
-#include <vee/libbase.h>
 #include <vee/net.h>
 #include <boost/asio.hpp>
 
@@ -50,12 +49,49 @@ public:
 protected:
     io_service* _iosvc;
     tcp_socket _socket;
-/* Disallow member functions */
+/* Disallowed member functions */
 private:
     // DISALLOW COPY OPERATIONS
     tcp_stream() = delete;
     tcp_stream(const tcp_stream&) = delete;
     void operator=(const tcp_stream&) = delete;
+};
+
+class tcp_server: public server
+{
+/* Public member types */
+public:
+    using this_t = tcp_server;
+    using ref_t = this_t&;
+    using rref_t = this_t&&;
+    using shared_ptr = ::std::shared_ptr<this_t>;
+    using unique_ptr = ::std::unique_ptr<this_t>;
+/* Protected member types */
+private:
+    using tcp_socket = ::boost::asio::ip::tcp::socket;
+    using tcp_endpoint = ::boost::asio::ip::tcp::endpoint;
+    using io_service = ::boost::asio::io_service;
+    tcp_server(port_t port, io_service& iosvc);
+    tcp_server(tcp_server&& other);
+    virtual ~tcp_server();
+    virtual void open() override;
+    virtual void close() override;
+    virtual ::std::pair<bool, session_t> accept() override;
+    virtual void async_accept(async_accept_delegate::shared_ptr callback, const size_t timeout) override;
+
+/* Protected member variables */
+protected:
+    io_service*  _iosvc;
+    tcp_socket   _socket;
+    tcp_endpoint _endpoint;
+    ::boost::asio::ip::tcp::acceptor _acceptor;
+
+/* Disallowed member functions */
+private:
+    // DISALLOW COPY OPERATIONS
+    tcp_server() = delete;
+    tcp_server(const tcp_server&) = delete;
+    void operator=(const tcp_server&) = delete;
 };
 
 } // !namespace tcp
