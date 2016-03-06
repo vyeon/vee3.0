@@ -57,6 +57,19 @@ void tcp_stream::swap(tcp_stream& other) __noexcept
 
 void tcp_stream::connect(const char* ip, port_t port, const size_t timeout)
 {
+    // Set a deadline for the connect operation.
+    _deadline.expires_from_now(::boost::posix_time::milliseconds(timeout));
+    
+    tcp_endpoint ep{ string_to_ipaddr(ip), port };
+    
+    // Start the asynchronous connect operation.
+    _socket.async_connect(ep, 
+                          ::std::bind(&this_t::_on_connect, 
+                                      this, 
+                                      ::std::placeholders::_1, 
+                                      ep));
+    
+    // Block until the asynchronous operation has completed.
     
 }
 
@@ -87,6 +100,11 @@ void tcp_stream::async_read_some(io::async_input_info::shared_ptr info, async_re
 
 void tcp_stream::async_write_some(io::async_output_info::shared_ptr info, async_write_delegate::shared_ptr callback, const size_t timeout)
 {
+}
+
+void tcp_stream::_on_connect(const ::boost::system::error_code& ec, ::boost::asio::ip::tcp::resolver::iterator endpoint_iter)
+{
+    
 }
 
 } // !namespace tcp

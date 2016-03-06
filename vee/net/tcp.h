@@ -46,6 +46,11 @@ public:
     virtual void async_read_some(io::async_input_info::shared_ptr info, async_read_delegate::shared_ptr callback, const size_t timeout) __noexcept override;
     virtual void async_write_some(io::async_output_info::shared_ptr info, async_write_delegate::shared_ptr callback, const size_t timeout) __noexcept override;
 
+/* Private member functions */
+private:
+    void _on_connect(const ::boost::system::error_code& ec,
+                     ::boost::asio::ip::tcp::resolver::iterator endpoint_iter);
+
 /* Protected member variables */
 protected:
     io_service* _iosvc;
