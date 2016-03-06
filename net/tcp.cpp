@@ -19,29 +19,35 @@ tcp_stream::~tcp_stream()
 
 tcp_stream::tcp_stream(tcp_stream&& other):
     _iosvc { other._iosvc },
-    _socket { ::std::move(other._socket) }
+    _socket { ::std::move(other._socket) },
+    _deadline { *_iosvc },
+    _heartbeat { *_iosvc }
 {
 }
 
 tcp_stream::tcp_stream(tcp_socket&& socket):
     _iosvc { &(socket.get_io_service()) },
-    _socket { ::std::move(socket) }
+    _socket { ::std::move(socket) },
+    _deadline{ *_iosvc },
+    _heartbeat{ *_iosvc }
 {
 }
 
 tcp_stream::tcp_stream(io_service& iosvc):
     _iosvc { &iosvc },
-    _socket { *_iosvc }
+    _socket { *_iosvc },
+    _deadline{ *_iosvc },
+    _heartbeat{ *_iosvc }
 {
 }
 
-tcp_stream& tcp_stream::operator=(tcp_stream&& rhs) __noexcept
-{
-    disconnect();
-    _socket = ::std::move(rhs._socket);
-    _iosvc = rhs._iosvc;
-    return *this;
-}
+//tcp_stream& tcp_stream::operator=(tcp_stream&& rhs) __noexcept
+//{
+//    disconnect();
+//    _socket = ::std::move(rhs._socket);
+//    _iosvc = rhs._iosvc;
+//    return *this;
+//}
 
 void tcp_stream::swap(tcp_stream& other) __noexcept
 {

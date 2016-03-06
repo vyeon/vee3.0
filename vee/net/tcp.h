@@ -27,6 +27,7 @@ private:
     using tcp_socket = ::boost::asio::ip::tcp::socket;
     using tcp_endpoint = ::boost::asio::ip::tcp::endpoint;
     using io_service = ::boost::asio::io_service;
+    using deadline_timer = ::boost::asio::deadline_timer;
 
 /* Public member functions */
 public:
@@ -34,7 +35,7 @@ public:
     tcp_stream(tcp_stream&& other);
     explicit tcp_stream(tcp_socket&& socket);
     explicit tcp_stream(io_service& iosvc);
-    tcp_stream& operator=(tcp_stream&& rhs) __noexcept;
+    //tcp_stream& operator=(tcp_stream&& rhs) __noexcept;
     void swap(tcp_stream& other) __noexcept;
     virtual void connect(const char* ip, port_t port, const size_t timeout) override;
     virtual void disconnect() override;
@@ -49,6 +50,8 @@ public:
 protected:
     io_service* _iosvc;
     tcp_socket _socket;
+    deadline_timer _deadline;
+    deadline_timer _heartbeat;
 /* Disallowed member functions */
 private:
     // DISALLOW COPY OPERATIONS
