@@ -3,6 +3,7 @@
 
 #include <vee/net.h>
 #include <boost/asio.hpp>
+#include <future>
 
 namespace vee {
     
@@ -49,6 +50,7 @@ public:
 /* Private member functions */
 private:
     void _on_connect(const ::boost::system::error_code& ec,
+                     ::std::promise<bool> promise,
                      ::boost::asio::ip::tcp::resolver::iterator endpoint_iter);
 
 /* Protected member variables */

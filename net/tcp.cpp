@@ -61,16 +61,24 @@ void tcp_stream::connect(const char* ip, port_t port, const size_t timeout)
     _deadline.expires_from_now(::boost::posix_time::milliseconds(timeout));
     
     tcp_endpoint ep{ string_to_ipaddr(ip), port };
+    ::std::promise<bool> promise;
+    ::std::future<bool> future{ promise.get_future() };
     
     // Start the asynchronous connect operation.
     _socket.async_connect(ep, 
                           ::std::bind(&this_t::_on_connect, 
-                                      this, 
-                                      ::std::placeholders::_1, 
+                                      this,
+                                      ::std::placeholders::_1,
+                                      ::std::move(promise),
                                       ep));
     
     // Block until the asynchronous operation has completed.
-    
+    bool result = future.get();
+
+    if (!result)
+    {
+        throw exl::connection_failed{};
+    }
 }
 
 void tcp_stream::disconnect()
@@ -102,7 +110,9 @@ void tcp_stream::async_write_some(io::async_output_info::shared_ptr info, async_
 {
 }
 
-void tcp_stream::_on_connect(const ::boost::system::error_code& ec, ::boost::asio::ip::tcp::resolver::iterator endpoint_iter)
+void tcp_stream::_on_connect(const ::boost::system::error_code& ec, 
+                             ::std::promise<bool> promise,
+                             ::boost::asio::ip::tcp::resolver::iterator endpoint_iter)
 {
     
 }

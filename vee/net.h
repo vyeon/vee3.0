@@ -21,7 +21,19 @@ public:
     virtual ~protocol_mismatch() = default;
     virtual char const* to_string() const __noexcept override;
 };
-    
+
+class connection_failed: public ::vee::exception
+{
+public:
+    using base_t = ::vee::exception;
+    connection_failed():
+        base_t{ "connection failed" }
+    {
+    }
+    virtual ~connection_failed() = default;
+    virtual char const* to_string() const __noexcept override;
+};
+
 } // !namespace exl
 
 using port_t = unsigned short;
