@@ -30,6 +30,7 @@ public:
         base_t{ "connection failed" }
     {
     }
+    explicit connection_failed(char const* const);
     virtual ~connection_failed() = default;
     virtual char const* to_string() const __noexcept override;
 };
@@ -48,11 +49,12 @@ class net_stream;
 
 using session_t = ::std::shared_ptr<net_stream>;
 
-enum class operation_issue
+enum class operation_issue: uint32_t
 {
-    clear = 0,
+    none = 0,
     eof,
-    timeout
+    timeout,
+    aborted,
 };
 
 struct async_connect_info

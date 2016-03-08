@@ -61,21 +61,39 @@ void tcp_stream::connect(const char* ip, port_t port, const size_t timeout)
     _deadline.expires_from_now(::boost::posix_time::milliseconds(timeout));
     
     tcp_endpoint ep{ string_to_ipaddr(ip), port };
-    ::std::promise<bool> promise;
-    ::std::future<bool> future{ promise.get_future() };
+    ::std::promise<operation_issue> promise;
+    ::std::future<operation_issue> future{ promise.get_future() };
     
+    auto on_connect = [this]( const ::boost::system::error_code& ec,
+                          ::std::promise<operation_issue> promise ) -> void
+    {
+        if (!this->_socket.is_open())
+        {
+            // timeout
+            promise.set_value(operation_issue::timeout);
+            return;
+        }
+        if (ec)
+        {
+            // operation aborted
+            promise.set_value(operation_issue::aborted);
+            return;
+        }
+        promise.set_value(operation_issue::none);
+        return;
+    };
+
     // Start the asynchronous connect operation.
     _socket.async_connect(ep, 
-                          ::std::bind(&this_t::_on_connect, 
+                          ::std::bind(on_connect, 
                                       this,
                                       ::std::placeholders::_1,
-                                      ::std::move(promise),
-                                      ep));
+                                      ::std::move(promise)));
     
     // Block until the asynchronous operation has completed.
-    bool result = future.get();
+    auto result = future.get();
 
-    if (!result)
+    if (result != operation_issue::none)
     {
         throw exl::connection_failed{};
     }
@@ -108,13 +126,6 @@ void tcp_stream::async_read_some(io::async_input_info::shared_ptr info, async_re
 
 void tcp_stream::async_write_some(io::async_output_info::shared_ptr info, async_write_delegate::shared_ptr callback, const size_t timeout)
 {
-}
-
-void tcp_stream::_on_connect(const ::boost::system::error_code& ec, 
-                             ::std::promise<bool> promise,
-                             ::boost::asio::ip::tcp::resolver::iterator endpoint_iter)
-{
-    
 }
 
 } // !namespace tcp
