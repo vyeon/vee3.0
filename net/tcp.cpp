@@ -62,25 +62,23 @@ void tcp_stream::connect(const char* ip, port_t port, const size_t timeout)
     _deadline.expires_from_now(::boost::posix_time::milliseconds(timeout));
     
     tcp_endpoint ep{ string_to_ipaddr(ip), port };
-    ::std::promise<operation_issue> promise;
-    ::std::future<operation_issue> future{ promise.get_future() };
-    
+    ::std::promise<operation_result> promise;
+    ::std::future<operation_result> future{ promise.get_future() };
     auto on_connect = [this]( const ::boost::system::error_code& ec,
-                          ::std::promise<operation_issue> promise ) -> void
+                              ::std::promise<operation_result> promise ) -> void
     {
         if (!this->_socket.is_open())
         {
-            // timeout
-            promise.set_value(operation_issue::timeout);
+            // timeout_or_aborted
+            promise.set_value(operation_result::timeout_or_aborted);
             return;
         }
         if (ec)
         {
             // operation aborted
-            promise.set_value(operation_issue::aborted);
             return;
         }
-        promise.set_value(operation_issue::none);
+        promise.set_value(this->_results.connection);
         return;
     };
 
@@ -94,7 +92,7 @@ void tcp_stream::connect(const char* ip, port_t port, const size_t timeout)
     // Block until the asynchronous operation has completed.
     auto result = future.get();
 
-    if (result != operation_issue::none)
+    if (result != operation_result::succeed)
     {
         throw exl::net::connection_failed{};
     }
@@ -114,7 +112,7 @@ void tcp_stream::async_connect(async_connect_delegate::shared_ptr info, const si
 
 socketfd_t tcp_stream::native()
 {
-
+    return _socket.native();
 }
 
 bool tcp_stream::is_open()

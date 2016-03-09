@@ -57,6 +57,11 @@ protected:
     tcp_socket _socket;
     deadline_timer _deadline;
     deadline_timer _heartbeat;
+    struct {
+        operation_result connection;
+        operation_result read;
+        operation_result write;
+    } _results;
 /* Disallowed member functions */
 private:
     // DISALLOW COPY OPERATIONS

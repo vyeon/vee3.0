@@ -65,11 +65,11 @@ class net_stream;
 
 using session_t = ::std::shared_ptr<net_stream>;
 
-enum class operation_issue: uint32_t
+enum class operation_result: uint32_t
 {
-    none = 0,
+    succeed = 0,
     eof,
-    timeout,
+    timeout_or_aborted,
     aborted,
 };
 
@@ -77,7 +77,7 @@ struct async_connect_info
 {
     using shared_ptr = ::std::shared_ptr<async_connect_info>;
     bool is_success;
-    operation_issue issue;
+    operation_result issue;
     session_t session;
 };
 
