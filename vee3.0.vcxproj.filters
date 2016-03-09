@@ -119,6 +119,8 @@
     <ClCompile Include="net\tcp.cpp">
       <Filter>net</Filter>
     </ClCompile>
-    <ClCompile Include="ex\exl_net.cpp" />
+    <ClCompile Include="ex\exl_net.cpp">
+      <Filter>ex</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

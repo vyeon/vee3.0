@@ -42,6 +42,7 @@ public:
     virtual void disconnect() override;
     virtual void async_connect(async_connect_delegate::shared_ptr info, const size_t timeout) __noexcept override;
     virtual socketfd_t native() __noexcept override;
+    virtual bool is_open() __noexcept override;
     virtual size_t write_some(const uint8_t* buffer, const size_t size, const size_t timeout) override;
     virtual size_t read_some(uint8_t* const buffer, const size_t size, const size_t timeout) override;
     virtual void async_read_some(io::async_input_info::shared_ptr info, async_read_delegate::shared_ptr callback, const size_t timeout) __noexcept override;

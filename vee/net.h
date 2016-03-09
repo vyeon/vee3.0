@@ -5,11 +5,11 @@
 #include <vee/platform.h>
 
 namespace vee {
-   
-namespace net {
 
 namespace exl {
 
+namespace net {
+    
 class protocol_mismatch: public ::vee::exception
 {
 public:
@@ -35,7 +35,23 @@ public:
     virtual char const* to_string() const __noexcept override;
 };
 
+class connection_already_disconnected: public ::vee::exception
+{
+public:
+    using base_t = ::vee::exception;
+    connection_already_disconnected():
+        base_t{ "connection already disconnected" }
+    {
+    }
+    virtual ~connection_already_disconnected() = default;
+    virtual char const* to_string() const __noexcept override;
+};
+
+} // !namespace net 
+
 } // !namespace exl
+   
+namespace net {
 
 using port_t = unsigned short;
 #if VEE_PLATFORM_X32
@@ -79,6 +95,7 @@ public:
     virtual void disconnect() __PURE;
     virtual void async_connect(async_connect_delegate::shared_ptr info, const size_t timeout) __noexcept __PURE;
     virtual socketfd_t native() __noexcept __PURE;
+    virtual bool is_open() __noexcept __PURE;
 };
 
 namespace tcp {

@@ -1,4 +1,5 @@
 #include <vee/net/tcp.h>
+#include <vee/exl.h>
 
 namespace vee {
     
@@ -95,37 +96,50 @@ void tcp_stream::connect(const char* ip, port_t port, const size_t timeout)
 
     if (result != operation_issue::none)
     {
-        throw exl::connection_failed{};
+        throw exl::net::connection_failed{};
     }
 }
 
 void tcp_stream::disconnect()
 {
-
+    if (!_socket.is_open())
+        throw exl::net::connection_already_disconnected{};
+    _socket.close();
 }
 
 void tcp_stream::async_connect(async_connect_delegate::shared_ptr info, const size_t timeout)
 {
+
 }
 
 socketfd_t tcp_stream::native()
 {
+
+}
+
+bool tcp_stream::is_open()
+{
+    return _socket.is_open();
 }
 
 size_t tcp_stream::write_some(const uint8_t* buffer, const size_t size, const size_t timeout)
 {
+
 }
 
 size_t tcp_stream::read_some(uint8_t* const buffer, const size_t size, const size_t timeout)
 {
+
 }
 
 void tcp_stream::async_read_some(io::async_input_info::shared_ptr info, async_read_delegate::shared_ptr callback, const size_t timeout)
 {
+
 }
 
 void tcp_stream::async_write_some(io::async_output_info::shared_ptr info, async_write_delegate::shared_ptr callback, const size_t timeout)
 {
+
 }
 
 } // !namespace tcp
