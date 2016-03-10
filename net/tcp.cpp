@@ -105,7 +105,7 @@ void tcp_stream::disconnect()
     _socket.close();
 }
 
-void tcp_stream::async_connect(async_connect_delegate::shared_ptr info, const size_t timeout)
+void tcp_stream::async_connect(async_connect_info::shared_ptr info, async_connect_delegate::shared_ptr callback, const size_t timeout)
 {
 
 }

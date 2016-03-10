@@ -3,6 +3,7 @@
 
 #include <vee/stream.h>
 #include <vee/platform.h>
+#include <string>
 
 namespace vee {
 
@@ -77,8 +78,10 @@ struct async_connect_info
 {
     using shared_ptr = ::std::shared_ptr<async_connect_info>;
     bool is_success;
-    operation_result issue;
+    operation_result result;
     session_t session;
+    ::std::string ip;
+    port_t port;
 };
 
 class net_stream abstract: public io_stream
@@ -93,7 +96,7 @@ public:
     virtual ~net_stream() = default;
     virtual void connect(const char* ip, port_t port, const size_t timeout) __PURE;
     virtual void disconnect() __PURE;
-    virtual void async_connect(async_connect_delegate::shared_ptr info, const size_t timeout) __noexcept __PURE;
+    virtual void async_connect(async_connect_info::shared_ptr info, async_connect_delegate::shared_ptr callback, const size_t timeout) __noexcept __PURE;
     virtual socketfd_t native() __noexcept __PURE;
     virtual bool is_open() __noexcept __PURE;
 };
