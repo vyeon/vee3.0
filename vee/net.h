@@ -70,7 +70,6 @@ enum class operation_result: uint32_t
 {
     succeed = 0,
     eof,
-    timeout_or_aborted,
     aborted,
 };
 
@@ -94,9 +93,9 @@ public:
     using unique_ptr = ::std::unique_ptr<this_t>;
     using async_connect_delegate = delegate<void(async_connect_info::shared_ptr)>;
     virtual ~net_stream() = default;
-    virtual void connect(const char* ip, port_t port, const size_t timeout) __PURE;
+    virtual void connect(const char* ip, port_t port) __PURE;
     virtual void disconnect() __PURE;
-    virtual void async_connect(async_connect_info::shared_ptr info, async_connect_delegate::shared_ptr callback, const size_t timeout) __noexcept __PURE;
+    virtual void async_connect(async_connect_info::shared_ptr info, async_connect_delegate::shared_ptr callback) __noexcept __PURE;
     virtual socketfd_t native() __noexcept __PURE;
     virtual bool is_open() __noexcept __PURE;
 };
@@ -123,7 +122,7 @@ public:
     virtual void open() __PURE;
     virtual void close() __PURE;
     virtual ::std::pair<bool, session_t> accept() __PURE;
-    virtual void async_accept(async_accept_delegate::shared_ptr callback, const size_t timeout) __PURE;
+    virtual void async_accept(async_accept_delegate::shared_ptr callback) __PURE;
 };
 
 session_t create_session() __noexcept;

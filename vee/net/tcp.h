@@ -28,7 +28,6 @@ private:
     using tcp_socket = ::boost::asio::ip::tcp::socket;
     using tcp_endpoint = ::boost::asio::ip::tcp::endpoint;
     using io_service = ::boost::asio::io_service;
-    using deadline_timer = ::boost::asio::deadline_timer;
 
 /* Public member functions */
 public:
@@ -38,15 +37,15 @@ public:
     explicit tcp_stream(io_service& iosvc);
     //tcp_stream& operator=(tcp_stream&& rhs) __noexcept;
     void swap(tcp_stream& other) __noexcept;
-    virtual void connect(const char* ip, port_t port, const size_t timeout) override;
+    virtual void connect(const char* ip, port_t port) override;
     virtual void disconnect() override;
-    virtual void async_connect(async_connect_info::shared_ptr info, async_connect_delegate::shared_ptr callback, const size_t timeout) __noexcept override;
+    virtual void async_connect(async_connect_info::shared_ptr info, async_connect_delegate::shared_ptr callback) __noexcept override;
     virtual socketfd_t native() __noexcept override;
     virtual bool is_open() __noexcept override;
-    virtual size_t write_some(const uint8_t* buffer, const size_t size, const size_t timeout) override;
-    virtual size_t read_some(uint8_t* const buffer, const size_t size, const size_t timeout) override;
-    virtual void async_read_some(io::async_input_info::shared_ptr info, async_read_delegate::shared_ptr callback, const size_t timeout) __noexcept override;
-    virtual void async_write_some(io::async_output_info::shared_ptr info, async_write_delegate::shared_ptr callback, const size_t timeout) __noexcept override;
+    virtual size_t write_some(const uint8_t* buffer, const size_t size) override;
+    virtual size_t read_some(uint8_t* const buffer, const size_t size) override;
+    virtual void async_read_some(io::async_input_info::shared_ptr info, async_read_delegate::shared_ptr callback) __noexcept override;
+    virtual void async_write_some(io::async_output_info::shared_ptr info, async_write_delegate::shared_ptr callback) __noexcept override;
 
 /* Private member functions */
 private:
@@ -55,13 +54,6 @@ private:
 protected:
     io_service* _iosvc;
     tcp_socket _socket;
-    deadline_timer _deadline;
-    deadline_timer _heartbeat;
-    struct {
-        operation_result connection;
-        operation_result read;
-        operation_result write;
-    } _results;
 /* Disallowed member functions */
 private:
     // DISALLOW COPY OPERATIONS
@@ -90,7 +82,7 @@ private:
     virtual void open() override;
     virtual void close() override;
     virtual ::std::pair<bool, session_t> accept() override;
-    virtual void async_accept(async_accept_delegate::shared_ptr callback, const size_t timeout) override;
+    virtual void async_accept(async_accept_delegate::shared_ptr callback) override;
 
 /* Protected member variables */
 protected:
