@@ -35,17 +35,20 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="vee\core\noncopyable.h" />
     <ClInclude Include="vee\delegate.h" />
     <ClInclude Include="vee\enumeration.h" />
     <ClInclude Include="vee\exception.h" />
     <ClInclude Include="vee\exl.h" />
-    <ClInclude Include="vee\iobase.h" />
+    <ClInclude Include="vee\io\detail\io_service_kernel.h" />
+    <ClInclude Include="vee\io\io_base.h" />
+    <ClInclude Include="vee\io\io_service.h" />
+    <ClInclude Include="vee\io\stream.h" />
     <ClInclude Include="vee\lockfree\list.h" />
     <ClInclude Include="vee\net.h" />
     <ClInclude Include="vee\net\tcp.h" />
     <ClInclude Include="vee\platform.h" />
-    <ClInclude Include="vee\stream.h" />
-    <ClInclude Include="vee\libbase.h" />
+    <ClInclude Include="vee\lib_base.h" />
     <ClInclude Include="vee\lock.h" />
     <ClInclude Include="vee\lockfree.h" />
     <ClInclude Include="vee\lockfree\queue.h" />
@@ -63,7 +66,8 @@
     <ClCompile Include="ex\exl.cpp" />
     <ClCompile Include="ex\exl_net.cpp" />
     <ClCompile Include="ex\exl_worker.cpp" />
-    <ClCompile Include="io\iobase.cpp" />
+    <ClCompile Include="io\io_base.cpp" />
+    <ClCompile Include="io\io_service.cpp" />
     <ClCompile Include="net\tcp.cpp" />
     <ClCompile Include="test\testobj.cpp" />
     <ClCompile Include="test\timerec.cpp" />

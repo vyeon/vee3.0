@@ -7,9 +7,6 @@
     <Filter Include="vee\test">
       <UniqueIdentifier>{2d331f38-a827-4982-8802-0ceec8278653}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vee\io">
-      <UniqueIdentifier>{4ac09de9-37dd-4abf-8639-e2d0a5a6827a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="test">
       <UniqueIdentifier>{3133e53b-e6ab-4ae0-8dfe-a938e4d11260}</UniqueIdentifier>
     </Filter>
@@ -28,11 +25,17 @@
     <Filter Include="net">
       <UniqueIdentifier>{13b3740b-6262-48b8-9932-5f1e79b517ea}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vee\core">
+      <UniqueIdentifier>{85b71d1d-09fe-43c4-bf77-f93ce9c3c0f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vee\io">
+      <UniqueIdentifier>{bb2b49ec-4890-47bb-8065-22a89d9a02dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vee\io\detail">
+      <UniqueIdentifier>{b6f6b763-79dd-4b90-b708-aa14fa2cd367}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="vee\libbase.h">
-      <Filter>vee</Filter>
-    </ClInclude>
     <ClInclude Include="vee\enumeration.h">
       <Filter>vee</Filter>
     </ClInclude>
@@ -60,9 +63,6 @@
     <ClInclude Include="vee\lockfree\queue.h">
       <Filter>vee\lockfree</Filter>
     </ClInclude>
-    <ClInclude Include="vee\iobase.h">
-      <Filter>vee</Filter>
-    </ClInclude>
     <ClInclude Include="vee\test\timerec.h">
       <Filter>vee\test</Filter>
     </ClInclude>
@@ -81,9 +81,6 @@
     <ClInclude Include="vee\lockfree\stack.h">
       <Filter>vee\lockfree</Filter>
     </ClInclude>
-    <ClInclude Include="vee\stream.h">
-      <Filter>vee</Filter>
-    </ClInclude>
     <ClInclude Include="vee\lockfree\list.h">
       <Filter>vee\lockfree</Filter>
     </ClInclude>
@@ -96,13 +93,28 @@
     <ClInclude Include="vee\net\tcp.h">
       <Filter>vee\net</Filter>
     </ClInclude>
+    <ClInclude Include="vee\lib_base.h">
+      <Filter>vee</Filter>
+    </ClInclude>
+    <ClInclude Include="vee\core\noncopyable.h">
+      <Filter>vee\core</Filter>
+    </ClInclude>
+    <ClInclude Include="vee\io\detail\io_service_kernel.h">
+      <Filter>vee\io\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="vee\io\stream.h">
+      <Filter>vee\io</Filter>
+    </ClInclude>
+    <ClInclude Include="vee\io\io_base.h">
+      <Filter>vee\io</Filter>
+    </ClInclude>
+    <ClInclude Include="vee\io\io_service.h">
+      <Filter>vee\io</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="test\testobj.cpp">
       <Filter>test</Filter>
-    </ClCompile>
-    <ClCompile Include="io\iobase.cpp">
-      <Filter>io</Filter>
     </ClCompile>
     <ClCompile Include="ex\exception.cpp">
       <Filter>ex</Filter>
@@ -121,6 +133,12 @@
     </ClCompile>
     <ClCompile Include="ex\exl_net.cpp">
       <Filter>ex</Filter>
+    </ClCompile>
+    <ClCompile Include="io\io_base.cpp">
+      <Filter>io</Filter>
+    </ClCompile>
+    <ClCompile Include="io\io_service.cpp">
+      <Filter>io</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

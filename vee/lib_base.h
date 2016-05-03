@@ -18,8 +18,6 @@ void operator=(const TypeName&&) = delete;
 #define DEBUG_PRINT(...)
 #endif
 
-#define __PURE = 0
-
 #define PRINT_LINE for(int i = 0; i < 7; ++i) printf("----------");printf("\n");
 
 #endif // !_VEE_LIBBASE_H_

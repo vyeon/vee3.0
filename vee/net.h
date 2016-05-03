@@ -1,9 +1,8 @@
 #ifndef _VEE_NET_H_
 #define _VEE_NET_H_
 
-#include <vee/stream.h>
+#include <vee/io/stream.h>
 #include <vee/platform.h>
-#include <string>
 
 namespace vee {
 
@@ -11,7 +10,7 @@ namespace exl {
 
 namespace net {
     
-class protocol_mismatch: public ::vee::exception
+class protocol_mismatch: virtual public ::vee::exception
 {
 public:
     using base_t = ::vee::exception;
@@ -23,7 +22,7 @@ public:
     virtual char const* to_string() const __noexcept override;
 };
 
-class connection_failed: public ::vee::exception
+class connection_failed: virtual public ::vee::exception
 {
 public:
     using base_t = ::vee::exception;
@@ -36,7 +35,7 @@ public:
     virtual char const* to_string() const __noexcept override;
 };
 
-class connection_already_disconnected: public ::vee::exception
+class connection_already_disconnected: virtual public ::vee::exception
 {
 public:
     using base_t = ::vee::exception;
@@ -83,7 +82,7 @@ struct async_connect_info
     port_t port;
 };
 
-class net_stream abstract: public io_stream
+class net_stream abstract: virtual public io_stream
 {
 public:
     using this_t = net_stream;
@@ -93,11 +92,11 @@ public:
     using unique_ptr = ::std::unique_ptr<this_t>;
     using async_connect_delegate = delegate<void(async_connect_info::shared_ptr)>;
     virtual ~net_stream() = default;
-    virtual void connect(const char* ip, port_t port) __PURE;
-    virtual void disconnect() __PURE;
-    virtual void async_connect(async_connect_info::shared_ptr info, async_connect_delegate::shared_ptr callback) __noexcept __PURE;
-    virtual socketfd_t native() __noexcept __PURE;
-    virtual bool is_open() __noexcept __PURE;
+    virtual void connect(const char* ip, port_t port) = 0;
+    virtual void disconnect() = 0;
+    virtual void async_connect(async_connect_info::shared_ptr info, async_connect_delegate::shared_ptr callback) __noexcept = 0;
+    virtual socketfd_t native() __noexcept = 0;
+    virtual bool is_open() __noexcept = 0;
 };
 
 namespace tcp {
@@ -119,20 +118,21 @@ public:
     using unique_ptr = ::std::unique_ptr<this_t>;
     using async_accept_delegate = delegate<void(async_accept_info::shared_ptr)>;
     virtual ~server() = default;
-    virtual void open() __PURE;
-    virtual void close() __PURE;
-    virtual ::std::pair<bool, session_t> accept() __PURE;
-    virtual void async_accept(async_accept_delegate::shared_ptr callback) __PURE;
+    virtual void open() = 0;
+    virtual void close() = 0;
+    virtual ::std::pair<bool, session_t> accept() = 0;
+    virtual void async_accept(async_accept_delegate::shared_ptr callback) = 0;
+    virtual io_service& get_io_service() __noexcept = 0;
 };
 
-session_t create_session() __noexcept;
-server::shared_ptr create_server(port_t port) __noexcept;
+session_t create_session(io_service& iosvc) __noexcept;
+server::shared_ptr create_server(io_service& iosvc, port_t port) __noexcept;
 
 } // !namespace tcp
     
 namespace udp {
 
-session_t create_stream() __noexcept;
+session_t create_stream(io_service& iosvc) __noexcept;
 
 } // !namespace udp
 
@@ -144,8 +144,8 @@ namespace exl {
 
 } // !namespace exl
 
-session_t create_session() __noexcept;
-tcp::server::shared_ptr create_server(port_t port) __noexcept;
+session_t create_session(io_service& iosvc) __noexcept;
+tcp::server::shared_ptr create_server(io_service& iosvc, port_t port) __noexcept;
 
 } // !namespace rfc6455
 

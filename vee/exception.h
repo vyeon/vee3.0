@@ -2,7 +2,7 @@
 #define _VEE_EXCEPTION_H_
 
 #include <vee/platform.h>
-#include <vee/libbase.h>
+#include <vee/lib_base.h>
 #include <exception>
 
 namespace vee {
@@ -16,7 +16,7 @@ public:
 	explicit exception(const exception&) = default;
 	exception& operator=(const exception&) = default;
 	virtual ~exception() = default;
-	virtual char const* to_string() const __noexcept __PURE;
+	virtual char const* to_string() const __noexcept = 0;
 };
 	
 } // !namespace vee

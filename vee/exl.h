@@ -7,7 +7,7 @@ namespace vee {
 	
 namespace exl {
 
-class precondition_violated: public ::vee::exception
+class precondition_violated: virtual public ::vee::exception
 {
 public:
 	using base_t = ::vee::exception;
@@ -17,7 +17,7 @@ public:
 	virtual char const* to_string() const __noexcept override;
 };
 
-class key_generation_failed: public ::vee::exception
+class key_generation_failed: virtual public ::vee::exception
 {
 public:
 	using base_t = ::vee::exception;
@@ -27,7 +27,7 @@ public:
 	virtual char const* to_string() const __noexcept override;
 };
 
-class target_not_found: public ::vee::exception
+class target_not_found: virtual public ::vee::exception
 {
 public:
 	using base_t = ::vee::exception;
@@ -37,7 +37,7 @@ public:
 	virtual char const* to_string() const __noexcept override;
 };
 
-class key_already_exist: public ::vee::exception
+class key_already_exist: virtual public ::vee::exception
 {
 public:
 	using base_t = ::vee::exception;

@@ -1,5 +1,5 @@
 #include <vee/net/tcp.h>
-#include <vee/exl.h>
+#include <vee/io/detail/io_service_kernel.h>
 
 namespace vee {
     
@@ -19,20 +19,14 @@ tcp_stream::~tcp_stream()
 }
 
 tcp_stream::tcp_stream(tcp_stream&& other):
-    _iosvc { other._iosvc },
+    _iosvc_ptr { other._iosvc_ptr },
     _socket { ::std::move(other._socket) }
 {
 }
 
-tcp_stream::tcp_stream(tcp_socket&& socket):
-    _iosvc { &(socket.get_io_service()) },
-    _socket { ::std::move(socket) }
-{
-}
-
 tcp_stream::tcp_stream(io_service& iosvc):
-    _iosvc { &iosvc },
-    _socket { *_iosvc }
+    _iosvc_ptr { &iosvc },
+    _socket { iosvc.kernel->to_boost() }
 {
 }
 
@@ -40,13 +34,13 @@ tcp_stream::tcp_stream(io_service& iosvc):
 //{
 //    disconnect();
 //    _socket = ::std::move(rhs._socket);
-//    _iosvc = rhs._iosvc;
+//    iosvc = rhs.iosvc;
 //    return *this;
 //}
 
 void tcp_stream::swap(tcp_stream& other) __noexcept
 {
-    ::std::swap(_iosvc, other._iosvc);
+    ::std::swap(_iosvc_ptr, other._iosvc_ptr);
     ::std::swap(_socket, other._socket);
 }
 
@@ -95,6 +89,11 @@ void tcp_stream::async_read_some(io::async_input_info::shared_ptr info, async_re
 void tcp_stream::async_write_some(io::async_output_info::shared_ptr info, async_write_delegate::shared_ptr callback) __noexcept
 {
 
+}
+
+io_service& tcp_stream::get_io_service() __noexcept
+{
+    return *_iosvc_ptr;
 }
 
 } // !namespace tcp

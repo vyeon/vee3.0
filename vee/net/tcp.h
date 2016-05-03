@@ -3,7 +3,6 @@
 
 #include <vee/net.h>
 #include <boost/asio.hpp>
-#include <future>
 
 namespace vee {
     
@@ -14,7 +13,7 @@ namespace tcp {
 class tcp_stream;
 class tcp_server;
 
-class tcp_stream: public net_stream
+class tcp_stream: virtual public net_stream, noncopyable
 {
 /* Public member types */
 public:
@@ -27,13 +26,11 @@ public:
 private:
     using tcp_socket = ::boost::asio::ip::tcp::socket;
     using tcp_endpoint = ::boost::asio::ip::tcp::endpoint;
-    using io_service = ::boost::asio::io_service;
 
 /* Public member functions */
 public:
     virtual ~tcp_stream();
     tcp_stream(tcp_stream&& other);
-    explicit tcp_stream(tcp_socket&& socket);
     explicit tcp_stream(io_service& iosvc);
     //tcp_stream& operator=(tcp_stream&& rhs) __noexcept;
     void swap(tcp_stream& other) __noexcept;
@@ -46,13 +43,14 @@ public:
     virtual size_t read_some(uint8_t* const buffer, const size_t size) override;
     virtual void async_read_some(io::async_input_info::shared_ptr info, async_read_delegate::shared_ptr callback) __noexcept override;
     virtual void async_write_some(io::async_output_info::shared_ptr info, async_write_delegate::shared_ptr callback) __noexcept override;
+    virtual io_service& get_io_service() __noexcept override;
 
 /* Private member functions */
 private:
 
 /* Protected member variables */
 protected:
-    io_service* _iosvc;
+    io_service* _iosvc_ptr;
     tcp_socket _socket;
 /* Disallowed member functions */
 private:
@@ -62,7 +60,7 @@ private:
     void operator=(const tcp_stream&) = delete;
 };
 
-class tcp_server: public server
+class tcp_server: virtual public server, noncopyable
 {
 /* Public member types */
 public:
@@ -75,7 +73,6 @@ public:
 private:
     using tcp_socket = ::boost::asio::ip::tcp::socket;
     using tcp_endpoint = ::boost::asio::ip::tcp::endpoint;
-    using io_service = ::boost::asio::io_service;
     tcp_server(port_t port, io_service& iosvc);
     tcp_server(tcp_server&& other);
     virtual ~tcp_server();
@@ -83,6 +80,7 @@ private:
     virtual void close() override;
     virtual ::std::pair<bool, session_t> accept() override;
     virtual void async_accept(async_accept_delegate::shared_ptr callback) override;
+    virtual io_service& get_io_service() __noexcept override;
 
 /* Protected member variables */
 protected:
