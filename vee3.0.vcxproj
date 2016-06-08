@@ -163,27 +163,27 @@
     <OutDir>$(SolutionDir)\lib\x32\</OutDir>
     <IntDir>$(SolutionDir)\obj\x32\Debug\$(ProjectName)\</IntDir>
     <TargetName>$(ProjectName)-vc120-sgd-300</TargetName>
-    <IncludePath>$(SolutionDir);$(BOOST_1_60_0);$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\lib\x32;$(BOOST_1_60_0)\stage\x32;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir);$(BOOST_1_61_0);$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\lib\x32;$(BOOST_1_61_0)\stage\x32;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='VS2015-Debug|Win32'">
     <OutDir>$(SolutionDir)\lib\x32\</OutDir>
     <IntDir>$(SolutionDir)\obj\x32\Debug\$(ProjectName)\</IntDir>
     <TargetName>$(ProjectName)-vc140-sgd-300</TargetName>
-    <IncludePath>$(SolutionDir);$(BOOST_1_60_0);$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\lib\x32;$(BOOST_1_60_0)\stage\x32;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir);$(BOOST_1_61_0);$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\lib\x32;$(BOOST_1_61_0)\stage\x32;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='VS2013-Debug|x64'">
     <TargetName>$(ProjectName)-vc120-sgd-300</TargetName>
-    <IncludePath>$(SolutionDir);$(BOOST_1_60_0);$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\lib\x64;$(BOOST_1_60_0)\stage\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir);$(BOOST_1_61_0);$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\lib\x64;$(BOOST_1_61_0)\stage\x64;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)\lib\x64\</OutDir>
     <IntDir>$(SolutionDir)\obj\x64\Debug\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='VS2015-Debug|x64'">
     <TargetName>$(ProjectName)-vc140-sgd-300</TargetName>
-    <IncludePath>$(SolutionDir);$(BOOST_1_60_0);$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\lib\x64;$(BOOST_1_60_0)\stage\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir);$(BOOST_1_61_0);$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\lib\x64;$(BOOST_1_61_0)\stage\x64;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)\lib\x64\</OutDir>
     <IntDir>$(SolutionDir)\obj\x64\Debug\$(ProjectName)\</IntDir>
   </PropertyGroup>
@@ -191,27 +191,27 @@
     <OutDir>$(SolutionDir)\lib\x32\</OutDir>
     <IntDir>$(SolutionDir)\obj\x32\Release\$(ProjectName)\</IntDir>
     <TargetName>$(ProjectName)-vc120-s-300</TargetName>
-    <IncludePath>$(SolutionDir);$(BOOST_1_60_0);$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\lib\x32;$(BOOST_1_60_0)\stage\x32;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir);$(BOOST_1_61_0);$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\lib\x32;$(BOOST_1_61_0)\stage\x32;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='VS2015-Release|Win32'">
     <OutDir>$(SolutionDir)\lib\x32\</OutDir>
     <IntDir>$(SolutionDir)\obj\x32\Release\$(ProjectName)\</IntDir>
     <TargetName>$(ProjectName)-vc140-s-300</TargetName>
-    <IncludePath>$(SolutionDir);$(BOOST_1_60_0);$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\lib\x32;$(BOOST_1_60_0)\stage\x32;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir);$(BOOST_1_61_0);$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\lib\x32;$(BOOST_1_61_0)\stage\x32;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='VS2013-Release|x64'">
     <TargetName>$(ProjectName)-vc120-s-300</TargetName>
-    <IncludePath>$(SolutionDir);$(BOOST_1_60_0);$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\lib\x64;$(BOOST_1_60_0)\stage\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir);$(BOOST_1_61_0);$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\lib\x64;$(BOOST_1_61_0)\stage\x64;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)\lib\x64\</OutDir>
     <IntDir>$(SolutionDir)\obj\x64\Release\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='VS2015-Release|x64'">
     <TargetName>$(ProjectName)-vc140-s-300</TargetName>
-    <IncludePath>$(SolutionDir);$(BOOST_1_60_0);$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\lib\x64;$(BOOST_1_60_0)\stage\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir);$(BOOST_1_61_0);$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\lib\x64;$(BOOST_1_61_0)\stage\x64;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)\lib\x64\</OutDir>
     <IntDir>$(SolutionDir)\obj\x64\Release\$(ProjectName)\</IntDir>
   </PropertyGroup>
