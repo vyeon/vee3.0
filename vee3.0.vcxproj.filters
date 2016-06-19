@@ -13,9 +13,6 @@
     <Filter Include="io">
       <UniqueIdentifier>{3546bbf1-b078-4684-910d-d81abeaf0a18}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ex">
-      <UniqueIdentifier>{143e12bd-f93d-4e4c-af21-4dbf49168aa2}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vee\lockfree">
       <UniqueIdentifier>{1c137e37-8330-4cc0-a126-2a8acbda6c0a}</UniqueIdentifier>
     </Filter>
@@ -33,6 +30,9 @@
     </Filter>
     <Filter Include="vee\io\detail">
       <UniqueIdentifier>{b6f6b763-79dd-4b90-b708-aa14fa2cd367}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="exceptions">
+      <UniqueIdentifier>{143e12bd-f93d-4e4c-af21-4dbf49168aa2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -117,28 +117,31 @@
       <Filter>test</Filter>
     </ClCompile>
     <ClCompile Include="ex\exception.cpp">
-      <Filter>ex</Filter>
+      <Filter>exceptions</Filter>
     </ClCompile>
     <ClCompile Include="ex\exl.cpp">
-      <Filter>ex</Filter>
+      <Filter>exceptions</Filter>
     </ClCompile>
     <ClCompile Include="test\timerec.cpp">
       <Filter>test</Filter>
     </ClCompile>
     <ClCompile Include="ex\exl_worker.cpp">
-      <Filter>ex</Filter>
+      <Filter>exceptions</Filter>
     </ClCompile>
     <ClCompile Include="net\tcp.cpp">
       <Filter>net</Filter>
     </ClCompile>
     <ClCompile Include="ex\exl_net.cpp">
-      <Filter>ex</Filter>
+      <Filter>exceptions</Filter>
     </ClCompile>
     <ClCompile Include="io\io_base.cpp">
       <Filter>io</Filter>
     </ClCompile>
     <ClCompile Include="io\io_service.cpp">
       <Filter>io</Filter>
+    </ClCompile>
+    <ClCompile Include="ex\exl_io.cpp">
+      <Filter>exceptions</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

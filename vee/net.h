@@ -6,32 +6,30 @@
 
 namespace vee {
 
-namespace exl {
-
 namespace net {
-    
-class protocol_mismatch: virtual public ::vee::exception
+
+class protocol_mismatch_exception: virtual public ::vee::exception
 {
 public:
     using base_t = ::vee::exception;
-    protocol_mismatch():
+    protocol_mismatch_exception():
         base_t{ "protocol mismatch" }
     {
     }
-    virtual ~protocol_mismatch() = default;
+    virtual ~protocol_mismatch_exception() = default;
     virtual char const* to_string() const __noexcept override;
 };
 
-class connection_failed: virtual public ::vee::exception
+class connection_failed_exception: virtual public ::vee::exception
 {
 public:
     using base_t = ::vee::exception;
-    connection_failed():
+    connection_failed_exception():
         base_t{ "connection failed" }
     {
     }
-    explicit connection_failed(char const* const);
-    virtual ~connection_failed() = default;
+    explicit connection_failed_exception(char const* const);
+    virtual ~connection_failed_exception() = default;
     virtual char const* to_string() const __noexcept override;
 };
 
@@ -48,8 +46,6 @@ public:
 };
 
 } // !namespace net 
-
-} // !namespace exl
    
 namespace net {
 
@@ -62,24 +58,22 @@ using socketfd_t = uint64_t;
 
 // Forward declaration
 class net_stream;
+struct async_connection_result;
 
 using session_t = ::std::shared_ptr<net_stream>;
 
-enum class operation_result: uint32_t
+struct async_connection_result: public io::async_result
 {
-    succeed = 0,
-    eof,
-    aborted,
-};
-
-struct async_connect_info
-{
-    using shared_ptr = ::std::shared_ptr<async_connect_info>;
-    bool is_success;
-    operation_result result;
+    using this_t = async_connection_result;
+    using ref_t = this_t&;
+    using rref_t = this_t&&;
+    using shared_ptr = ::std::shared_ptr<async_connection_result>;
+    using async_connect_delegate = delegate<void(rref_t)>;
     session_t session;
     ::std::string ip;
     port_t port;
+    async_connect_delegate::shared_ptr callback;
+    ::std::string message;
 };
 
 class net_stream abstract: virtual public io_stream
@@ -90,21 +84,20 @@ public:
     using rref_t = this_t&&;
     using shared_ptr = ::std::shared_ptr<this_t>;
     using unique_ptr = ::std::unique_ptr<this_t>;
-    using async_connect_delegate = delegate<void(async_connect_info::shared_ptr)>;
+    using async_connect_delegate = async_connection_result::async_connect_delegate;
     virtual ~net_stream() = default;
     virtual void connect(const char* ip, port_t port) = 0;
     virtual void disconnect() = 0;
-    virtual void async_connect(async_connect_info::shared_ptr info, async_connect_delegate::shared_ptr callback) __noexcept = 0;
+    virtual void async_connect(const char* ip, port_t port, async_connect_delegate::shared_ptr callback) __noexcept = 0;
     virtual socketfd_t native() __noexcept = 0;
     virtual bool is_open() __noexcept = 0;
 };
 
 namespace tcp {
 
-struct async_accept_info
+struct async_accept_result: public io::async_result
 {
-    using shared_ptr = ::std::shared_ptr<async_accept_info>;
-    bool is_success;
+    using shared_ptr = ::std::shared_ptr<async_accept_result>;
     session_t session;
 };
 
@@ -116,7 +109,7 @@ public:
     using rref_t = this_t&&;
     using shared_ptr = ::std::shared_ptr<this_t>;
     using unique_ptr = ::std::unique_ptr<this_t>;
-    using async_accept_delegate = delegate<void(async_accept_info::shared_ptr)>;
+    using async_accept_delegate = delegate<void(async_accept_result&)>;
     virtual ~server() = default;
     virtual void open() = 0;
     virtual void close() = 0;

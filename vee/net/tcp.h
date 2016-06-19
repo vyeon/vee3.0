@@ -36,13 +36,15 @@ public:
     void swap(tcp_stream& other) __noexcept;
     virtual void connect(const char* ip, port_t port) override;
     virtual void disconnect() override;
-    virtual void async_connect(async_connect_info::shared_ptr info, async_connect_delegate::shared_ptr callback) __noexcept override;
+    virtual void async_connect(const char* ip, port_t port, async_connect_delegate::shared_ptr callback) __noexcept override;
     virtual socketfd_t native() __noexcept override;
     virtual bool is_open() __noexcept override;
-    virtual size_t write_some(const uint8_t* buffer, const size_t size) override;
-    virtual size_t read_some(uint8_t* const buffer, const size_t size) override;
-    virtual void async_read_some(io::async_input_info::shared_ptr info, async_read_delegate::shared_ptr callback) __noexcept override;
-    virtual void async_write_some(io::async_output_info::shared_ptr info, async_write_delegate::shared_ptr callback) __noexcept override;
+    virtual size_t write_some(io::out_buffer_t buffer, const size_t size);
+    virtual size_t read_explicit(io::in_buffer_t buffer, const size_t size);
+    virtual size_t read_some(io::in_buffer_t buffer, const size_t size);
+    virtual void async_read_some(io::in_buffer_t buffer, size_t capacity, async_read_delegate::shared_ptr callback) __noexcept = 0;
+    virtual void async_read_explicit(io::in_buffer_t buffer, size_t bytes_requested, async_read_delegate::shared_ptr callback) __noexcept = 0;
+    virtual void async_write_some(io::out_buffer_t buffer, size_t bytes_requested, async_write_delegate::shared_ptr callback) __noexcept = 0;
     virtual io_service& get_io_service() __noexcept override;
 
 /* Private member functions */
@@ -84,7 +86,7 @@ private:
 
 /* Protected member variables */
 protected:
-    io_service*  _iosvc;
+    io_service*  _iosvc_ptr;
     tcp_socket   _socket;
     tcp_endpoint _endpoint;
     ::boost::asio::ip::tcp::acceptor _acceptor;

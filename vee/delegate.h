@@ -316,6 +316,7 @@ public:
             tupleupk(static_cast<binder_t&>(it.second), static_cast<args_tuple_t&&>(args));
         }
     }
+
     template <typename ...FwdArgs>
     void operator()(FwdArgs&& ...args)
     {
@@ -329,6 +330,13 @@ public:
             it.second.operator()(args...);
         }
     }
+    
+    template <typename ...FwdArgs>
+    inline void do_call(FwdArgs&& ...args)
+    {
+        this->operator()(::std::forward<FwdArgs>(args)...);
+    }
+
     void clear()
     {
         ::std::lock_guard<lock_t> locker{ _mtx };

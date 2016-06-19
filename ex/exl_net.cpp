@@ -2,22 +2,18 @@
 
 namespace vee {
 
-namespace exl {
-
 namespace net {
 
-inline connection_failed::connection_failed(char const* const msg):
+inline connection_failed_exception::connection_failed_exception(char const* const msg):
     base_t{ msg }
 {
 }
 
-char const* connection_failed::to_string() const __noexcept
+char const* connection_failed_exception::to_string() const __noexcept
 {
     return this->what();
 }
 
 } // !namespace net
-    
-} // !namespace exl
 
 } // !namespace vee

@@ -64,6 +64,7 @@
   <ItemGroup>
     <ClCompile Include="ex\exception.cpp" />
     <ClCompile Include="ex\exl.cpp" />
+    <ClCompile Include="ex\exl_io.cpp" />
     <ClCompile Include="ex\exl_net.cpp" />
     <ClCompile Include="ex\exl_worker.cpp" />
     <ClCompile Include="io\io_base.cpp" />
