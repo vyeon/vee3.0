@@ -32,7 +32,13 @@ tcp_stream::tcp_stream(io_service& iosvc):
 {
 }
 
-void tcp_stream::swap(tcp_stream& other) __noexcept
+tcp_stream::tcp_stream(io_service& iosvc, tcp_socket&& __socket):
+    iosvc_ptr { &iosvc },
+    socket { ::std::move(__socket)}
+{
+}
+
+void tcp_stream::swap(tcp_stream & other) noexcept
 {
     ::std::swap(iosvc_ptr, other.iosvc_ptr);
     ::std::swap(socket, other.socket);
@@ -197,9 +203,9 @@ void tcp_stream::async_read_explicit(io::buffer buffer, size_t bytes_requested, 
         }
         result.buffer.ptr += result.bytes_transferred;
         result.buffer.capacity -= result.bytes_transferred;
-        async_read_some(result.buffer, bytes_requested - total_transferred, result.callback);
+        tcp_stream::async_read_some(result.buffer, bytes_requested - total_transferred, result.callback);
     };
-    async_read_some(buffer, bytes_requested, ::std::make_shared<async_io_delegate>(0, iteration));
+    tcp_stream::async_read_some(buffer, bytes_requested, ::std::make_shared<async_io_delegate>(0, iteration));
 }
 
 void tcp_stream::async_write_some(io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback) noexcept
@@ -241,43 +247,81 @@ io_service& tcp_stream::get_io_service() __noexcept
     return *iosvc_ptr;
 }
 
-tcp_server::tcp_server(port_t port, io_service& iosvc):
-    _iosvc_ptr { &iosvc },
-    _socket{ iosvc.kernel->to_boost() },
-    _acceptor { iosvc.kernel->to_boost() }
+tcp_server::tcp_server(io_service& iosvc, port_t port):
+    iosvc_ptr{ &iosvc },
+    socket{ iosvc.kernel->to_boost() },
+    endpoint{ boost::asio::ip::tcp::v4(), port },
+    acceptor { iosvc.kernel->to_boost(), endpoint }
 {
 }
 
 tcp_server::tcp_server(tcp_server&& other):
-    _iosvc_ptr { other._iosvc_ptr },
-    _socket { ::std::move(other._socket)},
-    _acceptor { ::std::move(other._acceptor)}
+    iosvc_ptr { other.iosvc_ptr },
+    socket { ::std::move(other.socket)},
+    endpoint { ::std::move(other.endpoint)},
+    acceptor { ::std::move(other.acceptor)}
 {
 }
 
 tcp_server::~tcp_server()
 {
-}
-
-void tcp_server::open()
-{
+    tcp_server::close();
 }
 
 void tcp_server::close()
 {
+    if (acceptor.is_open())
+    {
+        acceptor.close();
+    }
+    if (socket.is_open())
+    {
+        socket.close();
+    }
 }
 
-//::std::pair<bool, session_t> tcp_server::accept()
-//{
-//}
+session_t tcp_server::accept()
+{
+    ::boost::asio::ip::tcp::socket client(iosvc_ptr->kernel->to_boost());
+    try
+    {
+        acceptor.accept(client);
+    }
+    catch (::std::exception&)
+    {
+        throw accept_failed_exception();
+    }
+    session_t session = ::std::make_shared<tcp_stream>(*iosvc_ptr, std::move(client));
+    return session;
+}
 
 void tcp_server::async_accept(async_accept_delegate::shared_ptr callback)
 {
+    ::std::shared_ptr<::boost::asio::ip::tcp::socket> clntsock_ptr = std::make_shared<::boost::asio::ip::tcp::socket>(iosvc_ptr->kernel->to_boost());
+    auto on_accept = [this, clntsock_ptr, callback](const ::boost::system::error_code& error)
+    {
+        async_accept_result result;
+        result.callback = ::std::move(callback);
+        if (error)
+        {
+            result.is_success = false;
+            result.message += error.message();
+        }
+        else
+        {
+            result.is_success = true;
+            result.message += error.message();
+            //TODO: I think this is dangerous code. I will resolve this.
+            result.session = ::std::make_shared<tcp_stream>(*iosvc_ptr, ::std::move(*clntsock_ptr));
+        }
+        callback->do_call(result);
+    };
+    acceptor.async_accept(*clntsock_ptr, on_accept);
 }
 
 io_service& tcp_server::get_io_service() noexcept
 {
-    return *_iosvc_ptr;
+    return *iosvc_ptr;
 }
 
 session_t create_session(io_service& iosvc) noexcept

@@ -15,8 +15,8 @@ int main()
         session->connect("127.0.0.1", 5000);
         while (true)
         {
-            gets_s((char*)buffer, 512);
-            session->write_some(io::buffer{buffer, 512}, strlen((char*)buffer) + 1);
+            gets_s(reinterpret_cast<char*>(buffer), 512);
+            session->write_some(io::buffer{buffer, 512}, strlen(reinterpret_cast<char*>(buffer)) + 1);
         }
     }
     catch (vee::exception& e)

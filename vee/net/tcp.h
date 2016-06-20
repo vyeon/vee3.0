@@ -3,9 +3,10 @@
 
 #include <vee/net.h>
 #ifdef VEE_PLATFORM_WINDOWS
-//#define _WIN32_WINDOWS
+#define _WIN32_WINNT 0x0603
 #endif
-#include <boost/asio.hpp>
+#include <boost/asio/ip/tcp.hpp>
+//#include <boost/asio.hpp>
 
 namespace vee {
     
@@ -35,6 +36,7 @@ public:
     virtual ~tcp_stream();
     tcp_stream(tcp_stream&& other);
     explicit tcp_stream(io_service& iosvc);
+    explicit tcp_stream(io_service& iosvc, tcp_socket&& socket);
     //tcp_stream& operator=(tcp_stream&& rhs) noexcept;
     void swap(tcp_stream& other) noexcept;
     virtual void connect(const char* ip, port_t port) override;
@@ -78,21 +80,21 @@ public:
 private:
     using tcp_socket = ::boost::asio::ip::tcp::socket;
     using tcp_endpoint = ::boost::asio::ip::tcp::endpoint;
-    tcp_server(port_t port, io_service& iosvc);
+    tcp_server(io_service& iosvc, port_t port);
     tcp_server(tcp_server&& other);
     virtual ~tcp_server();
-    virtual void open() override;
     virtual void close() override;
+    virtual session_t accept() override;
     //virtual ::std::pair<bool, session_t> accept() override;
     virtual void async_accept(async_accept_delegate::shared_ptr callback) override;
     virtual io_service& get_io_service() noexcept override;
 
 /* Protected member variables */
 protected:
-    io_service*  _iosvc_ptr;
-    tcp_socket   _socket;
-    tcp_endpoint _endpoint;
-    ::boost::asio::ip::tcp::acceptor _acceptor;
+    io_service*  iosvc_ptr;
+    tcp_socket   socket;
+    tcp_endpoint endpoint;
+    ::boost::asio::ip::tcp::acceptor acceptor;
 
 /* Disallowed member functions */
 private:

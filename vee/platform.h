@@ -6,7 +6,6 @@ namespace vee {
 // Check windows
 #if _WIN32 || _WIN64
 #define VEE_PLATFORM_WINDOWS 1
-#define _WIN32_WINNT 0x0501
 #if _WIN64
 #define VEE_PLATFORM_X32 0
 #define VEE_PLATFORM_X64 1

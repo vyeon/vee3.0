@@ -24,6 +24,11 @@ char const* connection_already_disconnected::to_string() const __noexcept
     return this->what();
 }
 
+char const* accept_failed_exception::to_string() const __noexcept
+{
+    return this->what();
+}
+
 } // !namespace net
 
 } // !namespace vee
