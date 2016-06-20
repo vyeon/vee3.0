@@ -2,6 +2,9 @@
 #define _VEE_NET_TCP_H_
 
 #include <vee/net.h>
+#ifdef VEE_PLATFORM_WINDOWS
+//#define _WIN32_WINDOWS
+#endif
 #include <boost/asio.hpp>
 
 namespace vee {
@@ -32,27 +35,27 @@ public:
     virtual ~tcp_stream();
     tcp_stream(tcp_stream&& other);
     explicit tcp_stream(io_service& iosvc);
-    //tcp_stream& operator=(tcp_stream&& rhs) __noexcept;
-    void swap(tcp_stream& other) __noexcept;
+    //tcp_stream& operator=(tcp_stream&& rhs) noexcept;
+    void swap(tcp_stream& other) noexcept;
     virtual void connect(const char* ip, port_t port) override;
     virtual void disconnect() override;
-    virtual void async_connect(const char* ip, port_t port, async_connect_delegate::shared_ptr callback) __noexcept override;
-    virtual socketfd_t native() __noexcept override;
-    virtual bool is_open() __noexcept override;
-    virtual size_t write_some(io::out_buffer_t buffer, const size_t size);
-    virtual size_t read_explicit(io::in_buffer_t buffer, const size_t size);
-    virtual size_t read_some(io::in_buffer_t buffer, const size_t size);
-    virtual void async_read_some(io::in_buffer_t buffer, size_t capacity, async_read_delegate::shared_ptr callback) __noexcept = 0;
-    virtual void async_read_explicit(io::in_buffer_t buffer, size_t bytes_requested, async_read_delegate::shared_ptr callback) __noexcept = 0;
-    virtual void async_write_some(io::out_buffer_t buffer, size_t bytes_requested, async_write_delegate::shared_ptr callback) __noexcept = 0;
-    virtual io_service& get_io_service() __noexcept override;
+    virtual void async_connect(const char* ip, port_t port, async_connect_delegate::shared_ptr callback) noexcept override;
+    virtual socketfd_t native() noexcept override;
+    virtual bool is_open() noexcept override;
+    virtual size_t write_some(io::buffer buffer, const size_t bytes_requested) override;
+    virtual size_t read_explicit(io::buffer buffer, const size_t bytes_requested) override;
+    virtual size_t read_some(io::buffer buffer, size_t bytes_requested) override;
+    virtual void async_read_some(io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback) noexcept override;
+    virtual void async_read_explicit(io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback) noexcept override;
+    virtual void async_write_some(io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback) noexcept override;
+    virtual io_service& get_io_service() noexcept override;
 
 /* Private member functions */
 private:
 
 /* Protected member variables */
 protected:
-    io_service* _iosvc_ptr;
+    io_service* iosvc_ptr;
     tcp_socket socket;
 /* Disallowed member functions */
 private:
@@ -80,9 +83,9 @@ private:
     virtual ~tcp_server();
     virtual void open() override;
     virtual void close() override;
-    virtual ::std::pair<bool, session_t> accept() override;
+    //virtual ::std::pair<bool, session_t> accept() override;
     virtual void async_accept(async_accept_delegate::shared_ptr callback) override;
-    virtual io_service& get_io_service() __noexcept override;
+    virtual io_service& get_io_service() noexcept override;
 
 /* Protected member variables */
 protected:

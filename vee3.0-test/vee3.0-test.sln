@@ -1,30 +1,18 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "minimal-test", "minimal-test\minimal-test.vcxproj", "{789B6D94-0333-4F96-8D39-57F52345919A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		VS2013-Debug|x32 = VS2013-Debug|x32
-		VS2013-Debug|x64 = VS2013-Debug|x64
-		VS2013-Release|x32 = VS2013-Release|x32
-		VS2013-Release|x64 = VS2013-Release|x64
 		VS2015-Debug|x32 = VS2015-Debug|x32
 		VS2015-Debug|x64 = VS2015-Debug|x64
 		VS2015-Release|x32 = VS2015-Release|x32
 		VS2015-Release|x64 = VS2015-Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{789B6D94-0333-4F96-8D39-57F52345919A}.VS2013-Debug|x32.ActiveCfg = VS2013-Debug|Win32
-		{789B6D94-0333-4F96-8D39-57F52345919A}.VS2013-Debug|x32.Build.0 = VS2013-Debug|Win32
-		{789B6D94-0333-4F96-8D39-57F52345919A}.VS2013-Debug|x64.ActiveCfg = VS2013-Debug|x64
-		{789B6D94-0333-4F96-8D39-57F52345919A}.VS2013-Debug|x64.Build.0 = VS2013-Debug|x64
-		{789B6D94-0333-4F96-8D39-57F52345919A}.VS2013-Release|x32.ActiveCfg = VS2013-Release|Win32
-		{789B6D94-0333-4F96-8D39-57F52345919A}.VS2013-Release|x32.Build.0 = VS2013-Release|Win32
-		{789B6D94-0333-4F96-8D39-57F52345919A}.VS2013-Release|x64.ActiveCfg = VS2013-Release|x64
-		{789B6D94-0333-4F96-8D39-57F52345919A}.VS2013-Release|x64.Build.0 = VS2013-Release|x64
 		{789B6D94-0333-4F96-8D39-57F52345919A}.VS2015-Debug|x32.ActiveCfg = VS2015-Debug|Win32
 		{789B6D94-0333-4F96-8D39-57F52345919A}.VS2015-Debug|x32.Build.0 = VS2015-Debug|Win32
 		{789B6D94-0333-4F96-8D39-57F52345919A}.VS2015-Debug|x64.ActiveCfg = VS2015-Debug|x64

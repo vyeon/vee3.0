@@ -17,7 +17,7 @@ public:
     {
     }
     virtual ~protocol_mismatch_exception() = default;
-    virtual char const* to_string() const __noexcept override;
+    virtual char const* to_string() const noexcept override;
 };
 
 class connection_failed_exception: virtual public ::vee::exception
@@ -30,7 +30,7 @@ public:
     }
     explicit connection_failed_exception(char const* const);
     virtual ~connection_failed_exception() = default;
-    virtual char const* to_string() const __noexcept override;
+    virtual char const* to_string() const noexcept override;
 };
 
 class connection_already_disconnected: virtual public ::vee::exception
@@ -42,7 +42,7 @@ public:
     {
     }
     virtual ~connection_already_disconnected() = default;
-    virtual char const* to_string() const __noexcept override;
+    virtual char const* to_string() const noexcept override;
 };
 
 } // !namespace net 
@@ -61,14 +61,14 @@ class net_stream;
 struct async_connection_result;
 
 using session_t = ::std::shared_ptr<net_stream>;
+using async_connect_delegate = delegate<void(async_connection_result&)>;
 
-struct async_connection_result: public io::async_result
+struct async_connection_result: public async_result
 {
     using this_t = async_connection_result;
     using ref_t = this_t&;
     using rref_t = this_t&&;
     using shared_ptr = ::std::shared_ptr<async_connection_result>;
-    using async_connect_delegate = delegate<void(rref_t)>;
     session_t session;
     ::std::string ip;
     port_t port;
@@ -84,22 +84,25 @@ public:
     using rref_t = this_t&&;
     using shared_ptr = ::std::shared_ptr<this_t>;
     using unique_ptr = ::std::unique_ptr<this_t>;
-    using async_connect_delegate = async_connection_result::async_connect_delegate;
     virtual ~net_stream() = default;
     virtual void connect(const char* ip, port_t port) = 0;
     virtual void disconnect() = 0;
-    virtual void async_connect(const char* ip, port_t port, async_connect_delegate::shared_ptr callback) __noexcept = 0;
-    virtual socketfd_t native() __noexcept = 0;
-    virtual bool is_open() __noexcept = 0;
+    virtual void async_connect(const char* ip, port_t port, async_connect_delegate::shared_ptr callback) noexcept = 0;
+    virtual socketfd_t native() noexcept = 0;
+    virtual bool is_open() noexcept = 0;
+
+    delegate<void(), lock::spin_lock> on_destroy;
 };
 
 namespace tcp {
 
-struct async_accept_result: public io::async_result
+struct async_accept_result: public async_result
 {
     using shared_ptr = ::std::shared_ptr<async_accept_result>;
     session_t session;
 };
+
+using async_accept_delegate = delegate<void(async_accept_result&)>;
 
 class server abstract
 {
@@ -109,36 +112,29 @@ public:
     using rref_t = this_t&&;
     using shared_ptr = ::std::shared_ptr<this_t>;
     using unique_ptr = ::std::unique_ptr<this_t>;
-    using async_accept_delegate = delegate<void(async_accept_result&)>;
     virtual ~server() = default;
     virtual void open() = 0;
     virtual void close() = 0;
     virtual ::std::pair<bool, session_t> accept() = 0;
     virtual void async_accept(async_accept_delegate::shared_ptr callback) = 0;
-    virtual io_service& get_io_service() __noexcept = 0;
+    virtual io_service& get_io_service() noexcept = 0;
 };
 
-session_t create_session(io_service& iosvc) __noexcept;
-server::shared_ptr create_server(io_service& iosvc, port_t port) __noexcept;
+session_t create_session(io_service& iosvc) noexcept;
+server::shared_ptr create_server(io_service& iosvc, port_t port) noexcept;
 
 } // !namespace tcp
     
 namespace udp {
 
-session_t create_stream(io_service& iosvc) __noexcept;
+session_t create_stream(io_service& iosvc) noexcept;
 
 } // !namespace udp
 
 namespace rfc6455 {
 
-namespace exl {
-
-// TODO
-
-} // !namespace exl
-
-session_t create_session(io_service& iosvc) __noexcept;
-tcp::server::shared_ptr create_server(io_service& iosvc, port_t port) __noexcept;
+session_t create_session(io_service& iosvc) noexcept;
+tcp::server::shared_ptr create_server(io_service& iosvc, port_t port) noexcept;
 
 } // !namespace rfc6455
 

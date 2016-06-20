@@ -1,30 +1,12 @@
 #ifndef _VEE_IO_STREAM_H_
 #define _VEE_IO_STREAM_H_
 
-#include <vee/delegate.h>
 #include <vee/io/io_base.h>
 #include <vee/io/io_service.h>
 
 namespace vee {
 
 namespace io {
-
-using buffer_t = uint8_t*;
-using in_buffer_t = uint8_t* const;  // read
-using out_buffer_t = const uint8_t*; // write
-
-struct async_result
-{
-    using shared_ptr = ::std::shared_ptr<async_result>;
-    bool is_success = false;
-};
-
-struct async_io_result: public async_result
-{
-    using shared_ptr = ::std::shared_ptr<async_io_result>;
-    io_result result;
-    size_t    bytes_transferred;
-};
 
 class invalid_stream_exception: virtual public ::vee::exception
 {
@@ -52,16 +34,16 @@ public:
     virtual char const* to_string() const __noexcept override;
 };
 
-class stream_corrupted_exception: virtual public ::vee::exception
+class stream_reset_exception: virtual public ::vee::exception
 {
 public:
     using base_t = ::vee::exception;
-    stream_corrupted_exception():
+    stream_reset_exception():
         base_t{ "stream corrupted exception" }
     {
     }
-    explicit stream_corrupted_exception(char const* const);
-    virtual ~stream_corrupted_exception() = default;
+    explicit stream_reset_exception(char const* const);
+    virtual ~stream_reset_exception() = default;
     virtual char const* to_string() const __noexcept override;
 };
 
@@ -101,9 +83,9 @@ public:
     using shared_ptr = ::std::shared_ptr<this_t>;
     using unique_ptr = ::std::unique_ptr<this_t>;
     virtual ~sync_stream() = default;
-    virtual size_t write_some(io::out_buffer_t buffer, const size_t size) = 0;
-    virtual size_t read_explicit(io::in_buffer_t buffer, const size_t size) = 0;
-    virtual size_t read_some(io::in_buffer_t buffer, const size_t size) = 0;
+    virtual size_t write_some(io::buffer buffer, const size_t bytes_requested) = 0;
+    virtual size_t read_explicit(io::buffer buffer, const size_t bytes_requested) = 0;
+    virtual size_t read_some(io::buffer buffer, size_t bytes_requested) = 0;
 };
 
 class async_stream abstract: virtual public stream_base
@@ -114,12 +96,10 @@ public:
     using rref_t = this_t&&;
     using shared_ptr = ::std::shared_ptr<this_t>;
     using unique_ptr = ::std::unique_ptr<this_t>;
-    using async_read_delegate  = delegate<void(io::async_read_result), lock::spin_lock>;
-    using async_write_delegate = delegate<void(io::async_write_result), lock::spin_lock>;
     virtual ~async_stream() = default;
-    virtual void async_read_some(io::in_buffer_t buffer, size_t capacity, async_read_delegate::shared_ptr callback) __noexcept = 0;
-    virtual void async_read_explicit(io::in_buffer_t buffer, size_t bytes_requested, async_read_delegate::shared_ptr callback) __noexcept = 0;
-    virtual void async_write_some(io::out_buffer_t buffer, size_t bytes_requested, async_write_delegate::shared_ptr callback) __noexcept = 0;
+    virtual void async_read_some(io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback) noexcept = 0;
+    virtual void async_read_explicit(io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback) noexcept = 0;
+    virtual void async_write_some(io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback) noexcept = 0;
 };
 
 class io_stream abstract: virtual public sync_stream, virtual public async_stream

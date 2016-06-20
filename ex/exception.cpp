@@ -14,4 +14,9 @@ exception::exception(char const* const msg):
 
 }
 
+char const* exception::to_string() const noexcept
+{
+    return this->what();
+}
+
 } // !namespace vee
