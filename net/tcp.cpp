@@ -20,39 +20,39 @@ tcp_stream::~tcp_stream()
 
 tcp_stream::tcp_stream(tcp_stream&& other):
     _iosvc_ptr { other._iosvc_ptr },
-    _socket { ::std::move(other._socket) }
+    socket { ::std::move(other.socket) }
 {
 }
 
 
 tcp_stream::tcp_stream(io_service& iosvc):
     _iosvc_ptr { &iosvc },
-    _socket { iosvc.kernel->to_boost() }
+    socket { iosvc.kernel->to_boost() }
 {
 }
 
 void tcp_stream::swap(tcp_stream& other) __noexcept
 {
     ::std::swap(_iosvc_ptr, other._iosvc_ptr);
-    ::std::swap(_socket, other._socket);
+    ::std::swap(socket, other.socket);
 }
 
 void tcp_stream::connect(const char* ip, port_t port)
 {
     ::boost::system::error_code err;
     tcp_endpoint ep{ string_to_ipaddr(ip), port };
-    _socket.connect(ep, err);
+    socket.connect(ep, err);
     if (err)
     {
-        throw exl::connection_failed_exception{};
+        throw connection_failed_exception{};
     }
 }
 
 void tcp_stream::disconnect()
 {
-    if (!_socket.is_open())
-        throw exl::connection_already_disconnected{};
-    _socket.close();
+    if (!socket.is_open())
+        throw connection_already_disconnected{};
+    socket.close();
 }
 
 void tcp_stream::async_connect(const char* ip, port_t port, async_connect_delegate::shared_ptr callback) __noexcept
@@ -78,36 +78,41 @@ void tcp_stream::async_connect(const char* ip, port_t port, async_connect_delega
          callback->do_call(::std::move(result));
     };
     tcp_endpoint ep{string_to_ipaddr(ip), port};
-    _socket.async_connect(ep, ::std::bind(on_connect, ::std::string(ip), ::std::placeholders::_1));
+    socket.async_connect(ep, ::std::bind(on_connect, ::std::string(ip), ::std::placeholders::_1));
 }
 
 socketfd_t tcp_stream::native() __noexcept
 {
-    return _socket.native();
+    return socket.native();
 }
 
 bool tcp_stream::is_open() __noexcept
 {
-    return _socket.is_open();
+    return socket.is_open();
 }
 
 size_t tcp_stream::write_some(io::out_buffer_t buffer, const size_t size)
 {
     ::boost::system::error_code error;
-    size_t bytes_transferred = static_cast<size_t>(_socket.write_some(::boost::asio::buffer(buffer, size), error));
-    if ((boost::asio::error::eof == error) || (boost::asio::error::connection_reset == error))
+    size_t bytes_transferred = static_cast<size_t>(socket.write_some(::boost::asio::buffer(buffer, size), error));
+    if (boost::asio::error::eof == error)
     {
-        throw io::exl::invalid_stream{};
+        throw io::invalid_stream_exception{};
+    }
+    else if (boost::asio::error::connection_reset == error)
+    {
+        throw io::stream_corrupted_exception{};
     }
     else if (error)
     {
-        
+        throw io::unknown_io_exception{};
     }
-
+    return bytes_transferred;
 }
 
 size_t tcp_stream::read_explicit(io::in_buffer_t buffer, const size_t size)
 {
+
 }
 
 size_t tcp_stream::read_some(io::in_buffer_t buffer, const size_t size)

@@ -53,7 +53,7 @@ private:
 /* Protected member variables */
 protected:
     io_service* _iosvc_ptr;
-    tcp_socket _socket;
+    tcp_socket socket;
 /* Disallowed member functions */
 private:
     // DISALLOW COPY OPERATIONS

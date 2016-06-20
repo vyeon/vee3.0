@@ -323,11 +323,11 @@ public:
         ::std::lock_guard<lock_t> locker{ _mtx };
         for (auto& it : _cont)
         {
-            it.second.operator()(args...);
+            it.second.operator()(::std::forward<FwdArgs>(args)...);
         }
         for (auto& it : _usrcont)
         {
-            it.second.operator()(args...);
+            it.second.operator()(::std::forward<FwdArgs>(args)...);
         }
     }
     

@@ -26,50 +26,12 @@ struct async_io_result: public async_result
     size_t    bytes_transferred;
 };
 
-struct async_read_result: public async_io_result
-{
-    using shared_ptr = ::std::shared_ptr<async_read_result>;
-    buffer_t  buffer;
-    size_t    capacity;
-    async_read_result(buffer_t __buffer, size_t __capacity):
-        buffer { __buffer },
-        capacity { __capacity }
-    {
-        
-    }
-    ~async_read_result()
-    {
-        
-    }
-private:
-    async_read_result() = delete;
-};
-
-struct async_write_result: public async_io_result
-{
-    using shared_ptr = ::std::shared_ptr<async_write_result>;
-    buffer_t  buffer;
-    size_t    capacity;
-    async_write_result(buffer_t __buffer, size_t __capacity):
-        buffer{ __buffer },
-        capacity{ __capacity }
-    {
-
-    }
-    ~async_write_result()
-    {
-        
-    }
-private:
-    async_write_result() = delete;
-};
-
 class invalid_stream_exception: virtual public ::vee::exception
 {
 public:
     using base_t = ::vee::exception;
     invalid_stream_exception():
-        base_t{ "invalid stream" }
+        base_t{ "invalid stream exception" }
     {
     }
     explicit invalid_stream_exception(char const* const);
@@ -82,11 +44,37 @@ class stream_write_failed_exception: virtual public ::vee::exception
 public:
     using base_t = ::vee::exception;
     stream_write_failed_exception():
-        base_t{ "" }
+        base_t{ "stream write failed exception" }
     {
     }
     explicit stream_write_failed_exception(char const* const);
     virtual ~stream_write_failed_exception() = default;
+    virtual char const* to_string() const __noexcept override;
+};
+
+class stream_corrupted_exception: virtual public ::vee::exception
+{
+public:
+    using base_t = ::vee::exception;
+    stream_corrupted_exception():
+        base_t{ "stream corrupted exception" }
+    {
+    }
+    explicit stream_corrupted_exception(char const* const);
+    virtual ~stream_corrupted_exception() = default;
+    virtual char const* to_string() const __noexcept override;
+};
+
+class unknown_io_exception: virtual public ::vee::exception
+{
+public:
+    using base_t = ::vee::exception;
+    unknown_io_exception():
+        base_t{ "unknown io exception" }
+    {
+    }
+    explicit unknown_io_exception(char const* const);
+    virtual ~unknown_io_exception() = default;
     virtual char const* to_string() const __noexcept override;
 };
 
