@@ -14,7 +14,7 @@ inline ::boost::asio::ip::address string_to_ipaddr(const char* str)
 }
 } // unnamed namespace
 
-tcp_stream::~tcp_stream()
+tcp_stream::~tcp_stream() noexcept
 {
     on_destroy.do_call();
 }
@@ -134,11 +134,11 @@ size_t tcp_stream::read_explicit(io::buffer buffer, const size_t bytes_requested
     return bytes_transferred;
 }
 
-size_t tcp_stream::read_some(io::buffer buffer, size_t bytes_requested)
+size_t tcp_stream::read_some(io::buffer buffer, size_t maximum_read_bytes)
 {
     ::boost::system::error_code error;
     memset(buffer.ptr, 0, buffer.capacity);
-    size_t bytes_transferred = static_cast<size_t>(socket.read_some(::boost::asio::buffer(buffer.ptr, bytes_requested), error));
+    size_t bytes_transferred = static_cast<size_t>(socket.read_some(::boost::asio::buffer(buffer.ptr, maximum_read_bytes), error));
     if (boost::asio::error::eof == error)
     {
         throw io::invalid_stream_exception{};
@@ -263,12 +263,12 @@ tcp_server::tcp_server(tcp_server&& other):
 {
 }
 
-tcp_server::~tcp_server()
+tcp_server::~tcp_server() noexcept
 {
     tcp_server::close();
 }
 
-void tcp_server::close()
+void tcp_server::close() noexcept
 {
     if (acceptor.is_open())
     {
@@ -328,6 +328,12 @@ session_t create_session(io_service& iosvc) noexcept
 {
     session_t session = ::std::make_shared<tcp_stream>(iosvc);
     return session;
+}
+
+server::shared_ptr create_server(io_service& iosvc, port_t port) noexcept
+{
+    server::shared_ptr server = ::std::make_shared<tcp_server>(iosvc, port);
+    return server;
 }
 
 } // !namespace tcp

@@ -8,6 +8,7 @@
 *.sln.docstates
 *.VC.opendb
 *.VC.db
+*.VC.VC.opendb
 
 # Build results
 [Dd]ebug/

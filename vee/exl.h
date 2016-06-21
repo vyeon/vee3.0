@@ -5,50 +5,46 @@
 
 namespace vee {
 	
-namespace exl {
-
-class precondition_violated: virtual public ::vee::exception
+class precondition_violated_exception: virtual public ::vee::exception
 {
 public:
 	using base_t = ::vee::exception;
-	precondition_violated():
-		base_t{ "precondition violated" } { }
-	virtual ~precondition_violated() = default;
+	precondition_violated_exception():
+		base_t{ "precondition violated exception" } { }
+	virtual ~precondition_violated_exception() = default;
 	virtual char const* to_string() const __noexcept override;
 };
 
-class key_generation_failed: virtual public ::vee::exception
+class key_generation_failed_exception: virtual public ::vee::exception
 {
 public:
 	using base_t = ::vee::exception;
-	key_generation_failed():
-		base_t{ "key gerneration failed" } { }
-	virtual ~key_generation_failed() = default;
+	key_generation_failed_exception():
+		base_t{ "key gerneration failed exception" } { }
+	virtual ~key_generation_failed_exception() = default;
 	virtual char const* to_string() const __noexcept override;
 };
 
-class target_not_found: virtual public ::vee::exception
+class target_not_found_exception: virtual public ::vee::exception
 {
 public:
 	using base_t = ::vee::exception;
-	target_not_found():
-		base_t{ "target not found" } { }
-	virtual ~target_not_found() = default;
+	target_not_found_exception():
+		base_t{ "target not found exception" } { }
+	virtual ~target_not_found_exception() = default;
 	virtual char const* to_string() const __noexcept override;
 };
 
-class key_already_exist: virtual public ::vee::exception
+class key_already_exist_exception: virtual public ::vee::exception
 {
 public:
 	using base_t = ::vee::exception;
-	key_already_exist():
-		base_t{ "key already exist" } { }
-	virtual ~key_already_exist() = default;
+	key_already_exist_exception():
+		base_t{ "key already exist exception" } { }
+	virtual ~key_already_exist_exception() = default;
 	virtual char const* to_string() const __noexcept override;
 };
 
-} // !namespace exl
-	
 } // !namespace vee
 
 #endif // !_VEE_EXL_H_

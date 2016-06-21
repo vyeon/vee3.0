@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="vee\console.h" />
     <ClInclude Include="vee\core\noncopyable.h" />
     <ClInclude Include="vee\delegate.h" />
     <ClInclude Include="vee\enumeration.h" />
@@ -46,6 +47,7 @@
     <ClInclude Include="vee\worker.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="console\print.cpp" />
     <ClCompile Include="ex\exception.cpp" />
     <ClCompile Include="ex\exl.cpp" />
     <ClCompile Include="ex\exl_io.cpp" />

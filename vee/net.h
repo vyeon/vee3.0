@@ -96,7 +96,7 @@ public:
     using rref_t = this_t&&;
     using shared_ptr = ::std::shared_ptr<this_t>;
     using unique_ptr = ::std::unique_ptr<this_t>;
-    virtual ~net_stream() = default;
+    virtual ~net_stream() noexcept = default;
     virtual void connect(const char* ip, port_t port) = 0;
     virtual void disconnect() = 0;
     virtual void async_connect(const char* ip, port_t port, async_connect_delegate::shared_ptr callback) noexcept = 0;
@@ -128,15 +128,15 @@ public:
     using rref_t = this_t&&;
     using shared_ptr = ::std::shared_ptr<this_t>;
     using unique_ptr = ::std::unique_ptr<this_t>;
-    virtual ~server() = default;
-    virtual void close() = 0;
+    virtual ~server() noexcept = default;
+    virtual void close() noexcept = 0;
     virtual session_t accept() = 0;
     virtual void async_accept(async_accept_delegate::shared_ptr callback) = 0;
     virtual io_service& get_io_service() noexcept = 0;
 };
 
 session_t create_session(io_service& iosvc) noexcept;
-server::shared_ptr create_server(port_t port, io_service& iosvc) noexcept;
+server::shared_ptr create_server(io_service& iosvc, port_t port) noexcept;
 
 } // !namespace tcp
     

@@ -33,7 +33,7 @@ private:
 
 /* Public member functions */
 public:
-    virtual ~tcp_stream();
+    virtual ~tcp_stream() noexcept;
     tcp_stream(tcp_stream&& other);
     explicit tcp_stream(io_service& iosvc);
     explicit tcp_stream(io_service& iosvc, tcp_socket&& socket);
@@ -46,7 +46,7 @@ public:
     virtual bool is_open() noexcept override;
     virtual size_t write_some(io::buffer buffer, const size_t bytes_requested) override;
     virtual size_t read_explicit(io::buffer buffer, const size_t bytes_requested) override;
-    virtual size_t read_some(io::buffer buffer, size_t bytes_requested) override;
+    virtual size_t read_some(io::buffer buffer, size_t maximum_read_bytes) override;
     virtual void async_read_some(io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback) noexcept override;
     virtual void async_read_explicit(io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback) noexcept override;
     virtual void async_write_some(io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback) noexcept override;
@@ -77,13 +77,13 @@ public:
     using shared_ptr = ::std::shared_ptr<this_t>;
     using unique_ptr = ::std::unique_ptr<this_t>;
 /* Protected member types */
-private:
+public:
     using tcp_socket = ::boost::asio::ip::tcp::socket;
     using tcp_endpoint = ::boost::asio::ip::tcp::endpoint;
     tcp_server(io_service& iosvc, port_t port);
     tcp_server(tcp_server&& other);
-    virtual ~tcp_server();
-    virtual void close() override;
+    virtual ~tcp_server() noexcept;
+    virtual void close() noexcept override;
     virtual session_t accept() override;
     //virtual ::std::pair<bool, session_t> accept() override;
     virtual void async_accept(async_accept_delegate::shared_ptr callback) override;

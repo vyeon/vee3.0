@@ -36,7 +36,7 @@ public:\
         }\
         catch(...)\
         {\
-            throw ::vee::exl::target_not_found()\
+            throw ::vee::target_not_found()\
         }\
     }\
     class iterator\

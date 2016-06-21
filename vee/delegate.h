@@ -122,7 +122,7 @@ public:
             > ::type;
         auto ptr = dst.template target<target_type>();
         if (!ptr)
-            throw exl::key_generation_failed();
+            throw key_generation_failed_exception();
         //printf("wrapper: %X, key: %X\n", ptr, *ptr);
         return mpl::pvoid_cast(*ptr);
     }
@@ -257,7 +257,7 @@ public:
         binder_t binder{ static_cast<CallableObjRef>(pair.second) };
         auto ret = _usrcont.insert(::std::make_pair(static_cast<UsrKeyRef>(pair.first), binder));
         if (ret.second == false)
-            throw exl::key_already_exist();
+            throw key_already_exist_exception();
         return *this;
     }
     template <class CallableObj>
@@ -275,7 +275,7 @@ public:
         key_t key = gen_key( binder_t{ ::std::forward<CallableObj>(obj) });
         auto  target = _cont.find(key);
         if (target == _cont.end())
-            throw exl::target_not_found();
+            throw target_not_found();
         _cont.erase(target);
         return *this;
     }
@@ -284,7 +284,7 @@ public:
         ::std::lock_guard<lock_t> locker{ _mtx };
         auto target = _usrcont.find(wrapped_key.value);
         if (target == _usrcont.end())
-            throw exl::target_not_found();
+            throw target_not_found();
         _usrcont.erase(target);
         return *this;
     }
@@ -375,7 +375,6 @@ template <class FTy,
           class CallableObj >
               delegate<FTy, LockTy, UsrKeyTy> make_delegate(CallableObj&& func)
 {
-    //TODO: Implementation
     return delegate<FTy, LockTy, UsrKeyTy>{ ::std::forward<CallableObj>(func) };
 
 }
@@ -385,7 +384,6 @@ class LockTy = lock::empty_lock,
 class UsrKeyTy = int32_t >
     delegate<FTy, LockTy, UsrKeyTy > make_delegate(::std::function<FTy> func)
 {
-    //TODO: Implementation
     return delegate<FTy, LockTy, UsrKeyTy >{ (func) };
 }
 

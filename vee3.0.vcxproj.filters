@@ -34,6 +34,9 @@
     <Filter Include="exceptions">
       <UniqueIdentifier>{143e12bd-f93d-4e4c-af21-4dbf49168aa2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="console">
+      <UniqueIdentifier>{126f025b-2347-4467-bda8-60fa1988b7db}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="vee\enumeration.h">
@@ -111,6 +114,9 @@
     <ClInclude Include="vee\io\io_service.h">
       <Filter>vee\io</Filter>
     </ClInclude>
+    <ClInclude Include="vee\console.h">
+      <Filter>vee</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="test\testobj.cpp">
@@ -142,6 +148,9 @@
     </ClCompile>
     <ClCompile Include="ex\exl_io.cpp">
       <Filter>exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="console\print.cpp">
+      <Filter>console</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

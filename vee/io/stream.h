@@ -85,7 +85,7 @@ public:
     virtual ~sync_stream() = default;
     virtual size_t write_some(io::buffer buffer, const size_t bytes_requested) = 0;
     virtual size_t read_explicit(io::buffer buffer, const size_t bytes_requested) = 0;
-    virtual size_t read_some(io::buffer buffer, size_t bytes_requested) = 0;
+    virtual size_t read_some(io::buffer buffer, size_t maximum_read_bytes) = 0;
 };
 
 class async_stream abstract: virtual public stream_base

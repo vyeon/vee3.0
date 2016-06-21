@@ -163,7 +163,7 @@ public:
     {
         size_t result = nothrow_request(::std::forward<Job>(job));
         if (!result)
-            throw exl::worker_is_busy{};
+            throw worker_is_busy{};
         return result;
     }
     template <class Job>
@@ -231,14 +231,15 @@ private:
         {
             if (remained == 0)
             {
-                auto promise = new std::promise<void>();
+                auto promise = new ::std::make_shared<::std::promise<void>>();
+                //auto promise = new std::promise<void>();
                 this->_promise = promise;
                 auto future = promise->get_future();
                 events.sleep.operator()();
                 puts("worker wait");
                 future.wait();
-                _promise = nullptr;
-                delete promise;
+                _promise.reset();
+                //delete promise;
             }
             _epoch();
             remained = _remained.fetch_sub(1) - 1;
@@ -268,7 +269,7 @@ public:
 private:
     ::std::atomic<size_t>  _remained;
     ::std::atomic<state_t> _state;
-    ::std::promise<void> volatile* _promise;
+    ::std::shared_ptr<::std::promise<void>> _promise;
     lockfree::queue<job_t> _job_queue;
     ::std::thread _thr;
 
@@ -354,7 +355,7 @@ public:
     {
         bool result = nothrow_request(::std::forward<JobRef>(job));
         if (!result)
-            throw exl::worker_is_busy{};
+            throw worker_is_busy{};
         return true;
     }
 
