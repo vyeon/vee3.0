@@ -1,22 +1,26 @@
 #include <vee/exception.h>
+#include <cstring>
 
 namespace vee {
 	
-exception::exception():
-	base_t { "Undefined exception" }
+exception::exception()
 {
-	
+    desc.fill(0);
+    desc[0] = 'n';
+    desc[1] = 'u';
+    desc[2] = 'l';
+    desc[3] = 'l';
 }
 
-exception::exception(char const* const msg):
-	base_t { msg }
+exception::exception(char const* const msg)
 {
-
+    desc.fill(0);
+    strcpy(desc.data(), msg);
 }
 
 char const* exception::to_string() const noexcept
 {
-    return this->what();
+    return desc.data();
 }
 
 } // !namespace vee

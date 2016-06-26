@@ -178,8 +178,7 @@ public:
             while (this->_promise == nullptr)
             {
             }; // waiting until promise ready
-            ::std::promise<void>* promise = const_cast<::std::promise<void>*>(_promise);
-            promise->set_value(); // signalling
+            _promise->set_value(); // signalling
         }
         events.job_requested.operator()();
         return remained_old + 1;

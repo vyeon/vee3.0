@@ -9,9 +9,9 @@ invalid_stream_exception::invalid_stream_exception(char const* const msg):
 {
 }
 
-char const* invalid_stream_exception::to_string() const __noexcept
+char const* invalid_stream_exception::to_string() const noexcept
 {
-    return this->what();
+    return base_t::to_string();
 }
 
 stream_write_failed_exception::stream_write_failed_exception(char const* const msg):
@@ -19,9 +19,9 @@ stream_write_failed_exception::stream_write_failed_exception(char const* const m
 {
 }
 
-char const* stream_write_failed_exception::to_string() const __noexcept
+char const* stream_write_failed_exception::to_string() const noexcept
 {
-    return this->what();
+    return base_t::to_string();
 }
 
 stream_reset_exception::stream_reset_exception(char const* const msg):
@@ -29,9 +29,9 @@ stream_reset_exception::stream_reset_exception(char const* const msg):
 {
 }
 
-char const* stream_reset_exception::to_string() const __noexcept
+char const* stream_reset_exception::to_string() const noexcept
 {
-    return this->what();
+    return base_t::to_string();
 }
 
 unknown_io_exception::unknown_io_exception(char const* const msg):
@@ -39,9 +39,9 @@ unknown_io_exception::unknown_io_exception(char const* const msg):
 {
 }
 
-char const* unknown_io_exception::to_string() const __noexcept
+char const* unknown_io_exception::to_string() const noexcept
 {
-    return this->what();
+    return base_t::to_string();
 }
 
 } // !namespace io
