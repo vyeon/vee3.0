@@ -57,10 +57,6 @@ public:
     virtual char const* to_string() const noexcept override;
 };
 
-} // !namespace net 
-   
-namespace net {
-
 using port_t = unsigned short;
 #if VEE_PLATFORM_X32
 using socketfd_t = uint32_t;
@@ -73,8 +69,9 @@ class net_stream;
 struct async_connection_result;
 
 using session_t = ::std::shared_ptr<net_stream>;
-using async_connect_delegate = delegate<void(async_connection_result&)>;
 
+using async_connect_delegate = delegate<void(async_connection_result&)>;
+using async_connect_callback = async_connect_delegate::shared_ptr;
 struct async_connection_result: public async_result
 {
     using this_t = async_connection_result;
@@ -84,7 +81,7 @@ struct async_connection_result: public async_result
     session_t session;
     ::std::string ip;
     port_t port;
-    async_connect_delegate::shared_ptr callback;
+    async_connect_callback callback;
     ::std::string message;
 };
 
@@ -99,26 +96,27 @@ public:
     virtual ~net_stream() noexcept = default;
     virtual void connect(const char* ip, port_t port) = 0;
     virtual void disconnect() = 0;
-    virtual void async_connect(const char* ip, port_t port, async_connect_delegate::shared_ptr callback) noexcept = 0;
+    template <class ...FwdArgs>
+    inline void async_connect(const char* ip, port_t port, FwdArgs&& ...args)
+    {
+        async_connect(ip,
+                      port,
+                      async_callback<async_connect_callback>(::std::forward<FwdArgs>(args)...)
+        );
+    }
+    virtual void async_connect(const char* ip, port_t port, async_connect_callback callback) noexcept = 0;
     virtual socketfd_t native() noexcept = 0;
     virtual bool is_open() noexcept = 0;
 
-    delegate<void(), lock::spin_lock> on_destroy;
+    delegate<void()> on_destroy;
 };
 
 namespace tcp {
 
 struct async_accept_result;
+
 using async_accept_delegate = delegate<void(async_accept_result&)>;
-
-struct async_accept_result: public async_result
-{
-    using shared_ptr = ::std::shared_ptr<async_accept_result>;
-    session_t session { nullptr };
-    ::std::string message;
-    async_accept_delegate::shared_ptr callback;
-};
-
+using async_accept_callback = async_accept_delegate::shared_ptr;
 
 class server abstract
 {
@@ -131,12 +129,28 @@ public:
     virtual ~server() noexcept = default;
     virtual void close() noexcept = 0;
     virtual session_t accept() = 0;
-    virtual void async_accept(async_accept_delegate::shared_ptr callback) = 0;
+    template <class ...FwdArgs>
+    inline void async_accept(FwdArgs&& ...args)
+    {
+        async_accept(async_callback<async_accept_callback>(::std::forward<FwdArgs>(args)...));
+    }
+    virtual void async_accept(async_accept_callback callback) = 0;
     virtual io_service& get_io_service() noexcept = 0;
 };
 
+using server_t = server::shared_ptr;
+
+struct async_accept_result: public async_result
+{
+    using shared_ptr = ::std::shared_ptr<async_accept_result>;
+    server* server_ptr { nullptr };
+    session_t session{ nullptr };
+    ::std::string message;
+    async_accept_callback callback;
+};
+
 session_t create_session(io_service& iosvc) noexcept;
-server::shared_ptr create_server(io_service& iosvc, port_t port) noexcept;
+server_t create_server(io_service& iosvc, port_t port) noexcept;
 
 } // !namespace tcp
     

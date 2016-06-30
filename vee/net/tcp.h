@@ -41,15 +41,15 @@ public:
     void swap(tcp_stream& other) noexcept;
     virtual void connect(const char* ip, port_t port) override;
     virtual void disconnect() override;
-    virtual void async_connect(const char* ip, port_t port, async_connect_delegate::shared_ptr callback) noexcept override;
+    virtual void async_connect(const char* ip, port_t port, async_connect_callback callback) noexcept override;
     virtual socketfd_t native() noexcept override;
     virtual bool is_open() noexcept override;
     virtual size_t write_some(io::buffer buffer, const size_t bytes_requested) override;
     virtual size_t read_explicit(io::buffer buffer, const size_t bytes_requested) override;
     virtual size_t read_some(io::buffer buffer, size_t maximum_read_bytes) override;
-    virtual void async_read_some(io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback) noexcept override;
-    virtual void async_read_explicit(io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback) noexcept override;
-    virtual void async_write_some(io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback) noexcept override;
+    virtual void async_read_some(io::buffer buffer, size_t bytes_requested, async_io_callback callback) noexcept override;
+    virtual void async_read_explicit(io::buffer buffer, size_t bytes_requested, async_io_callback callback) noexcept override;
+    virtual void async_write_some(io::buffer buffer, size_t bytes_requested, async_io_callback callback) noexcept override;
     virtual io_service& get_io_service() noexcept override;
 
 /* Private member functions */
@@ -86,7 +86,7 @@ public:
     virtual void close() noexcept override;
     virtual session_t accept() override;
     //virtual ::std::pair<bool, session_t> accept() override;
-    virtual void async_accept(async_accept_delegate::shared_ptr callback) override;
+    virtual void async_accept(async_accept_callback callback) override;
     virtual io_service& get_io_service() noexcept override;
 
 /* Protected member variables */

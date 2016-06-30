@@ -1,6 +1,7 @@
 #include <vee/net.h>
 #include <vee/console.h>
 using namespace vee;
+using namespace net;
 
 int main()
 {
@@ -10,7 +11,7 @@ int main()
         try
         {
             // Create a tcp-client object [Factory method pattern]
-            auto client = net::tcp::create_session(iosvc);
+            auto client = tcp::create_session(iosvc);
             printf("---------------------------\n");
             printf("sys> test client initalized\n");
 

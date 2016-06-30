@@ -62,7 +62,7 @@ void tcp_stream::disconnect()
     socket.close();
 }
 
-void tcp_stream::async_connect(const char* ip, port_t port, async_connect_delegate::shared_ptr callback) __noexcept
+void tcp_stream::async_connect(const char* ip, port_t port, async_connect_callback callback) __noexcept
 {
     ::std::string _ip_str{ ip };
     auto on_connect = [callback, port, ip_str = ::std::move(_ip_str)](const ::boost::system::error_code& error)
@@ -154,11 +154,12 @@ size_t tcp_stream::read_some(io::buffer buffer, size_t maximum_read_bytes)
     return bytes_transferred;
 }
 
-void tcp_stream::async_read_some(io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback) noexcept
+void tcp_stream::async_read_some(io::buffer buffer, size_t bytes_requested, async_io_callback callback) noexcept
 {
-    auto on_read = [buffer, callback](const ::boost::system::error_code& error, size_t bytes_transferred) -> void
+    auto on_read = [this, buffer, callback](const ::boost::system::error_code& error, size_t bytes_transferred) -> void
     {
         async_io_result result;
+        result.stream_ptr = this;
         result.bytes_transferred = bytes_transferred;
         result.buffer = buffer;
         result.callback = callback;
@@ -188,7 +189,7 @@ void tcp_stream::async_read_some(io::buffer buffer, size_t bytes_requested, asyn
     return;
 }
 
-void tcp_stream::async_read_explicit(io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback) noexcept
+void tcp_stream::async_read_explicit(io::buffer buffer, size_t bytes_requested, async_io_callback callback) noexcept
 {
     auto iteration = [this, buffer, bytes_requested, callback, total_transferred = static_cast<size_t>(0)](async_io_result& result) mutable -> void
     {
@@ -208,11 +209,12 @@ void tcp_stream::async_read_explicit(io::buffer buffer, size_t bytes_requested, 
     tcp_stream::async_read_some(buffer, bytes_requested, ::std::make_shared<async_io_delegate>(0, iteration));
 }
 
-void tcp_stream::async_write_some(io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback) noexcept
+void tcp_stream::async_write_some(io::buffer buffer, size_t bytes_requested, async_io_callback callback) noexcept
 {
-    auto on_write = [buffer, callback](const ::boost::system::error_code& error, size_t bytes_transferred) -> void
+    auto on_write = [this, buffer, callback](const ::boost::system::error_code& error, size_t bytes_transferred) -> void
     {
         async_io_result result;
+        result.stream_ptr = this;
         result.bytes_transferred = bytes_transferred;
         result.buffer = buffer;
         result.callback = callback;
@@ -295,12 +297,13 @@ session_t tcp_server::accept()
     return session;
 }
 
-void tcp_server::async_accept(async_accept_delegate::shared_ptr callback)
+void tcp_server::async_accept(async_accept_callback callback)
 {
     ::std::shared_ptr<::boost::asio::ip::tcp::socket> clntsock_ptr = std::make_shared<::boost::asio::ip::tcp::socket>(iosvc_ptr->kernel->to_boost());
     auto on_accept = [this, clntsock_ptr, callback](const ::boost::system::error_code& error)
     {
         async_accept_result result;
+        result.server_ptr = this;
         result.callback = ::std::move(callback);
         if (error)
         {

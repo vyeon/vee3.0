@@ -97,9 +97,9 @@ public:
     using shared_ptr = ::std::shared_ptr<this_t>;
     using unique_ptr = ::std::unique_ptr<this_t>;
     virtual ~async_stream() = default;
-    virtual void async_read_some(io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback) noexcept = 0;
-    virtual void async_read_explicit(io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback) noexcept = 0;
-    virtual void async_write_some(io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback) noexcept = 0;
+    virtual void async_read_some(io::buffer buffer, size_t bytes_requested, async_io_callback callback) noexcept = 0;
+    virtual void async_read_explicit(io::buffer buffer, size_t bytes_requested, async_io_callback callback) noexcept = 0;
+    virtual void async_write_some(io::buffer buffer, size_t bytes_requested, async_io_callback callback) noexcept = 0;
 };
 
 class io_stream abstract: virtual public sync_stream, virtual public async_stream

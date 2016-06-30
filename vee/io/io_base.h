@@ -1,8 +1,6 @@
 #ifndef _VEE_IO_IO_BASE_H_
 #define _VEE_IO_IO_BASE_H_
 
-#include <cstdio>
-#include <cstdint>
 #include <vee/delegate.h>
 
 namespace vee {
@@ -43,9 +41,21 @@ struct io_result
     size_t   bytes_transferred = 0;
 };
 
+class stream_base;
+class sync_stream;
+class async_stream;
+class io_stream;
+
 struct async_io_result;
 struct async_result;
 using async_io_delegate = delegate<void(async_io_result&)>;
+using async_io_callback = async_io_delegate::shared_ptr;
+
+template <class Result, class ...FwdArgs>
+inline Result async_callback(FwdArgs&& ...args)
+{
+    return ::std::make_shared< ::std::pointer_traits<Result>::element_type >(::std::forward<FwdArgs>(args)...);
+}
 
 struct async_result
 {
@@ -54,13 +64,13 @@ struct async_result
 
 struct async_io_result: public async_result
 {
+    io_stream* stream_ptr { nullptr };
     io_issue   issue = io_issue::null;
     size_t     bytes_transferred = 0;
     size_t     bytes_requested = 0;
     io::buffer buffer {};
-    async_io_delegate::shared_ptr callback { nullptr };
+    async_io_callback callback { nullptr };
 };
-
 
 } // !namespace vee
 
