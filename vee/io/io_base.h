@@ -64,12 +64,12 @@ struct async_result
 
 struct async_io_result: public async_result
 {
-    io_stream* stream_ptr { nullptr };
+    async_stream* stream_ptr { nullptr };
     io_issue   issue = io_issue::null;
     size_t     bytes_transferred = 0;
     size_t     bytes_requested = 0;
     io::buffer buffer {};
-    async_io_callback callback { nullptr };
+    async_io_callback callback{ nullptr };
 };
 
 } // !namespace vee

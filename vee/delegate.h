@@ -1,9 +1,7 @@
 #ifndef _VEE_DELEGATE_H_
 #define _VEE_DELEGATE_H_
 
-#include <functional>
 #include <memory>
-#include <mutex>
 #include <map>
 #include <vee/exl.h>
 #include <vee/tupleupk.h>
@@ -284,7 +282,7 @@ public:
         ::std::lock_guard<lock_t> locker{ _mtx };
         auto target = _usrcont.find(wrapped_key.value);
         if (target == _usrcont.end())
-            throw target_not_found();
+            throw target_not_found_exception{};
         _usrcont.erase(target);
         return *this;
     }

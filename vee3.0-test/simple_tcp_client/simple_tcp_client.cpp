@@ -8,6 +8,7 @@ int main()
     io_service iosvc; 
     while (true)
     {
+        fflush(stdin);
         try
         {
             // Create a tcp-client object [Factory method pattern]
@@ -35,9 +36,12 @@ int main()
                 uint8_t msg_buffer[MSG_BUFFER_SIZE] = { 0, };
                 printf("sys> connection success!\nin >\tmsg> ");
                 gets_s(reinterpret_cast<char*>(msg_buffer), MSG_BUFFER_SIZE);
+                size_t requested_size = strlen(reinterpret_cast<char*>(msg_buffer));
+                if (requested_size == 0)
+                    continue;
                 size_t bytes_transferred = 
                     client->write_some(io::buffer{ msg_buffer, MSG_BUFFER_SIZE },
-                                       strlen(reinterpret_cast<char*>(msg_buffer)));
+                                       requested_size);
                 printf("%zu bytes to server ------------------------------------------\n", bytes_transferred);
                 print_hexa(msg_buffer, bytes_transferred);
                 printf("\n------------------------------------------------------------\n");

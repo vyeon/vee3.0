@@ -84,8 +84,8 @@ public:
     tcp_server(tcp_server&& other);
     virtual ~tcp_server() noexcept;
     virtual void close() noexcept override;
-    virtual session_t accept() override;
-    //virtual ::std::pair<bool, session_t> accept() override;
+    virtual session_handle accept() override;
+    //virtual ::std::pair<bool, session_handle> accept() override;
     virtual void async_accept(async_accept_callback callback) override;
     virtual io_service& get_io_service() noexcept override;
 

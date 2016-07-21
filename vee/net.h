@@ -68,7 +68,7 @@ using socketfd_t = uint64_t;
 class net_stream;
 struct async_connection_result;
 
-using session_t = ::std::shared_ptr<net_stream>;
+using session_handle = ::std::shared_ptr<net_stream>;
 
 using async_connect_delegate = delegate<void(async_connection_result&)>;
 using async_connect_callback = async_connect_delegate::shared_ptr;
@@ -78,7 +78,7 @@ struct async_connection_result: public async_result
     using ref_t = this_t&;
     using rref_t = this_t&&;
     using shared_ptr = ::std::shared_ptr<async_connection_result>;
-    session_t session;
+    session_handle session;
     ::std::string ip;
     port_t port;
     async_connect_callback callback;
@@ -128,7 +128,7 @@ public:
     using unique_ptr = ::std::unique_ptr<this_t>;
     virtual ~server() noexcept = default;
     virtual void close() noexcept = 0;
-    virtual session_t accept() = 0;
+    virtual session_handle accept() = 0;
     template <class ...FwdArgs>
     inline void async_accept(FwdArgs&& ...args)
     {
@@ -144,25 +144,25 @@ struct async_accept_result: public async_result
 {
     using shared_ptr = ::std::shared_ptr<async_accept_result>;
     server* server_ptr { nullptr };
-    session_t session{ nullptr };
+    session_handle session;
     ::std::string message;
     async_accept_callback callback;
 };
 
-session_t create_session(io_service& iosvc) noexcept;
+session_handle create_session(io_service& iosvc) noexcept;
 server_t create_server(io_service& iosvc, port_t port) noexcept;
 
 } // !namespace tcp
     
 namespace udp {
 
-session_t create_stream(io_service& iosvc) noexcept;
+session_handle create_stream(io_service& iosvc) noexcept;
 
 } // !namespace udp
 
 namespace rfc6455 {
 
-session_t create_session(io_service& iosvc) noexcept;
+session_handle create_session(io_service& iosvc) noexcept;
 tcp::server::shared_ptr create_server(io_service& iosvc, port_t port) noexcept;
 
 } // !namespace rfc6455

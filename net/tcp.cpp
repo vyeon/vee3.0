@@ -282,7 +282,7 @@ void tcp_server::close() noexcept
     }
 }
 
-session_t tcp_server::accept()
+session_handle tcp_server::accept()
 {
     ::boost::asio::ip::tcp::socket client(iosvc_ptr->kernel->to_boost());
     try
@@ -293,7 +293,7 @@ session_t tcp_server::accept()
     {
         throw accept_failed_exception();
     }
-    session_t session = ::std::make_shared<tcp_stream>(*iosvc_ptr, std::move(client));
+    session_handle session = ::std::make_shared<tcp_stream>(*iosvc_ptr, std::move(client));
     return session;
 }
 
@@ -314,7 +314,6 @@ void tcp_server::async_accept(async_accept_callback callback)
         {
             result.is_success = true;
             result.message += error.message();
-            //TODO: I think this is dangerous code. I will resolve this.
             result.session = ::std::make_shared<tcp_stream>(*iosvc_ptr, ::std::move(*clntsock_ptr));
         }
         callback->do_call(result);
@@ -327,9 +326,9 @@ io_service& tcp_server::get_io_service() noexcept
     return *iosvc_ptr;
 }
 
-session_t create_session(io_service& iosvc) noexcept
+session_handle create_session(io_service& iosvc) noexcept
 {
-    session_t session = ::std::make_shared<tcp_stream>(iosvc);
+    session_handle session = ::std::make_shared<tcp_stream>(iosvc);
     return session;
 }
 
