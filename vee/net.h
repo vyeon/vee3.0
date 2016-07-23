@@ -66,18 +66,20 @@ using socketfd_t = uint64_t;
 
 // Forward declaration
 class net_stream;
-struct async_connection_result;
+struct async_connect_result;
 
 using session_handle = ::std::shared_ptr<net_stream>;
 
-using async_connect_delegate = delegate<void(async_connection_result&)>;
-using async_connect_callback = async_connect_delegate::shared_ptr;
-struct async_connection_result: public async_result
+using async_connect_delegate = delegate<void(async_connect_result&)>;
+//using async_connect_callback = async_connect_delegate::shared_ptr;
+using async_connect_callback = std::function<void(async_connect_result&)>;
+
+struct async_connect_result: public async_result
 {
-    using this_t = async_connection_result;
+    using this_t = async_connect_result;
     using ref_t = this_t&;
     using rref_t = this_t&&;
-    using shared_ptr = ::std::shared_ptr<async_connection_result>;
+    using shared_ptr = ::std::shared_ptr<async_connect_result>;
     session_handle session;
     ::std::string ip;
     port_t port;
@@ -95,16 +97,9 @@ public:
     using unique_ptr = ::std::unique_ptr<this_t>;
     virtual ~net_stream() noexcept = default;
     virtual void connect(const char* ip, port_t port) = 0;
-    virtual void disconnect() = 0;
-    template <class ...FwdArgs>
-    inline void async_connect(const char* ip, port_t port, FwdArgs&& ...args)
-    {
-        async_connect(ip,
-                      port,
-                      async_callback<async_connect_callback>(::std::forward<FwdArgs>(args)...)
-        );
-    }
+    virtual void disconnect() = 0; 
     virtual void async_connect(const char* ip, port_t port, async_connect_callback callback) noexcept = 0;
+    virtual void async_connect(const char* ip, port_t port, async_connect_delegate::shared_ptr callback) noexcept = 0;
     virtual socketfd_t native() noexcept = 0;
     virtual bool is_open() noexcept = 0;
 
@@ -116,7 +111,8 @@ namespace tcp {
 struct async_accept_result;
 
 using async_accept_delegate = delegate<void(async_accept_result&)>;
-using async_accept_callback = async_accept_delegate::shared_ptr;
+//using async_accept_callback = async_accept_delegate::shared_ptr;
+using async_accept_callback = std::function<void(async_accept_result&)>;
 
 class server abstract
 {
@@ -129,12 +125,8 @@ public:
     virtual ~server() noexcept = default;
     virtual void close() noexcept = 0;
     virtual session_handle accept() = 0;
-    template <class ...FwdArgs>
-    inline void async_accept(FwdArgs&& ...args)
-    {
-        async_accept(async_callback<async_accept_callback>(::std::forward<FwdArgs>(args)...));
-    }
     virtual void async_accept(async_accept_callback callback) = 0;
+    virtual void async_accept(async_accept_delegate::shared_ptr callback) = 0;
     virtual io_service& get_io_service() noexcept = 0;
 };
 

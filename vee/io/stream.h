@@ -18,7 +18,7 @@ public:
     }
     explicit invalid_stream_exception(char const* const);
     virtual ~invalid_stream_exception() = default;
-    virtual char const* to_string() const __noexcept override;
+    virtual char const* to_string() const noexcept override;
 };
 
 class stream_write_failed_exception: virtual public ::vee::exception
@@ -31,7 +31,7 @@ public:
     }
     explicit stream_write_failed_exception(char const* const);
     virtual ~stream_write_failed_exception() = default;
-    virtual char const* to_string() const __noexcept override;
+    virtual char const* to_string() const noexcept override;
 };
 
 class stream_reset_exception: virtual public ::vee::exception
@@ -44,7 +44,7 @@ public:
     }
     explicit stream_reset_exception(char const* const);
     virtual ~stream_reset_exception() = default;
-    virtual char const* to_string() const __noexcept override;
+    virtual char const* to_string() const noexcept override;
 };
 
 class unknown_io_exception: virtual public ::vee::exception
@@ -57,7 +57,7 @@ public:
     }
     explicit unknown_io_exception(char const* const);
     virtual ~unknown_io_exception() = default;
-    virtual char const* to_string() const __noexcept override;
+    virtual char const* to_string() const noexcept override;
 };
 
 } // !namespace io
@@ -71,7 +71,7 @@ public:
     using shared_ptr = ::std::shared_ptr<this_t>;
     using unique_ptr = ::std::unique_ptr<this_t>;
     virtual ~stream_base() = default;
-    virtual io_service& get_io_service() __noexcept = 0;
+    virtual io_service& get_io_service() noexcept = 0;
 };
 
 class sync_stream abstract: virtual public stream_base
@@ -97,9 +97,14 @@ public:
     using shared_ptr = ::std::shared_ptr<this_t>;
     using unique_ptr = ::std::unique_ptr<this_t>;
     virtual ~async_stream() = default;
+    // I/O member functions of std::function type callback
     virtual void async_read_some(io::buffer buffer, size_t bytes_requested, async_io_callback callback) noexcept = 0;
     virtual void async_read_explicit(io::buffer buffer, size_t bytes_requested, async_io_callback callback) noexcept = 0;
     virtual void async_write_some(io::buffer buffer, size_t bytes_requested, async_io_callback callback) noexcept = 0;
+    // I/O member functions of delegate
+    virtual void async_read_some(io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback) noexcept = 0;
+    virtual void async_read_explicit(io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback) noexcept = 0;
+    virtual void async_write_some(io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback) noexcept = 0;
 };
 
 class io_stream abstract: virtual public sync_stream, virtual public async_stream

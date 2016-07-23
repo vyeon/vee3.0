@@ -28,7 +28,7 @@ void on_accept(net::tcp::async_accept_result& result)
         result.session->async_read_some(
             io::buffer{ io_buffer, IO_BUFFER_SIZE }, 
             IO_BUFFER_SIZE, 
-            async_callback<async_io_callback>( NULL, std::bind(on_recv, result.session, std::placeholders::_1) ));
+            std::bind(on_recv, result.session, std::placeholders::_1));
         result.server_ptr->async_accept(result.callback);
     }
     else
@@ -51,7 +51,7 @@ void on_send(net::session_handle session, async_io_result& result)
     session->async_read_some(
         result.buffer,
         IO_BUFFER_SIZE,
-        async_callback<async_io_callback>(NULL, std::bind(on_recv, session, std::placeholders::_1)));
+        std::bind(on_recv, session, std::placeholders::_1));
 }
 
 void on_recv(net::session_handle session, async_io_result& result)
@@ -68,7 +68,7 @@ void on_recv(net::session_handle session, async_io_result& result)
     session->async_write_some(
         result.buffer, 
         result.bytes_transferred, 
-        async_callback<async_io_callback>(NULL, std::bind(on_send, session, std::placeholders::_1))
+        std::bind(on_send, session, std::placeholders::_1)
     );
 }
 

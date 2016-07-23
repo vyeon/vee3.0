@@ -12,7 +12,7 @@ public:
 	precondition_violated_exception():
 		base_t{ "precondition violated exception" } { }
 	virtual ~precondition_violated_exception() = default;
-	virtual char const* to_string() const __noexcept override;
+	virtual char const* to_string() const noexcept override;
 };
 
 class key_generation_failed_exception: virtual public ::vee::exception
@@ -22,7 +22,7 @@ public:
 	key_generation_failed_exception():
 		base_t{ "key gerneration failed exception" } { }
 	virtual ~key_generation_failed_exception() = default;
-	virtual char const* to_string() const __noexcept override;
+	virtual char const* to_string() const noexcept override;
 };
 
 class target_not_found_exception: virtual public ::vee::exception
@@ -32,7 +32,7 @@ public:
 	target_not_found_exception():
 		base_t{ "target not found exception" } { }
 	virtual ~target_not_found_exception() = default;
-	virtual char const* to_string() const __noexcept override;
+	virtual char const* to_string() const noexcept override;
 };
 
 class key_already_exist_exception: virtual public ::vee::exception
@@ -42,7 +42,7 @@ public:
 	key_already_exist_exception():
 		base_t{ "key already exist exception" } { }
 	virtual ~key_already_exist_exception() = default;
-	virtual char const* to_string() const __noexcept override;
+	virtual char const* to_string() const noexcept override;
 };
 
 } // !namespace vee

@@ -15,7 +15,7 @@ exception::exception()
 exception::exception(char const* const msg)
 {
     desc.fill(0);
-    strcpy(desc.data(), msg);
+    strcpy_s(desc.data(), desc_buffer_size, msg);
 }
 
 char const* exception::to_string() const noexcept

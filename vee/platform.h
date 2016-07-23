@@ -27,14 +27,6 @@ namespace vee {
 #endif
 #endif
 
-#if (_MSC_VER == 1900) // VS2015
-#define __noexcept noexcept
-#define __constexpr constexpr
-#else
-#define __noexcept throw()
-#define __constexpr
-#endif
-    
 } // !namespace vee
 
 #endif // !_VEE_PLATFORM_H_

@@ -49,10 +49,11 @@ class io_stream;
 struct async_io_result;
 struct async_result;
 using async_io_delegate = delegate<void(async_io_result&)>;
-using async_io_callback = async_io_delegate::shared_ptr;
+//using async_io_callback = async_io_delegate::shared_ptr;
+using async_io_callback = std::function<void(async_io_result&)>;
 
 template <class Result, class ...FwdArgs>
-inline Result async_callback(FwdArgs&& ...args)
+inline Result async_delegate_callbck(FwdArgs&& ...args)
 {
     return ::std::make_shared< ::std::pointer_traits<Result>::element_type >(::std::forward<FwdArgs>(args)...);
 }

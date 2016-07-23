@@ -148,7 +148,7 @@ public:
         _cont = other._cont;
         _usrcont = other._usrcont;
     }
-    delegate(rref_t other) __noexcept
+    delegate(rref_t other) noexcept
     {
         ::std::lock_guard<lock_t> locker(other._mtx);
         _cont = ::std::move(other._cont);
@@ -167,7 +167,7 @@ public:
 
         return *this;
     }
-    ref_t operator=(rref_t other) __noexcept
+    ref_t operator=(rref_t other) noexcept
     {
         // lock both mutexes without deadlock
         ::std::lock(_mtx, other._mtx);

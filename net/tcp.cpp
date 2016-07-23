@@ -62,12 +62,12 @@ void tcp_stream::disconnect()
     socket.close();
 }
 
-void tcp_stream::async_connect(const char* ip, port_t port, async_connect_callback callback) __noexcept
+void tcp_stream::async_connect(const char* ip, port_t port, async_connect_callback callback) noexcept
 {
     ::std::string _ip_str{ ip };
     auto on_connect = [callback, port, ip_str = ::std::move(_ip_str)](const ::boost::system::error_code& error)
     {
-        async_connection_result result;
+        async_connect_result result;
         result.ip = ::std::move(ip_str);
         result.port = port;
         result.callback = ::std::move(callback);
@@ -83,18 +83,28 @@ void tcp_stream::async_connect(const char* ip, port_t port, async_connect_callba
              result.is_success = true;
              result.message = result.ip + ":" + buffer + " connection established";
          }
-         callback->do_call(result);
+         //callback->do_call(result);
+         callback(result);
     };
     tcp_endpoint ep{string_to_ipaddr(ip), port};
     socket.async_connect(ep, on_connect);
 }
 
-socketfd_t tcp_stream::native() __noexcept
+void tcp_stream::async_connect(const char* ip, port_t port, async_connect_delegate::shared_ptr callback) noexcept
+{
+    auto binder = [callback](async_connect_result& result) -> void
+    {
+        callback->do_call(result);
+    };
+    this->async_connect(ip, port, binder);
+}
+
+socketfd_t tcp_stream::native() noexcept
 {
     return socket.native();
 }
 
-bool tcp_stream::is_open() __noexcept
+bool tcp_stream::is_open() noexcept
 {
     return socket.is_open();
 }
@@ -183,7 +193,8 @@ void tcp_stream::async_read_some(io::buffer buffer, size_t bytes_requested, asyn
             result.is_success = true;
             // result.issue = io_issue::null; // default
         }
-        callback->do_call(result);
+        //callback->do_call(result);
+        callback(result);
     };
     socket.async_read_some(::boost::asio::buffer(buffer.ptr, bytes_requested), on_read);
     return;
@@ -199,14 +210,16 @@ void tcp_stream::async_read_explicit(io::buffer buffer, size_t bytes_requested, 
             result.buffer = buffer;
             result.bytes_transferred = total_transferred;
             result.callback = callback;
-            callback->do_call(result);
+            //callback->do_call(result);
+            callback(result);
             return;
         }
         result.buffer.ptr += result.bytes_transferred;
         result.buffer.capacity -= result.bytes_transferred;
         tcp_stream::async_read_some(result.buffer, bytes_requested - total_transferred, result.callback);
     };
-    tcp_stream::async_read_some(buffer, bytes_requested, ::std::make_shared<async_io_delegate>(0, iteration));
+    //tcp_stream::async_read_some(buffer, bytes_requested, ::std::make_shared<async_io_delegate>(0, iteration));
+    tcp_stream::async_read_some(buffer, bytes_requested, callback);
 }
 
 void tcp_stream::async_write_some(io::buffer buffer, size_t bytes_requested, async_io_callback callback) noexcept
@@ -238,13 +251,41 @@ void tcp_stream::async_write_some(io::buffer buffer, size_t bytes_requested, asy
             result.is_success = true;
             // result.issue = io_issue::null; // default
         }
-        callback->do_call(result);
+        //callback->do_call(result);
+        callback(result);
     };
     socket.async_write_some(::boost::asio::buffer(buffer.ptr, bytes_requested), on_write);
     return;
 }
 
-io_service& tcp_stream::get_io_service() __noexcept
+void tcp_stream::async_read_some(io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback) noexcept
+{
+    auto binder = [callback = std::move(callback)](async_io_result& result) -> void
+    {
+        callback->do_call(result);
+    };
+    this->async_read_some(buffer, bytes_requested, binder);
+}
+
+void tcp_stream::async_read_explicit(io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback) noexcept
+{
+    auto binder = [callback = std::move(callback)](async_io_result& result) -> void
+    {
+        callback->do_call(result);
+    };
+    this->async_read_explicit(buffer, bytes_requested, binder);
+}
+
+void tcp_stream::async_write_some(io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback) noexcept
+{
+    auto binder = [callback = std::move(callback)](async_io_result& result) -> void
+    {
+        callback->do_call(result);
+    };
+    this->async_write_some(buffer, bytes_requested, binder);
+}
+
+io_service& tcp_stream::get_io_service() noexcept
 {
     return *iosvc_ptr;
 }
@@ -316,9 +357,19 @@ void tcp_server::async_accept(async_accept_callback callback)
             result.message += error.message();
             result.session = ::std::make_shared<tcp_stream>(*iosvc_ptr, ::std::move(*clntsock_ptr));
         }
-        callback->do_call(result);
+        //callback->do_call(result);
+        callback(result);
     };
     acceptor.async_accept(*clntsock_ptr, on_accept);
+}
+
+void tcp_server::async_accept(async_accept_delegate::shared_ptr callback)
+{
+    auto binder = [callback](async_accept_result& result)
+    {
+        callback->do_call(result);
+    };
+    this->async_accept(binder);
 }
 
 io_service& tcp_server::get_io_service() noexcept

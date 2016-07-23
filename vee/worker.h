@@ -21,7 +21,7 @@ public:
     {
     }
     virtual ~worker_is_busy() = default;
-    virtual char const* to_string() const __noexcept override;
+    virtual char const* to_string() const noexcept override;
 };
 
 } // !namespace exl
