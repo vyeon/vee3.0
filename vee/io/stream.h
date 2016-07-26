@@ -8,10 +8,10 @@ namespace vee {
 
 namespace io {
 
-class invalid_stream_exception: virtual public ::vee::exception
+class invalid_stream_exception: public vee::exception
 {
 public:
-    using base_t = ::vee::exception;
+    using base_t = vee::exception;
     invalid_stream_exception():
         base_t{ "invalid stream exception" }
     {
@@ -21,10 +21,10 @@ public:
     virtual char const* to_string() const noexcept override;
 };
 
-class stream_write_failed_exception: virtual public ::vee::exception
+class stream_write_failed_exception: public vee::exception
 {
 public:
-    using base_t = ::vee::exception;
+    using base_t = vee::exception;
     stream_write_failed_exception():
         base_t{ "stream write failed exception" }
     {
@@ -34,10 +34,10 @@ public:
     virtual char const* to_string() const noexcept override;
 };
 
-class stream_reset_exception: virtual public ::vee::exception
+class stream_reset_exception: public vee::exception
 {
 public:
-    using base_t = ::vee::exception;
+    using base_t = vee::exception;
     stream_reset_exception():
         base_t{ "stream corrupted exception" }
     {
@@ -47,10 +47,10 @@ public:
     virtual char const* to_string() const noexcept override;
 };
 
-class unknown_io_exception: virtual public ::vee::exception
+class unknown_io_exception: public vee::exception
 {
 public:
-    using base_t = ::vee::exception;
+    using base_t = vee::exception;
     unknown_io_exception():
         base_t{ "unknown io exception" }
     {
@@ -70,8 +70,9 @@ public:
     using rref_t = this_t&&;
     using shared_ptr = std::shared_ptr<this_t>;
     using unique_ptr = std::unique_ptr<this_t>;
-    virtual ~stream_base() = default;
+    virtual ~stream_base() noexcept;
     virtual io_service& get_io_service() noexcept = 0;
+    delegate<void()> on_destroy;
 };
 
 class sync_stream abstract: virtual public stream_base
@@ -107,7 +108,7 @@ public:
     virtual void async_write_some(io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback) noexcept = 0;
 };
 
-class io_stream abstract: virtual public sync_stream, virtual public async_stream
+class io_stream abstract: public sync_stream, public async_stream
 {
 public:
     using this_t = io_stream;

@@ -12,10 +12,10 @@ namespace vee {
 
 namespace exl {
     
-class worker_is_busy: public ::vee::exception
+class worker_is_busy: public vee::exception
 {
 public:
-    using base_t = ::vee::exception;
+    using base_t = vee::exception;
     worker_is_busy():
         base_t{ "worker is busy" }
     {

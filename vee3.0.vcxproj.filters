@@ -117,6 +117,9 @@
     <ClInclude Include="vee\console.h">
       <Filter>vee</Filter>
     </ClInclude>
+    <ClInclude Include="vee\net\udp.h">
+      <Filter>vee\net</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="test\testobj.cpp">
@@ -151,6 +154,15 @@
     </ClCompile>
     <ClCompile Include="console\print.cpp">
       <Filter>console</Filter>
+    </ClCompile>
+    <ClCompile Include="net\udp.cpp">
+      <Filter>net</Filter>
+    </ClCompile>
+    <ClCompile Include="io\stream.cpp">
+      <Filter>io</Filter>
+    </ClCompile>
+    <ClCompile Include="net\net.cpp">
+      <Filter>net</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -18,7 +18,6 @@ inline ::boost::asio::ip::address string_to_ipaddr(const char* str)
 
 tcp_stream::~tcp_stream() noexcept
 {
-    on_destroy.do_call();
 }
 
 tcp_stream::tcp_stream(tcp_stream&& other) :
@@ -40,50 +39,75 @@ tcp_stream::tcp_stream(io_service& iosvc, tcp_socket&& __socket) :
 {
 }
 
+tcp_stream& tcp_stream::operator=(tcp_stream&& rhs) noexcept
+{
+    this->iosvc_ptr = rhs.iosvc_ptr;
+    this->socket = std::move(rhs.socket);
+    this->on_destroy = std::move(rhs.on_destroy);
+    return *this;
+}
+
 void tcp_stream::swap(tcp_stream & other) noexcept
 {
     std::swap(iosvc_ptr, other.iosvc_ptr);
     std::swap(socket, other.socket);
+    std::swap(on_destroy, other.on_destroy);
 }
 
 void tcp_stream::connect(const char* ip, port_t port)
 {
+    if (socket.is_open())
+    {
+        this->disconnect();
+    }
     ::boost::system::error_code err;
     tcp_endpoint ep{ string_to_ipaddr(ip), port };
-    socket.connect(ep, err);
+    this->socket.connect(ep, err);
     if (err)
     {
-        throw connection_failed_exception{};
+        throw connection_failed_exception{ err.message().c_str() };
     }
+    this->endpoint.set_value(ip, port);
 }
 
-void tcp_stream::disconnect()
+void tcp_stream::connect(const ip_endpoint& endpoint)
 {
-    if (!socket.is_open())
-        throw connection_already_disconnected{};
+    this->connect(endpoint.ip, endpoint.port);
+}
+
+void tcp_stream::disconnect() noexcept
+{
+    //if (!socket.is_open())
+    //    throw connection_already_disconnected{};
+    this->endpoint.clear();
     socket.close();
 }
 
 void tcp_stream::async_connect(const char* ip, port_t port, async_connect_callback callback) noexcept
 {
+    if (socket.is_open())
+    {
+        this->disconnect();
+    }
     std::string _ip_str{ ip };
-    auto on_connect = [callback, port, ip_str = std::move(_ip_str)](const ::boost::system::error_code& error)
+    auto on_connect = [this, callback, port, ip_str = std::move(_ip_str)](const ::boost::system::error_code& error)
     {
         async_connect_result result;
-        result.ip = std::move(ip_str);
-        result.port = port;
+        result.endpoint.set_value(ip_str.c_str(), port);
         result.callback = std::move(callback);
         char buffer[256] = { 0, };
         _itoa_s(port, buffer, 10);
         if (error)
         {
             result.is_success = false;
-            result.message = result.ip + ":" + buffer + " connection failed, detail:" + error.message();
+            result.message = std::string{ result.endpoint.ip } + ":" + buffer + " connection failed, detail:" + error.message();
+            //this->endpoint.clear();
         }
         else
         {
             result.is_success = true;
-            result.message = result.ip + ":" + buffer + " connection established";
+            result.message = std::string{ result.endpoint.ip } +":" + buffer + " connection established";
+            this->endpoint = result.endpoint;
         }
         //callback->do_call(result);
         callback(result);
@@ -99,6 +123,16 @@ void tcp_stream::async_connect(const char* ip, port_t port, async_connect_delega
         callback->do_call(result);
     };
     this->async_connect(ip, port, binder);
+}
+
+void tcp_stream::async_connect(const ip_endpoint& endpoint, async_connect_callback callback) noexcept
+{
+    this->async_connect(endpoint.ip, endpoint.port, std::move(callback));
+}
+
+void tcp_stream::async_connect(const ip_endpoint& endpoint, async_connect_delegate::shared_ptr callback) noexcept
+{
+    this->async_connect(endpoint.ip, endpoint.port, std::move(callback));
 }
 
 socketfd_t tcp_stream::native() noexcept
@@ -285,6 +319,11 @@ void tcp_stream::async_write_some(io::buffer buffer, size_t bytes_requested, asy
         callback->do_call(result);
     };
     this->async_write_some(buffer, bytes_requested, binder);
+}
+
+ip_endpoint tcp_stream::get_endpoint() noexcept
+{
+    return ip_endpoint{ endpoint };
 }
 
 io_service& tcp_stream::get_io_service() noexcept
