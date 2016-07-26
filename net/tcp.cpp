@@ -4,7 +4,9 @@
 namespace vee {
     
 namespace net {
-    
+
+namespace ip {
+
 namespace tcp {
 
 namespace /* unnamed */ {
@@ -19,29 +21,29 @@ tcp_stream::~tcp_stream() noexcept
     on_destroy.do_call();
 }
 
-tcp_stream::tcp_stream(tcp_stream&& other):
-    iosvc_ptr { other.iosvc_ptr },
-    socket { ::std::move(other.socket) }
+tcp_stream::tcp_stream(tcp_stream&& other) :
+    iosvc_ptr{ other.iosvc_ptr },
+    socket{ std::move(other.socket) }
 {
 }
 
 
-tcp_stream::tcp_stream(io_service& iosvc):
-    iosvc_ptr { &iosvc },
-    socket { iosvc.kernel->to_boost() }
+tcp_stream::tcp_stream(io_service& iosvc) :
+    iosvc_ptr{ &iosvc },
+    socket{ iosvc.kernel->to_boost() }
 {
 }
 
-tcp_stream::tcp_stream(io_service& iosvc, tcp_socket&& __socket):
-    iosvc_ptr { &iosvc },
-    socket { ::std::move(__socket)}
+tcp_stream::tcp_stream(io_service& iosvc, tcp_socket&& __socket) :
+    iosvc_ptr{ &iosvc },
+    socket{ std::move(__socket) }
 {
 }
 
 void tcp_stream::swap(tcp_stream & other) noexcept
 {
-    ::std::swap(iosvc_ptr, other.iosvc_ptr);
-    ::std::swap(socket, other.socket);
+    std::swap(iosvc_ptr, other.iosvc_ptr);
+    std::swap(socket, other.socket);
 }
 
 void tcp_stream::connect(const char* ip, port_t port)
@@ -64,29 +66,29 @@ void tcp_stream::disconnect()
 
 void tcp_stream::async_connect(const char* ip, port_t port, async_connect_callback callback) noexcept
 {
-    ::std::string _ip_str{ ip };
-    auto on_connect = [callback, port, ip_str = ::std::move(_ip_str)](const ::boost::system::error_code& error)
+    std::string _ip_str{ ip };
+    auto on_connect = [callback, port, ip_str = std::move(_ip_str)](const ::boost::system::error_code& error)
     {
         async_connect_result result;
-        result.ip = ::std::move(ip_str);
+        result.ip = std::move(ip_str);
         result.port = port;
-        result.callback = ::std::move(callback);
+        result.callback = std::move(callback);
         char buffer[256] = { 0, };
         _itoa_s(port, buffer, 10);
-         if (error)
-         {
-             result.is_success = false;
-             result.message = result.ip + ":" + buffer + " connection failed, detail:" + error.message();
-         }
-         else
-         {
-             result.is_success = true;
-             result.message = result.ip + ":" + buffer + " connection established";
-         }
-         //callback->do_call(result);
-         callback(result);
+        if (error)
+        {
+            result.is_success = false;
+            result.message = result.ip + ":" + buffer + " connection failed, detail:" + error.message();
+        }
+        else
+        {
+            result.is_success = true;
+            result.message = result.ip + ":" + buffer + " connection established";
+        }
+        //callback->do_call(result);
+        callback(result);
     };
-    tcp_endpoint ep{string_to_ipaddr(ip), port};
+    tcp_endpoint ep{ string_to_ipaddr(ip), port };
     socket.async_connect(ep, on_connect);
 }
 
@@ -218,7 +220,7 @@ void tcp_stream::async_read_explicit(io::buffer buffer, size_t bytes_requested, 
         result.buffer.capacity -= result.bytes_transferred;
         tcp_stream::async_read_some(result.buffer, bytes_requested - total_transferred, result.callback);
     };
-    //tcp_stream::async_read_some(buffer, bytes_requested, ::std::make_shared<async_io_delegate>(0, iteration));
+    //tcp_stream::async_read_some(buffer, bytes_requested, std::make_shared<async_io_delegate>(0, iteration));
     tcp_stream::async_read_some(buffer, bytes_requested, callback);
 }
 
@@ -290,19 +292,19 @@ io_service& tcp_stream::get_io_service() noexcept
     return *iosvc_ptr;
 }
 
-tcp_server::tcp_server(io_service& iosvc, port_t port):
+tcp_server::tcp_server(io_service& iosvc, port_t port) :
     iosvc_ptr{ &iosvc },
     socket{ iosvc.kernel->to_boost() },
     endpoint{ boost::asio::ip::tcp::v4(), port },
-    acceptor { iosvc.kernel->to_boost(), endpoint }
+    acceptor{ iosvc.kernel->to_boost(), endpoint }
 {
 }
 
-tcp_server::tcp_server(tcp_server&& other):
-    iosvc_ptr { other.iosvc_ptr },
-    socket { ::std::move(other.socket)},
-    endpoint { ::std::move(other.endpoint)},
-    acceptor { ::std::move(other.acceptor)}
+tcp_server::tcp_server(tcp_server&& other) :
+    iosvc_ptr{ other.iosvc_ptr },
+    socket{ std::move(other.socket) },
+    endpoint{ std::move(other.endpoint) },
+    acceptor{ std::move(other.acceptor) }
 {
 }
 
@@ -323,29 +325,29 @@ void tcp_server::close() noexcept
     }
 }
 
-session_handle tcp_server::accept()
+connectable_stream_handle tcp_server::accept()
 {
     ::boost::asio::ip::tcp::socket client(iosvc_ptr->kernel->to_boost());
     try
     {
         acceptor.accept(client);
     }
-    catch (::std::exception&)
+    catch (std::exception&)
     {
         throw accept_failed_exception();
     }
-    session_handle session = ::std::make_shared<tcp_stream>(*iosvc_ptr, std::move(client));
+    connectable_stream_handle session = std::make_shared<tcp_stream>(*iosvc_ptr, std::move(client));
     return session;
 }
 
 void tcp_server::async_accept(async_accept_callback callback)
 {
-    ::std::shared_ptr<::boost::asio::ip::tcp::socket> clntsock_ptr = std::make_shared<::boost::asio::ip::tcp::socket>(iosvc_ptr->kernel->to_boost());
+    std::shared_ptr<::boost::asio::ip::tcp::socket> clntsock_ptr = std::make_shared<::boost::asio::ip::tcp::socket>(iosvc_ptr->kernel->to_boost());
     auto on_accept = [this, clntsock_ptr, callback](const ::boost::system::error_code& error)
     {
         async_accept_result result;
         result.server_ptr = this;
-        result.callback = ::std::move(callback);
+        result.callback = std::move(callback);
         if (error)
         {
             result.is_success = false;
@@ -355,7 +357,7 @@ void tcp_server::async_accept(async_accept_callback callback)
         {
             result.is_success = true;
             result.message += error.message();
-            result.session = ::std::make_shared<tcp_stream>(*iosvc_ptr, ::std::move(*clntsock_ptr));
+            result.session = std::make_shared<tcp_stream>(*iosvc_ptr, std::move(*clntsock_ptr));
         }
         //callback->do_call(result);
         callback(result);
@@ -377,19 +379,21 @@ io_service& tcp_server::get_io_service() noexcept
     return *iosvc_ptr;
 }
 
-session_handle create_session(io_service& iosvc) noexcept
+connectable_stream_handle create_session(io_service& iosvc) noexcept
 {
-    session_handle session = ::std::make_shared<tcp_stream>(iosvc);
+    connectable_stream_handle session = std::make_shared<tcp_stream>(iosvc);
     return session;
 }
 
 server::shared_ptr create_server(io_service& iosvc, port_t port) noexcept
 {
-    server::shared_ptr server = ::std::make_shared<tcp_server>(iosvc, port);
+    server::shared_ptr server = std::make_shared<tcp_server>(iosvc, port);
     return server;
 }
 
 } // !namespace tcp
+
+} // !namespace ip
 
 } // !namespace net
 

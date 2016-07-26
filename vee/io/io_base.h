@@ -55,7 +55,7 @@ using async_io_callback = std::function<void(async_io_result&)>;
 template <class Result, class ...FwdArgs>
 inline Result async_delegate_callbck(FwdArgs&& ...args)
 {
-    return ::std::make_shared< ::std::pointer_traits<Result>::element_type >(::std::forward<FwdArgs>(args)...);
+    return std::make_shared< std::pointer_traits<Result>::element_type >(std::forward<FwdArgs>(args)...);
 }
 
 struct async_result

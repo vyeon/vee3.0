@@ -12,7 +12,7 @@ int main()
         try
         {
             // Create a tcp-client object [Factory method pattern]
-            auto client = tcp::create_session(iosvc);
+            auto client = ip::tcp::create_session(iosvc);
             printf("---------------------------\n");
             printf("sys> test client initalized\n");
 
@@ -21,7 +21,7 @@ int main()
             gets_s(ip_buffer);
 
             if (strlen(ip_buffer) <= 0)
-                throw ::vee::exception{ "invalid IP address" };
+                throw vee::exception{ "invalid IP address" };
             
             char port_buffer[16] = { 0, };
             printf("\tport> ");
@@ -56,7 +56,7 @@ int main()
             }
             
         }
-        catch (::vee::exception& e)
+        catch (vee::exception& e)
         {
             printf("err> %s\n", e.to_string());
         }

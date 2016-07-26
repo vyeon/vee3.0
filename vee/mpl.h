@@ -46,7 +46,7 @@ struct type_to_type
     using real_type = T;
     template <class Arg>
     explicit type_to_type(Arg&& arg):
-        value(::std::forward<Arg>(arg))
+        value(std::forward<Arg>(arg))
     {
     }
     T value;

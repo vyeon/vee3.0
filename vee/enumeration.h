@@ -15,13 +15,13 @@ public:\
     } value_t;\
     inline static const char* to_string(__ENUM_TYPE__::value_t value)\
     {\
-        auto gen = []() -> ::std::map<int, ::std::string>*\
+        auto gen = []() -> std::map<int, std::string>*\
         {\
-            ::std::string raw(#__ENUMERATION_START__);\
+            std::string raw(#__ENUMERATION_START__);\
             raw.append(", ");\
             raw.append(#__VA_ARGS__);\
-            ::std::vector<::std::string> strings = ::vee::strutils::split(raw, ",");\
-            ::std::map<int, ::std::string>* result = new ::std::map<int, ::std::string>();\
+            std::vector<std::string> strings = ::vee::strutils::split(raw, ",");\
+            std::map<int, std::string>* result = new std::map<int, std::string>();\
             int key = Offset;\
             for (unsigned int i = 0; i < strings.size(); ++i)\
             {\
@@ -31,7 +31,7 @@ public:\
         };\
         try\
         {\
-            static ::std::map<int, ::std::string>* map = gen();\
+            static std::map<int, std::string>* map = gen();\
             return map->operator[](static_cast<int>(value)).c_str();\
         }\
         catch(...)\

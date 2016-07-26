@@ -22,7 +22,7 @@ public:
 	{
 		
 	}
-	inline static ::std::mutex::native_handle_type native_handle()
+	inline static std::mutex::native_handle_type native_handle()
 	{
 		return nullptr;
 	}
@@ -52,7 +52,7 @@ public:
 		_lock.clear(order);
 	}
 protected:
-	::std::atomic_flag _lock;
+	std::atomic_flag _lock;
 };
 
 } // !namespace lock	

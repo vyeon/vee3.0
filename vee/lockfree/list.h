@@ -20,9 +20,9 @@ public:
     class node
     {
     public:
-        using shared_ptr = ::std::shared_ptr<node>;
-        ::std::atomic<node*> next;
-        ::std::atomic<node*> prev;
+        using shared_ptr = std::shared_ptr<node>;
+        std::atomic<node*> next;
+        std::atomic<node*> prev;
         data_t value;
     };
     using node_ptr = typename node::shared_ptr;

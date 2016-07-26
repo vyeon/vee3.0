@@ -11,27 +11,29 @@
 namespace vee {
     
 namespace net {
-    
+
+namespace ip {
+
 namespace tcp {
 
 class tcp_stream;
 class tcp_server;
 
-class tcp_stream: virtual public net_stream, noncopyable
+class tcp_stream : virtual public connectable_stream, noncopyable
 {
-/* Public member types */
+    /* Public member types */
 public:
     using this_t = tcp_stream;
     using ref_t = this_t&;
     using rref_t = this_t&&;
-    using shared_ptr = ::std::shared_ptr<this_t>;
-    using unique_ptr = ::std::unique_ptr<this_t>;
-/* Protected member types */
+    using shared_ptr = std::shared_ptr<this_t>;
+    using unique_ptr = std::unique_ptr<this_t>;
+    /* Protected member types */
 private:
     using tcp_socket = ::boost::asio::ip::tcp::socket;
     using tcp_endpoint = ::boost::asio::ip::tcp::endpoint;
 
-/* Public member functions */
+    /* Public member functions */
 public:
     virtual ~tcp_stream() noexcept;
     tcp_stream(tcp_stream&& other);
@@ -56,14 +58,14 @@ public:
     virtual void async_write_some(io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback) noexcept override;
     virtual io_service& get_io_service() noexcept override;
 
-/* Private member functions */
+    /* Private member functions */
 private:
 
-/* Protected member variables */
+    /* Protected member variables */
 protected:
     io_service* iosvc_ptr;
     tcp_socket socket;
-/* Disallowed member functions */
+    /* Disallowed member functions */
 private:
     // DISALLOW COPY OPERATIONS
     tcp_stream() = delete;
@@ -71,16 +73,16 @@ private:
     void operator=(const tcp_stream&) = delete;
 };
 
-class tcp_server: virtual public server, noncopyable
+class tcp_server : virtual public server, noncopyable
 {
-/* Public member types */
+    /* Public member types */
 public:
     using this_t = tcp_server;
     using ref_t = this_t&;
     using rref_t = this_t&&;
-    using shared_ptr = ::std::shared_ptr<this_t>;
-    using unique_ptr = ::std::unique_ptr<this_t>;
-/* Protected member types */
+    using shared_ptr = std::shared_ptr<this_t>;
+    using unique_ptr = std::unique_ptr<this_t>;
+    /* Protected member types */
 public:
     using tcp_socket = ::boost::asio::ip::tcp::socket;
     using tcp_endpoint = ::boost::asio::ip::tcp::endpoint;
@@ -88,20 +90,20 @@ public:
     tcp_server(tcp_server&& other);
     virtual ~tcp_server() noexcept;
     virtual void close() noexcept override;
-    virtual session_handle accept() override;
-    //virtual ::std::pair<bool, session_handle> accept() override;
+    virtual connectable_stream_handle accept() override;
+    //virtual std::pair<bool, session_handle> accept() override;
     virtual void async_accept(async_accept_callback callback) override;
     virtual void async_accept(async_accept_delegate::shared_ptr callback) override;
     virtual io_service& get_io_service() noexcept override;
-    
-/* Protected member variables */
+
+    /* Protected member variables */
 protected:
     io_service*  iosvc_ptr;
     tcp_socket   socket;
     tcp_endpoint endpoint;
     ::boost::asio::ip::tcp::acceptor acceptor;
 
-/* Disallowed member functions */
+    /* Disallowed member functions */
 private:
     // DISALLOW COPY OPERATIONS
     tcp_server() = delete;
@@ -110,6 +112,8 @@ private:
 };
 
 } // !namespace tcp
+
+} // !namespace ip
 
 } // !namespace net
 

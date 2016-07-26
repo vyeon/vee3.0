@@ -47,9 +47,9 @@ public:
 	bool enqueue(DataRef&& val)
 	{
 		size_t rear;
-		::std::unique_lock<blocklock_t> block_locker;
+		std::unique_lock<blocklock_t> block_locker;
 		{
-			::std::lock_guard<idxlock_t> idx_locker{ _idxlck };
+			std::lock_guard<idxlock_t> idx_locker{ _idxlck };
 			rear = _rear;
 			if(is_full())
 			{
@@ -63,31 +63,31 @@ public:
 				++_rear %= capacity;
 				++_size;
 			}
-			::std::unique_lock<blocklock_t> temp{_blocklcks[rear], std::adopt_lock};
-			::std::swap(block_locker, temp);
+			std::unique_lock<blocklock_t> temp{_blocklcks[rear], std::adopt_lock};
+			std::swap(block_locker, temp);
 		}
-		_blocks[rear] = ::std::forward<DataRef>(val);
+		_blocks[rear] = std::forward<DataRef>(val);
 		return true;
 	}
 	bool dequeue(data_t& out)
 	{
 		size_t front;
-		::std::unique_lock<blocklock_t> block_locker;
+		std::unique_lock<blocklock_t> block_locker;
 		{
-			::std::lock_guard<idxlock_t> idx_locker{ _idxlck };
+			std::lock_guard<idxlock_t> idx_locker{ _idxlck };
 			if (!_size)
 				return false;
 			--_size;
 			front = _front;
 			++_front %= capacity;
 
-			::std::unique_lock<blocklock_t> temp{ _blocklcks[front], std::adopt_lock };
-			::std::swap(block_locker, temp);
+			std::unique_lock<blocklock_t> temp{ _blocklcks[front], std::adopt_lock };
+			std::swap(block_locker, temp);
 		}
-		using request_t = ::std::conditional_t<
-			::std::is_trivially_move_assignable<data_t>::value,
-			::std::add_rvalue_reference_t<data_t>,
-			::std::add_lvalue_reference_t<data_t> >;
+		using request_t = std::conditional_t<
+			std::is_trivially_move_assignable<data_t>::value,
+			std::add_rvalue_reference_t<data_t>,
+			std::add_lvalue_reference_t<data_t> >;
 		out = static_cast<request_t>(_blocks[front]);
 		return true;
 	}

@@ -14,11 +14,11 @@ class io_service: noncopyable
 public:
     io_service();
     ~io_service();
-    ::std::size_t run();
-    ::std::size_t run_one();
+    std::size_t run();
+    std::size_t run_one();
     void stop();
     bool stopped() const;
-    ::std::unique_ptr<io_service_kernel> kernel;
+    std::unique_ptr<io_service_kernel> kernel;
 };
 
 } // !namespace vee

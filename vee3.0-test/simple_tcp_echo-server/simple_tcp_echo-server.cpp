@@ -1,13 +1,12 @@
 #include <vee/net.h>
 #include <vee/console.h>
 using namespace vee;
-using namespace net;
 
 int main()
 {
     io_service iosvc;
     // Create a tcp-server object [Factory method pattern]
-    auto server = tcp::create_server(iosvc, static_cast<port_t>(5000));
+    auto server = net::ip::tcp::create_server(iosvc, static_cast<net::ip::port_t>(5000));
     while (true)
     {
         try

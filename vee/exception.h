@@ -8,12 +8,12 @@
 
 namespace vee {
 
-class exception: public ::std::exception
+class exception: public std::exception
 {
 public:
     static const int desc_buffer_size = 256;
-    ::std::array<char, desc_buffer_size> desc;
-	using base_t = ::std::exception;
+    std::array<char, desc_buffer_size> desc;
+	using base_t = std::exception;
 	exception();
 	exception(const exception&) = default;
 	explicit exception(char const* const);

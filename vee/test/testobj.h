@@ -9,7 +9,7 @@ namespace test {
 
 class testobj
 {
-    static ::std::atomic<int> _counter;
+    static std::atomic<int> _counter;
 public:
     testobj();
     explicit testobj(int i);

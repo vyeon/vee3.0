@@ -31,7 +31,7 @@ public:
 			if (_cont_queue.enqueue(i))
 				++i;
 			else
-				throw ::std::runtime_error("stack initialization failed!");
+				throw std::runtime_error("stack initialization failed!");
 		}
 	}
 	~stack()
@@ -44,11 +44,11 @@ public:
 	template <typename DataRef>
 	bool push(DataRef&& data)
 	{
-		::std::atomic_thread_fence(std::memory_order_release);
+		std::atomic_thread_fence(std::memory_order_release);
 		size_t block_id = 0;
 		if (_cont_queue.dequeue(block_id))
 		{
-			_cont[block_id] = ::std::forward<DataRef>(data);
+			_cont[block_id] = std::forward<DataRef>(data);
 			size_t outidx = _top.fetch_add(1);
 			while (_outarr[outidx] != nullptr)
 			{
@@ -73,12 +73,12 @@ public:
 				return false; // stack is empty
 			if (_outarr[dst] != nullptr)
 			{
-				if (::std::atomic_compare_exchange_strong(&_top, &top, dst))
+				if (std::atomic_compare_exchange_strong(&_top, &top, dst))
 				{
-					using request_t = ::std::conditional_t<
-						::std::is_move_assignable<data_t>::value,
-						::std::add_rvalue_reference_t<data_t>,
-						::std::add_lvalue_reference_t<data_t> >;
+					using request_t = std::conditional_t<
+						std::is_move_assignable<data_t>::value,
+						std::add_rvalue_reference_t<data_t>,
+						std::add_lvalue_reference_t<data_t> >;
 					out = static_cast<request_t>(_cont[dst]);
 					_outarr[dst] = nullptr;
                     while (!_cont_queue.enqueue(dst))
@@ -96,7 +96,7 @@ private:
 	data_t* _cont = nullptr;
 	data_t** _outarr = nullptr;
 	atqueue<size_t> _cont_queue;
-	::std::atomic<size_t> _top;
+	std::atomic<size_t> _top;
 };
 
 } // !namespace lockfree

@@ -68,8 +68,8 @@ public:
     using this_t = stream_base;
     using ref_t = this_t&;
     using rref_t = this_t&&;
-    using shared_ptr = ::std::shared_ptr<this_t>;
-    using unique_ptr = ::std::unique_ptr<this_t>;
+    using shared_ptr = std::shared_ptr<this_t>;
+    using unique_ptr = std::unique_ptr<this_t>;
     virtual ~stream_base() = default;
     virtual io_service& get_io_service() noexcept = 0;
 };
@@ -80,8 +80,8 @@ public:
     using this_t = sync_stream;
     using ref_t = this_t&;
     using rref_t = this_t&&;
-    using shared_ptr = ::std::shared_ptr<this_t>;
-    using unique_ptr = ::std::unique_ptr<this_t>;
+    using shared_ptr = std::shared_ptr<this_t>;
+    using unique_ptr = std::unique_ptr<this_t>;
     virtual ~sync_stream() = default;
     virtual size_t write_some(io::buffer buffer, const size_t bytes_requested) = 0;
     virtual size_t read_explicit(io::buffer buffer, const size_t bytes_requested) = 0;
@@ -94,8 +94,8 @@ public:
     using this_t = async_stream;
     using ref_t = this_t&;
     using rref_t = this_t&&;
-    using shared_ptr = ::std::shared_ptr<this_t>;
-    using unique_ptr = ::std::unique_ptr<this_t>;
+    using shared_ptr = std::shared_ptr<this_t>;
+    using unique_ptr = std::unique_ptr<this_t>;
     virtual ~async_stream() = default;
     // I/O member functions of std::function type callback
     virtual void async_read_some(io::buffer buffer, size_t bytes_requested, async_io_callback callback) noexcept = 0;
@@ -113,8 +113,8 @@ public:
     using this_t = io_stream;
     using ref_t = this_t&;
     using rref_t = this_t&&;
-    using shared_ptr = ::std::shared_ptr<this_t>;
-    using unique_ptr = ::std::unique_ptr<this_t>;
+    using shared_ptr = std::shared_ptr<this_t>;
+    using unique_ptr = std::unique_ptr<this_t>;
     virtual ~io_stream() = default;
 };
 

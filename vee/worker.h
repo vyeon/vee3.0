@@ -37,9 +37,9 @@ public:
     using ref_t = this_t&;
     using rref_t = this_t&&;
     using delegate_t = delegate<RTy(Args...)>;
-    using argstup_t = ::std::tuple< ::std::remove_reference_t<Args>... >;
-    using shared_ptr = ::std::shared_ptr<this_t>;
-    using unique_ptr = ::std::unique_ptr<this_t>;
+    using argstup_t = std::tuple< std::remove_reference_t<Args>... >;
+    using shared_ptr = std::shared_ptr<this_t>;
+    using unique_ptr = std::unique_ptr<this_t>;
     packaged_task() = default;
     packaged_task(ref_t other):
         task{ other.task },
@@ -49,31 +49,31 @@ public:
         
     }
     packaged_task(rref_t other):
-        task{ ::std::move(other.task) },
-        args{ ::std::move(other.args) },
-        is_valid{ ::std::move(other.is_valid) }
+        task{ std::move(other.task) },
+        args{ std::move(other.args) },
+        is_valid{ std::move(other.is_valid) }
     {
         
     }
     template <class Delegate, class ...Arguments>
     explicit packaged_task(Delegate&& e, Arguments&& ...args):
-        task{ ::std::forward<Delegate>(e) },
-        args{ ::std::make_tuple(::std::forward<Arguments>(args)...) },
+        task{ std::forward<Delegate>(e) },
+        args{ std::make_tuple(std::forward<Arguments>(args)...) },
         is_valid { true }
     {
 
     }
     template <class Delegate>
     explicit packaged_task(Delegate&& e, argstup_t&& tup):
-        task{ ::std::forward<Delegate>(e) },
-        args{ ::std::move(tup) },
+        task{ std::forward<Delegate>(e) },
+        args{ std::move(tup) },
         is_valid { true }
     {
 
     }
     template <class Delegate>
     explicit packaged_task(Delegate&& e, argstup_t& tup):
-        task{ ::std::forward<Delegate>(e) },
+        task{ std::forward<Delegate>(e) },
         args{ tup },
         is_valid { true }
     {
@@ -92,8 +92,8 @@ public:
     }
     ref_t operator=(rref_t rhs)
     {
-        task = ::std::move(rhs.task);
-        args = ::std::move(rhs.args);
+        task = std::move(rhs.task);
+        args = std::move(rhs.args);
         is_valid = rhs.is_valid;
         return *this;
     }
@@ -119,7 +119,7 @@ public:
     using ref_t = this_t&;
     using rref_t = this_t&&;
     using delegate_t = delegate<RTy(Args...)>;
-    using argstup_t = ::std::tuple<Args...>;
+    using argstup_t = std::tuple<Args...>;
     using task_t = packaged_task<RTy(Args...)>;
     using job_t = typename task_t::shared_ptr;
 
@@ -161,7 +161,7 @@ public:
     template <class Job>
     size_t request(Job&& job)
     {
-        size_t result = nothrow_request(::std::forward<Job>(job));
+        size_t result = nothrow_request(std::forward<Job>(job));
         if (!result)
             throw worker_is_busy{};
         return result;
@@ -169,7 +169,7 @@ public:
     template <class Job>
     size_t nothrow_request(Job&& job)
     {
-        bool result = _job_queue.enqueue(::std::forward<Job>(job));
+        bool result = _job_queue.enqueue(std::forward<Job>(job));
         if (!result)
             return 0; // request failed, job queue is full
         size_t remained_old = _remained.fetch_add(1);
@@ -186,16 +186,16 @@ public:
     bool start()
     {
         state_t cmp{ state_t::standby };
-        bool result = ::std::atomic_compare_exchange_strong(&_state, &cmp, state_t::running);
+        bool result = std::atomic_compare_exchange_strong(&_state, &cmp, state_t::running);
         if (result == false)
             return false; // worker is already in the running state
-        _thr = ::std::thread{ &this_t::_worker_main, this };
+        _thr = std::thread{ &this_t::_worker_main, this };
         return true;
     }
     bool shutdown(bool sync)
     {
         state_t cmp{ state_t::running };
-        bool result = ::std::atomic_compare_exchange_strong(&_state, &cmp, state_t::shutdown);
+        bool result = std::atomic_compare_exchange_strong(&_state, &cmp, state_t::shutdown);
         if (result == false)
             return false; // worker isn't in the running state
 
@@ -203,7 +203,7 @@ public:
         {
             // generate a dummy job for wakeup the worker
             request(
-                ::std::make_shared<task_t>()
+                std::make_shared<task_t>()
             );
         }
 
@@ -230,7 +230,7 @@ private:
         {
             if (remained == 0)
             {
-                auto promise = new ::std::make_shared<::std::promise<void>>();
+                auto promise = new std::make_shared<std::promise<void>>();
                 //auto promise = new std::promise<void>();
                 this->_promise = promise;
                 auto future = promise->get_future();
@@ -244,9 +244,9 @@ private:
             remained = _remained.fetch_sub(1) - 1;
         }
         state_t cmp{ state_t::shutdown };
-        bool result = ::std::atomic_compare_exchange_strong(&_state, &cmp, state_t::standby);
+        bool result = std::atomic_compare_exchange_strong(&_state, &cmp, state_t::standby);
         if (result == false)
-            throw ::std::runtime_error("unexpected worker state is detected while shutdown process");
+            throw std::runtime_error("unexpected worker state is detected while shutdown process");
         puts("worker main exit");
     }
 
@@ -266,11 +266,11 @@ public:
     events_wrapper events;
 
 private:
-    ::std::atomic<size_t>  _remained;
-    ::std::atomic<state_t> _state;
-    ::std::shared_ptr<::std::promise<void>> _promise;
+    std::atomic<size_t>  _remained;
+    std::atomic<state_t> _state;
+    std::shared_ptr<std::promise<void>> _promise;
     lockfree::queue<job_t> _job_queue;
-    ::std::thread _thr;
+    std::thread _thr;
 
 private:
     // DISALLOW DEFAULT CONSTRUCTOR AND COPY AND MOVE OPERATIONS
@@ -287,14 +287,14 @@ class nonscalable_worker_group;
 template <class RTy, class ...Args>
 class nonscalable_worker_group<RTy(Args ...)>
 {
-    using worker_handle = ::std::shared_ptr<worker<RTy(Args ...)>>;
+    using worker_handle = std::shared_ptr<worker<RTy(Args ...)>>;
 public:
     using worker_t = worker<RTy(Args ...)>;
     using this_t = nonscalable_worker_group<RTy(Args...)>;
     using ref_t = this_t&;
     using rref_t = this_t&&;
     using delegate_t = delegate<RTy(Args...)>;
-    using argstup_t = ::std::tuple<Args...>;
+    using argstup_t = std::tuple<Args...>;
     using job_t = packaged_task<RTy(Args...)>;
     using index_t = size_t;
 
@@ -308,12 +308,12 @@ public:
         /*_stackables.reserve(__number_of_workers);*/
         for (size_t i = 0; i < __number_of_workers; ++i)
         {
-            _workers.push_back( ::std::make_shared<worker_t>(__job_queue_size, false)/*autorun*/ );
-            /*_stackables.push_back( ::std::make_shared<::std::atomic_flag>() );*/
+            _workers.push_back( std::make_shared<worker_t>(__job_queue_size, false)/*autorun*/ );
+            /*_stackables.push_back( std::make_shared<std::atomic_flag>() );*/
 
-            _workers[i]->events.sleep += ::std::make_pair(i, ::std::bind(&this_t::on_worker_sleep, this, i));
-            _workers[i]->events.job_requested += ::std::make_pair(i, ::std::bind(&this_t::on_job_requested, this, i));
-            _workers[i]->events.job_processed += ::std::make_pair(i, ::std::bind(&this_t::on_job_processed, this, i));
+            _workers[i]->events.sleep += std::make_pair(i, std::bind(&this_t::on_worker_sleep, this, i));
+            _workers[i]->events.job_requested += std::make_pair(i, std::bind(&this_t::on_job_requested, this, i));
+            _workers[i]->events.job_processed += std::make_pair(i, std::bind(&this_t::on_job_processed, this, i));
             _workers[i]->start();
         }
     }
@@ -331,7 +331,7 @@ public:
         //if (!_stackables[id]->test_and_set())
         //{
         //    if (!_stack.push(id))
-        //        throw ::std::runtime_error("stack::push failed in the worker group!");
+        //        throw std::runtime_error("stack::push failed in the worker group!");
         //    else
         //        puts("success to store worker to group stack"); // logs for debug
         //}
@@ -352,7 +352,7 @@ public:
     template <class JobRef>
     bool request(JobRef&& job)
     {
-        bool result = nothrow_request(::std::forward<JobRef>(job));
+        bool result = nothrow_request(std::forward<JobRef>(job));
         if (!result)
             throw worker_is_busy{};
         return true;
@@ -365,7 +365,7 @@ public:
         if (_stack.pop(id))
         {
             _stackables[id]->clear();
-            return _workers[id]->request(::std::forward<JobRef>(job));
+            return _workers[id]->request(std::forward<JobRef>(job));
         }*/
         // Add the schedule algorithms -> current: temporary linear search algorithm
         long double average = static_cast<long double>(_job_counter.load() / number_of_workers);
@@ -373,7 +373,7 @@ public:
         {
             if (_workers[id]->guess_remined_jobs() <= average)
             {
-                size_t result = _workers[id]->nothrow_request(::std::forward<JobRef>(job));
+                size_t result = _workers[id]->nothrow_request(std::forward<JobRef>(job));
                 if (result)
                     return true;
             }
@@ -385,10 +385,10 @@ public:
     const size_t total_job_queue_capacity;
     const size_t number_of_workers;
 private:
-    ::std::vector<worker_handle> _workers;
+    std::vector<worker_handle> _workers;
     /*lockfree::stack<index_t> _stack;
-    ::std::vector< ::std::shared_ptr< ::std::atomic_flag > > _stackables;*/
-    ::std::atomic<size_t> _job_counter;
+    std::vector< std::shared_ptr< std::atomic_flag > > _stackables;*/
+    std::atomic<size_t> _job_counter;
 
     // DISALLOW DEFAULT CONSTRUCTOR AND COPY & MOVE OPERATIONS
     nonscalable_worker_group() = delete;

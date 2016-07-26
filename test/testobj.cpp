@@ -5,7 +5,7 @@ namespace vee {
 
 namespace test {
 
-::std::atomic<int> testobj::_counter;
+std::atomic<int> testobj::_counter;
 
 testobj::testobj():
 value(0),

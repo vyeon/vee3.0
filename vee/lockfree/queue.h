@@ -41,14 +41,14 @@ public:
 
 		while (counter <= retries)
 		{
-			::std::atomic_thread_fence(std::memory_order_release);
+			std::atomic_thread_fence(std::memory_order_release);
 			size_t rear = _rear.load();
 			if (_ptrs[rear] == nullptr)
 			{
 				size_t next = (rear + 1) % capacity;
-				if (::std::atomic_compare_exchange_strong(&_rear, &rear, next))
+				if (std::atomic_compare_exchange_strong(&_rear, &rear, next))
 				{
-					_cont[rear] = ::std::forward<DataRef>(value);
+					_cont[rear] = std::forward<DataRef>(value);
 					_ptrs[rear] = &_cont[rear];
 					return true;
 				}
@@ -71,12 +71,12 @@ public:
 			if(_ptrs[front] != nullptr)
 			{
 				size_t next = (front + 1) % capacity;
-				if(::std::atomic_compare_exchange_strong(&_front, &front, next))
+				if(std::atomic_compare_exchange_strong(&_front, &front, next))
 				{
-					using request_t = ::std::conditional_t<
-						::std::is_move_assignable<data_t>::value,
-						::std::add_rvalue_reference_t<data_t>,
-						::std::add_lvalue_reference_t<data_t> >;
+					using request_t = std::conditional_t<
+						std::is_move_assignable<data_t>::value,
+						std::add_rvalue_reference_t<data_t>,
+						std::add_lvalue_reference_t<data_t> >;
 					out = static_cast<request_t>(_cont[front]);
 					_ptrs[front] = nullptr;
 					return true;
@@ -93,8 +93,8 @@ public:
 	
 	const size_t capacity;
 private:
-	::std::atomic<size_t> _front; // dequeue index
-	::std::atomic<size_t> _rear;  // enqueue index
+	std::atomic<size_t> _front; // dequeue index
+	std::atomic<size_t> _rear;  // enqueue index
 	data_t* _cont = nullptr;
 	data_t** _ptrs = nullptr;
 
@@ -124,7 +124,7 @@ public:
 			if (_cont_queue.enqueue(i))
 				++i;
 			else
-				throw ::std::runtime_error("queue initialization failed!");
+				throw std::runtime_error("queue initialization failed!");
 		}
 	}
 	~queue()
@@ -141,7 +141,7 @@ public:
 			size_t block_id = 0;
 			if (_cont_queue.dequeue(block_id))
 			{
-				_cont[block_id] = ::std::forward<DataRef>(data);
+				_cont[block_id] = std::forward<DataRef>(data);
 				while(!_out_queue.enqueue(block_id))
 				{
 					
@@ -161,10 +161,10 @@ public:
 		size_t block_id = 0;
 		if (!_out_queue.dequeue(block_id))
 			return false;
-		using request_t = ::std::conditional_t<
-			::std::is_move_assignable<data_t>::value,
-			::std::add_rvalue_reference_t<data_t>,
-			::std::add_lvalue_reference_t<data_t> >;
+		using request_t = std::conditional_t<
+			std::is_move_assignable<data_t>::value,
+			std::add_rvalue_reference_t<data_t>,
+			std::add_lvalue_reference_t<data_t> >;
 		out = static_cast<request_t>(_cont[block_id]);
 		while (!_cont_queue.enqueue(block_id))
 		{
