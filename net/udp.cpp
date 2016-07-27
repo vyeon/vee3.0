@@ -72,50 +72,48 @@ void udp_stream::set_endpoint(const ip_endpoint& __endpoint) noexcept
 
 size_t udp_stream::write_some(io::buffer buffer, const size_t bytes_requested)
 {
-    
+    boost::system::error_code error;
+    size_t bytes_transferred = 0;
+    while (bytes_transferred)
+    {
+        
+    }
+    return 0;
 }
 
 size_t udp_stream::read_explicit(io::buffer buffer, const size_t bytes_requested)
 {
+    return 0;
 }
 
 size_t udp_stream::read_some(io::buffer buffer, size_t maximum_read_bytes)
 {
+    return 0;
 }
 
-size_t udp_stream::write_some_to(ip_endpoint& endpoint, io::buffer buffer, const size_t bytes_requested)
+size_t udp_stream::read_from(io::buffer buffer, size_t maximum_read_bytes, ip_endpoint* endpoint_out)
+{
+    return 0;
+}
+
+size_t udp_stream::write_to(io::buffer buffer, const size_t bytes_requested, ip_endpoint& endpoint)
+{
+    return 0;
+}
+
+void udp_stream::async_read_from(io::buffer buffer, size_t bytes_requested, async_io_callback callback, ip_endpoint* endpoint_out) noexcept
 {
 }
 
-size_t udp_stream::read_explicit_to(ip_endpoint& endpoint, io::buffer buffer, const size_t bytes_requested)
+void udp_stream::async_write_to(io::buffer buffer, size_t bytes_requested, async_io_callback callback, ip_endpoint& endpoint) noexcept
 {
 }
 
-size_t udp_stream::read_some_to(ip_endpoint& endpoint, io::buffer buffer, size_t maximum_read_bytes)
+void udp_stream::async_read_from(io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback, ip_endpoint* endpoint_out) noexcept
 {
 }
 
-void udp_stream::async_read_some_to(ip_endpoint& endpoint, io::buffer buffer, size_t bytes_requested, async_io_callback callback) noexcept
-{
-}
-
-void udp_stream::async_read_explicit_to(ip_endpoint& endpoint, io::buffer buffer, size_t bytes_requested, async_io_callback callback) noexcept
-{
-}
-
-void udp_stream::async_write_some_to(ip_endpoint& endpoint, io::buffer buffer, size_t bytes_requested, async_io_callback callback) noexcept
-{
-}
-
-void udp_stream::async_read_some_to(ip_endpoint& endpoint, io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback) noexcept
-{
-}
-
-void udp_stream::async_read_explicit_to(ip_endpoint& endpoint, io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback) noexcept
-{
-}
-
-void udp_stream::async_write_some_to(ip_endpoint& endpoint, io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback) noexcept
+void udp_stream::async_write_to(io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback, ip_endpoint& endpoint) noexcept
 {
 }
 

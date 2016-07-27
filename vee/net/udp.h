@@ -42,20 +42,17 @@ public:
     virtual size_t write_some(io::buffer buffer, const size_t bytes_requested) override;
     virtual size_t read_explicit(io::buffer buffer, const size_t bytes_requested) override;
     virtual size_t read_some(io::buffer buffer, size_t maximum_read_bytes) override; 
-    virtual size_t write_some_to(ip_endpoint& endpoint, io::buffer buffer, const size_t bytes_requested) override;
-    virtual size_t read_explicit_to(ip_endpoint& endpoint, io::buffer buffer, const size_t bytes_requested) override;
-    virtual size_t read_some_to(ip_endpoint& endpoint, io::buffer buffer, size_t maximum_read_bytes) override;
+    virtual size_t read_from(io::buffer buffer, size_t maximum_read_bytes, ip_endpoint* endpoint_out) override;
+    virtual size_t write_to(io::buffer buffer, const size_t bytes_requested, ip_endpoint& endpoint) override;
     // Asynchronous I/O member functions of std::function type callback
-    virtual void async_read_some_to(ip_endpoint& endpoint, io::buffer buffer, size_t bytes_requested, async_io_callback callback) noexcept override;
-    virtual void async_read_explicit_to(ip_endpoint& endpoint, io::buffer buffer, size_t bytes_requested, async_io_callback callback) noexcept override;
-    virtual void async_write_some_to(ip_endpoint& endpoint, io::buffer buffer, size_t bytes_requested, async_io_callback callback) noexcept override;
+    virtual void async_read_from(io::buffer buffer, size_t bytes_requested, async_io_callback callback, ip_endpoint* endpoint_out) noexcept override;
+    virtual void async_write_to(io::buffer buffer, size_t bytes_requested, async_io_callback callback, ip_endpoint& endpoint) noexcept override;
     virtual void async_read_some(io::buffer buffer, size_t bytes_requested, async_io_callback callback) noexcept override;
     virtual void async_read_explicit(io::buffer buffer, size_t bytes_requested, async_io_callback callback) noexcept override;
     virtual void async_write_some(io::buffer buffer, size_t bytes_requested, async_io_callback callback) noexcept override;
     // Asynchronous I/O member functions of delegate
-    virtual void async_read_some_to(ip_endpoint& endpoint, io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback) noexcept override;
-    virtual void async_read_explicit_to(ip_endpoint& endpoint, io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback) noexcept override;
-    virtual void async_write_some_to(ip_endpoint& endpoint, io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback) noexcept override;
+    virtual void async_read_from(io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback, ip_endpoint* endpoint_out) noexcept override;
+    virtual void async_write_to(io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback, ip_endpoint& endpoint) noexcept override;
     virtual void async_read_some(io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback) noexcept override;
     virtual void async_read_explicit(io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback) noexcept override;
     virtual void async_write_some(io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback) noexcept override;

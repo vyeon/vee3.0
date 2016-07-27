@@ -89,13 +89,13 @@ struct ip_endpoint //! POD Type
     port_t port { 0 };
     ip_endpoint() = default;
     ~ip_endpoint() = default;
-    ip_endpoint(const ref_t other);
+    ip_endpoint(const ip_endpoint& other);
     ip_endpoint& operator=(const ip_endpoint& other);
     inline void ip_endpoint::set_value(const char* __ip, port_t __port);
     inline void ip_endpoint::clear();
 };
 
-struct async_connect_result : public async_result
+struct async_connect_result : virtual public async_result
 {
     using this_t = async_connect_result;
     using ref_t = this_t&;
@@ -152,17 +152,14 @@ public:
     virtual void set_endpoint(const ip_endpoint& endpoint) = 0;
 
     // Synchronous I/O member functions 
-    virtual size_t write_some_to(ip_endpoint& endpoint, io::buffer buffer, const size_t bytes_requested) = 0;
-    virtual size_t read_explicit_to(ip_endpoint& endpoint, io::buffer buffer, const size_t bytes_requested) = 0;
-    virtual size_t read_some_to(ip_endpoint& endpoint, io::buffer buffer, size_t maximum_read_bytes) = 0;
+    virtual size_t read_from(io::buffer buffer, size_t maximum_read_bytes, ip_endpoint* endpoint_out) = 0;
+    virtual size_t write_to(io::buffer buffer, const size_t bytes_requested, ip_endpoint& endpoint) = 0;
     // Asynchronous I/O member functions of std::function type callback
-    virtual void async_read_some_to(ip_endpoint& endpoint, io::buffer buffer, size_t bytes_requested, async_io_callback callback) noexcept = 0;
-    virtual void async_read_explicit_to(ip_endpoint& endpoint, io::buffer buffer, size_t bytes_requested, async_io_callback callback) noexcept = 0;
-    virtual void async_write_some_to(ip_endpoint& endpoint, io::buffer buffer, size_t bytes_requested, async_io_callback callback) noexcept = 0;
+    virtual void async_read_from(io::buffer buffer, size_t bytes_requested, async_io_callback callback, ip_endpoint* endpoint_out) noexcept = 0;
+    virtual void async_write_to(io::buffer buffer, size_t bytes_requested, async_io_callback callback, ip_endpoint& endpoint) noexcept = 0;
     // Asynchronous I/O member functions of delegate
-    virtual void async_read_some_to(ip_endpoint& endpoint, io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback) noexcept = 0;
-    virtual void async_read_explicit_to(ip_endpoint& endpoint, io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback) noexcept = 0;
-    virtual void async_write_some_to(ip_endpoint& endpoint, io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback) noexcept = 0;
+    virtual void async_read_from(io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback, ip_endpoint* endpoint_out) noexcept = 0;
+    virtual void async_write_to(io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback, ip_endpoint& endpoint) noexcept = 0;
 
 };
 
