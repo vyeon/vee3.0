@@ -10,9 +10,9 @@ namespace ip {
 namespace udp {
 
 namespace /* unnamed */ {
-inline ::boost::asio::ip::address string_to_ipaddr(const char* str)
+inline boost::asio::ip::address string_to_ipaddr(const char* str)
 {
-    return ::boost::asio::ip::address::from_string(str);
+    return boost::asio::ip::address::from_string(str);
 }
 } // unnamed namespace
 
@@ -45,7 +45,7 @@ udp_stream::udp_stream(io_service& iosvc, udp_socket&& __socket):
     }
     else
     {
-        this->remote_endpoint.set_value(__remote_endpoint.address().to_string().c_str(), __remote_endpoint.port());
+        update_remote_endpoint(__remote_endpoint);
     }
 }
 
@@ -71,49 +71,86 @@ socketfd_t udp_stream::native() noexcept
 
 void udp_stream::map_remote_endpoint(const char* ip, port_t port) noexcept
 {
-    remote_endpoint.set_value(ip, port);
+    remote_endpoint = udp_endpoint{ string_to_ipaddr(ip), port };
 }
 
-void udp_stream::map_remote_endpoint(const ip_endpoint& __endpoint) noexcept
+void udp_stream::map_remote_endpoint(const ip_endpoint& endpoint) noexcept
 {
-    remote_endpoint = __endpoint;
+    remote_endpoint = udp_endpoint{ string_to_ipaddr(endpoint.ip), endpoint.port };
 }
 
 size_t udp_stream::write_some(const io::buffer& buffer, const size_t bytes_requested)
 {
-    return 0;
+    return this->write_to(buffer, bytes_requested, remote_endpoint_cache);
 }
 
 size_t udp_stream::read_explicit(io::buffer buffer, const size_t bytes_requested)
 {
-    return 0;
+    ip_endpoint temp;
+    return this->read_from(buffer, bytes_requested, temp);
 }
 
+    boost::system::error_code error;
 size_t udp_stream::read_some(io::buffer buffer, size_t maximum_read_bytes)
 {
-    return 0;
+    ip_endpoint temp;
+    return this->read_from(buffer, maximum_read_bytes, temp);
 }
 
-size_t udp_stream::read_from(io::buffer buffer, size_t maximum_read_bytes, ip_endpoint* endpoint_out)
+size_t udp_stream::read_from(io::buffer buffer, size_t maximum_read_bytes, ip_endpoint& endpoint_out)
 {
-    return 0;
+    return socket.receive_from(boost::asio::buffer(buffer.ptr, maximum_read_bytes), remote_endpoint);
 }
 
 size_t udp_stream::write_to(io::buffer buffer, const size_t bytes_requested, ip_endpoint& endpoint)
 {
-    return 0;
+    return socket.send_to(boost::asio::buffer(buffer.ptr, bytes_requested), remote_endpoint);
 }
 
-void udp_stream::async_read_from(io::buffer buffer, size_t bytes_requested, async_io_callback callback, ip_endpoint* endpoint_out) noexcept
+void udp_stream::async_read_from(io::buffer buffer, size_t bytes_requested, async_io_callback callback, ip_endpoint& endpoint_out) noexcept
 {
-
+    udp_endpoint* udp_endpoint_out{ nullptr };
+    {
+        auto raw = static_cast<udp_endpoint*>(udp_endpoint_pool::malloc());
+        udp_endpoint_out = new(raw) udp_endpoint;
+    }
+    auto on_read = [=, &endpoint_out](const ::boost::system::error_code& error, size_t bytes_transferred) -> void
+    {
+        async_io_result result;
+        result.stream_ptr = this;
+        result.bytes_transferred = bytes_transferred;
+        result.buffer = buffer;
+        result.callback = callback;
+        endpoint_out.set_value(udp_endpoint_out->address().to_string().c_str(), udp_endpoint_out->port());
+        if (::boost::asio::error::eof == error)
+        {
+            result.is_success = false;
+            result.issue = io_issue::eof;
+        }
+        else if (error)
+        {
+            result.is_success = false;
+            result.issue = io_issue::unknown;
+        }
+        else
+        {
+            result.is_success = true;
+        }
+        callback(result);
+        udp_endpoint_out->~udp_endpoint();
+        udp_endpoint_pool::free(udp_endpoint_out);
+    };
+    socket.async_receive_from(boost::asio::buffer(buffer.ptr, bytes_requested), 
+                              *udp_endpoint_out,
+                              on_read);
+    return;
 }
 
 void udp_stream::async_write_to(io::buffer buffer, size_t bytes_requested, async_io_callback callback, ip_endpoint& endpoint) noexcept
 {
 }
 
-void udp_stream::async_read_from(io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback, ip_endpoint* endpoint_out) noexcept
+void udp_stream::async_read_from(io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback, ip_endpoint& endpoint_out) noexcept
 {
 }
 
@@ -147,7 +184,7 @@ void udp_stream::async_write_some(const io::buffer& buffer, size_t bytes_request
 
 ip_endpoint udp_stream::get_remote_endpoint() noexcept
 {
-    return ip_endpoint{ remote_endpoint };
+    return remote_endpoint_cache;
 }
 
 io_service& udp_stream::get_io_service() noexcept
