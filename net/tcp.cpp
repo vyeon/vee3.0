@@ -37,6 +37,16 @@ tcp_stream::tcp_stream(io_service& iosvc, tcp_socket&& __socket) :
     iosvc_ptr{ &iosvc },
     socket{ std::move(__socket) }
 {
+    boost::system::error_code ec;
+    auto __remote_endpoint = socket.remote_endpoint(ec);
+    if (ec)
+    {
+        // An error occurred.
+    }
+    else
+    {
+        this->remote_endpoint.set_value(__remote_endpoint.address().to_string().c_str(), __remote_endpoint.port());
+    }
 }
 
 tcp_stream& tcp_stream::operator=(tcp_stream&& rhs) noexcept
@@ -67,7 +77,7 @@ void tcp_stream::connect(const char* ip, port_t port)
     {
         throw connection_failed_exception{ err.message().c_str() };
     }
-    this->endpoint.set_value(ip, port);
+    this->remote_endpoint.set_value(ip, port);
 }
 
 void tcp_stream::connect(const ip_endpoint& endpoint)
@@ -79,7 +89,7 @@ void tcp_stream::disconnect() noexcept
 {
     //if (!socket.is_open())
     //    throw connection_already_disconnected{};
-    this->endpoint.clear();
+    this->remote_endpoint.clear();
     socket.close();
 }
 
@@ -101,13 +111,13 @@ void tcp_stream::async_connect(const char* ip, port_t port, async_connect_callba
         {
             result.is_success = false;
             result.message = std::string{ result.endpoint.ip } + ":" + buffer + " connection failed, detail:" + error.message();
-            //this->endpoint.clear();
+            //this->remote_endpoint.clear();
         }
         else
         {
             result.is_success = true;
             result.message = std::string{ result.endpoint.ip } +":" + buffer + " connection established";
-            this->endpoint = result.endpoint;
+            this->remote_endpoint = result.endpoint;
         }
         //callback->do_call(result);
         callback(result);
@@ -145,7 +155,7 @@ bool tcp_stream::is_open() noexcept
     return socket.is_open();
 }
 
-size_t tcp_stream::write_some(io::buffer buffer, const size_t bytes_requested)
+size_t tcp_stream::write_some(const io::buffer& buffer, const size_t bytes_requested)
 {
     ::boost::system::error_code error;
     size_t bytes_transferred = 0;
@@ -258,7 +268,7 @@ void tcp_stream::async_read_explicit(io::buffer buffer, size_t bytes_requested, 
     tcp_stream::async_read_some(buffer, bytes_requested, callback);
 }
 
-void tcp_stream::async_write_some(io::buffer buffer, size_t bytes_requested, async_io_callback callback) noexcept
+void tcp_stream::async_write_some(const io::buffer& buffer, size_t bytes_requested, async_io_callback callback) noexcept
 {
     auto on_write = [this, buffer, callback](const ::boost::system::error_code& error, size_t bytes_transferred) -> void
     {
@@ -312,7 +322,7 @@ void tcp_stream::async_read_explicit(io::buffer buffer, size_t bytes_requested, 
     this->async_read_explicit(buffer, bytes_requested, binder);
 }
 
-void tcp_stream::async_write_some(io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback) noexcept
+void tcp_stream::async_write_some(const io::buffer& buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback) noexcept
 {
     auto binder = [callback = std::move(callback)](async_io_result& result) -> void
     {
@@ -321,9 +331,9 @@ void tcp_stream::async_write_some(io::buffer buffer, size_t bytes_requested, asy
     this->async_write_some(buffer, bytes_requested, binder);
 }
 
-ip_endpoint tcp_stream::get_endpoint() noexcept
+ip_endpoint tcp_stream::get_remote_endpoint() noexcept
 {
-    return ip_endpoint{ endpoint };
+    return ip_endpoint{ remote_endpoint };
 }
 
 io_service& tcp_stream::get_io_service() noexcept

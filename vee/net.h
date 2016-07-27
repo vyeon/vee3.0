@@ -89,10 +89,11 @@ struct ip_endpoint //! POD Type
     port_t port { 0 };
     ip_endpoint() = default;
     ~ip_endpoint() = default;
+    ip_endpoint(const char* __ip, port_t __port);
     ip_endpoint(const ip_endpoint& other);
     ip_endpoint& operator=(const ip_endpoint& other);
-    inline void ip_endpoint::set_value(const char* __ip, port_t __port);
-    inline void ip_endpoint::clear();
+    inline void set_value(const char* __ip, port_t __port);
+    inline void clear();
 };
 
 struct async_connect_result : virtual public async_result
@@ -117,7 +118,7 @@ public:
     using unique_ptr = std::unique_ptr<this_t>;
     virtual socketfd_t native() noexcept = 0;
     virtual ~socket_stream() noexcept = default;  
-    virtual ip_endpoint get_endpoint() noexcept = 0;
+    virtual ip_endpoint get_remote_endpoint() noexcept = 0;
 };
 
 class connectable_stream abstract : virtual public socket_stream
@@ -148,8 +149,8 @@ public:
     using shared_ptr = std::shared_ptr<this_t>;
     using unique_ptr = std::unique_ptr<this_t>;
     virtual ~datagram_stream() noexcept = default;
-    virtual void set_endpoint(const char* ip, port_t port) = 0;
-    virtual void set_endpoint(const ip_endpoint& endpoint) = 0;
+    virtual void map_remote_endpoint(const char* ip, port_t port) = 0;
+    virtual void map_remote_endpoint(const ip_endpoint& endpoint) = 0;
 
     // Synchronous I/O member functions 
     virtual size_t read_from(io::buffer buffer, size_t maximum_read_bytes, ip_endpoint* endpoint_out) = 0;

@@ -84,7 +84,7 @@ public:
     using shared_ptr = std::shared_ptr<this_t>;
     using unique_ptr = std::unique_ptr<this_t>;
     virtual ~sync_stream() = default;
-    virtual size_t write_some(io::buffer buffer, const size_t bytes_requested) = 0;
+    virtual size_t write_some(const io::buffer& buffer, const size_t bytes_requested) = 0;
     virtual size_t read_explicit(io::buffer buffer, const size_t bytes_requested) = 0;
     virtual size_t read_some(io::buffer buffer, size_t maximum_read_bytes) = 0;
 };
@@ -101,11 +101,11 @@ public:
     // I/O member functions of std::function type callback
     virtual void async_read_some(io::buffer buffer, size_t bytes_requested, async_io_callback callback) noexcept = 0;
     virtual void async_read_explicit(io::buffer buffer, size_t bytes_requested, async_io_callback callback) noexcept = 0;
-    virtual void async_write_some(io::buffer buffer, size_t bytes_requested, async_io_callback callback) noexcept = 0;
+    virtual void async_write_some(const io::buffer& buffer, size_t bytes_requested, async_io_callback callback) noexcept = 0;
     // I/O member functions of delegate
     virtual void async_read_some(io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback) noexcept = 0;
     virtual void async_read_explicit(io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback) noexcept = 0;
-    virtual void async_write_some(io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback) noexcept = 0;
+    virtual void async_write_some(const io::buffer& buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback) noexcept = 0;
 };
 
 class io_stream abstract: public sync_stream, public async_stream

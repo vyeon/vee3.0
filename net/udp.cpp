@@ -37,7 +37,16 @@ udp_stream::udp_stream(io_service& iosvc, udp_socket&& __socket):
     iosvc_ptr{ &iosvc },
     socket{ std::move(__socket) }
 {
-
+    boost::system::error_code ec;
+    auto __remote_endpoint = socket.remote_endpoint(ec);
+    if (ec)
+    {
+        // An error occurred.
+    }
+    else
+    {
+        this->remote_endpoint.set_value(__remote_endpoint.address().to_string().c_str(), __remote_endpoint.port());
+    }
 }
 
 udp_stream::ref_t udp_stream::operator=(udp_stream&& other) noexcept
@@ -60,24 +69,18 @@ socketfd_t udp_stream::native() noexcept
     return socket.native();
 }
 
-void udp_stream::set_endpoint(const char* ip, port_t port) noexcept
+void udp_stream::map_remote_endpoint(const char* ip, port_t port) noexcept
 {
-    endpoint.set_value(ip, port);
+    remote_endpoint.set_value(ip, port);
 }
 
-void udp_stream::set_endpoint(const ip_endpoint& __endpoint) noexcept
+void udp_stream::map_remote_endpoint(const ip_endpoint& __endpoint) noexcept
 {
-    endpoint = __endpoint;
+    remote_endpoint = __endpoint;
 }
 
-size_t udp_stream::write_some(io::buffer buffer, const size_t bytes_requested)
+size_t udp_stream::write_some(const io::buffer& buffer, const size_t bytes_requested)
 {
-    boost::system::error_code error;
-    size_t bytes_transferred = 0;
-    while (bytes_transferred)
-    {
-        
-    }
     return 0;
 }
 
@@ -103,6 +106,7 @@ size_t udp_stream::write_to(io::buffer buffer, const size_t bytes_requested, ip_
 
 void udp_stream::async_read_from(io::buffer buffer, size_t bytes_requested, async_io_callback callback, ip_endpoint* endpoint_out) noexcept
 {
+
 }
 
 void udp_stream::async_write_to(io::buffer buffer, size_t bytes_requested, async_io_callback callback, ip_endpoint& endpoint) noexcept
@@ -125,7 +129,7 @@ void udp_stream::async_read_explicit(io::buffer buffer, size_t bytes_requested, 
 {
 }
 
-void udp_stream::async_write_some(io::buffer buffer, size_t bytes_requested, async_io_callback callback) noexcept
+void udp_stream::async_write_some(const io::buffer& buffer, size_t bytes_requested, async_io_callback callback) noexcept
 {
 }
 
@@ -137,13 +141,13 @@ void udp_stream::async_read_explicit(io::buffer buffer, size_t bytes_requested, 
 {
 }
 
-void udp_stream::async_write_some(io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback) noexcept
+void udp_stream::async_write_some(const io::buffer& buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback) noexcept
 {
 }
 
-ip_endpoint udp_stream::get_endpoint() noexcept
+ip_endpoint udp_stream::get_remote_endpoint() noexcept
 {
-    return ip_endpoint{ endpoint };
+    return ip_endpoint{ remote_endpoint };
 }
 
 io_service& udp_stream::get_io_service() noexcept

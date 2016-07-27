@@ -6,6 +6,12 @@ namespace net {
 
 namespace ip {
 
+ip_endpoint::ip_endpoint(const char* __ip, port_t __port):
+    port{ __port }
+{ 
+    strcpy_s(ip, IP_BUFFER_SIZE, __ip);
+}
+
 ip_endpoint::ip_endpoint(const ip_endpoint& other):
     port{ other.port }
 {

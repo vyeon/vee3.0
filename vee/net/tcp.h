@@ -38,7 +38,7 @@ public:
     virtual ~tcp_stream() noexcept;
     tcp_stream(tcp_stream&& other);
     explicit tcp_stream(io_service& iosvc);
-    explicit tcp_stream(io_service& iosvc, tcp_socket&& socket);
+    tcp_stream(io_service& iosvc, tcp_socket&& socket);
     tcp_stream& operator=(tcp_stream&& rhs) noexcept;
     void swap(tcp_stream& other) noexcept;
     virtual void connect(const char* ip, port_t port) override;
@@ -50,16 +50,16 @@ public:
     virtual void async_connect(const ip_endpoint& endpoint, async_connect_delegate::shared_ptr callback) noexcept override;
     virtual socketfd_t native() noexcept override;
     virtual bool is_open() noexcept override;
-    virtual size_t write_some(io::buffer buffer, const size_t bytes_requested) override;
+    virtual size_t write_some(const io::buffer& buffer, const size_t bytes_requested) override;
     virtual size_t read_explicit(io::buffer buffer, const size_t bytes_requested) override;
     virtual size_t read_some(io::buffer buffer, size_t maximum_read_bytes) override;
     virtual void async_read_some(io::buffer buffer, size_t bytes_requested, async_io_callback callback) noexcept override;
     virtual void async_read_explicit(io::buffer buffer, size_t bytes_requested, async_io_callback callback) noexcept override;
-    virtual void async_write_some(io::buffer buffer, size_t bytes_requested, async_io_callback callback) noexcept override;
+    virtual void async_write_some(const io::buffer& buffer, size_t bytes_requested, async_io_callback callback) noexcept override;
     virtual void async_read_some(io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback) noexcept override;
     virtual void async_read_explicit(io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback) noexcept override;
-    virtual void async_write_some(io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback) noexcept override;
-    virtual ip_endpoint get_endpoint() noexcept override;
+    virtual void async_write_some(const io::buffer& buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback) noexcept override;
+    virtual ip_endpoint get_remote_endpoint() noexcept override;
     virtual io_service& get_io_service() noexcept override;
 
     /* Private member functions */
@@ -68,7 +68,7 @@ private:
     /* Protected member variables */
 protected:
     io_service* iosvc_ptr;
-    ip_endpoint endpoint;
+    ip_endpoint remote_endpoint;
     tcp_socket  socket;
     /* Disallowed member functions */
 private:
