@@ -239,10 +239,10 @@ public:
     template <class URef>
     ref_t operator+=(URef&& uref)
     {
-        return this->_register(std::forward<URef>(uref), mpl::meta_branch< mpl::is_pair<typename std::remove_reference<URef>::type >::value>());
+        return this->_register(std::forward<URef>(uref), mpl::binary_dispatch< mpl::is_pair<typename std::remove_reference<URef>::type >::value>());
     }
     template <class PairRef>
-    ref_t _register(PairRef&& pair, mpl::meta_branch<true>/*is_pair == true*/)
+    ref_t _register(PairRef&& pair, mpl::binary_dispatch<true>/*is_pair == true*/)
     {
         std::lock_guard<lock_t> locker{ _mtx };
         using PairTy = typename std::remove_reference<PairRef>::type;
@@ -259,7 +259,7 @@ public:
         return *this;
     }
     template <class CallableObj>
-    ref_t _register(CallableObj&& obj, mpl::meta_branch<false>/*is_pair == false*/)
+    ref_t _register(CallableObj&& obj, mpl::binary_dispatch<false>/*is_pair == false*/)
     {
         std::lock_guard<lock_t> locker{ _mtx };
         _cmpbinder_t cmpbinder{ std::forward<CallableObj>(obj) };

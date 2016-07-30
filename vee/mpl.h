@@ -53,9 +53,9 @@ struct type_to_type
 };
 
 template <bool B>
-struct meta_branch
+struct binary_dispatch
 {
-    static const bool value = B;
+    // static const bool value = B;
 };
 
 template< class T >

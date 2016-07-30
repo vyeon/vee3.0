@@ -37,6 +37,9 @@
     <Filter Include="console">
       <UniqueIdentifier>{126f025b-2347-4467-bda8-60fa1988b7db}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vee\type">
+      <UniqueIdentifier>{b10bc195-e9eb-4cfe-b292-5ddac46f13a9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="vee\enumeration.h">
@@ -119,6 +122,9 @@
     </ClInclude>
     <ClInclude Include="vee\net\udp.h">
       <Filter>vee\net</Filter>
+    </ClInclude>
+    <ClInclude Include="vee\type\unsigned_integer.h">
+      <Filter>vee\type</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
