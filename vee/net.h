@@ -153,13 +153,13 @@ public:
     virtual void map_remote_endpoint(const ip_endpoint& endpoint) = 0;
 
     // Synchronous I/O member functions 
-    virtual size_t read_from(io::buffer buffer, size_t maximum_read_bytes, ip_endpoint* endpoint_out) = 0;
+    virtual size_t read_from(io::buffer buffer, size_t maximum_read_bytes, ip_endpoint& endpoint_out) = 0;
     virtual size_t write_to(io::buffer buffer, const size_t bytes_requested, ip_endpoint& endpoint) = 0;
-    // Asynchronous I/O member functions of std::function type callback
-    virtual void async_read_from(io::buffer buffer, size_t bytes_requested, async_io_callback callback, ip_endpoint* endpoint_out) noexcept = 0;
+    // Asynchronous I/O member functions for std::function type callback
+    virtual void async_read_from(io::buffer buffer, size_t bytes_requested, async_io_callback callback, ip_endpoint& endpoint_out) noexcept = 0;
     virtual void async_write_to(io::buffer buffer, size_t bytes_requested, async_io_callback callback, ip_endpoint& endpoint) noexcept = 0;
-    // Asynchronous I/O member functions of delegate
-    virtual void async_read_from(io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback, ip_endpoint* endpoint_out) noexcept = 0;
+    // Asynchronous I/O member functions for vee::delegate type callback
+    virtual void async_read_from(io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback, ip_endpoint& endpoint_out) noexcept = 0;
     virtual void async_write_to(io::buffer buffer, size_t bytes_requested, async_io_delegate::shared_ptr callback, ip_endpoint& endpoint) noexcept = 0;
 
 };
