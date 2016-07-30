@@ -40,7 +40,6 @@ public:
     >
         T casting(mpl::binary_dispatch<true> /* TypeSize <= sizeof(T) */) const
     {
-        puts(__FUNCSIG__);
         T temp;
         memset(&temp, 0, sizeof(temp));
         // On the Little endian system
@@ -55,7 +54,6 @@ public:
     >
         T casting(mpl::binary_dispatch<false> /* TypeSize > sizeof(T) */) const
     {
-        puts(__FUNCSIG__);
         T temp;
         memset(&temp, 0, sizeof(temp));
         // On the Little endian system
