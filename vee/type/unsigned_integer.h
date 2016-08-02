@@ -3,10 +3,13 @@
 #define _VEE_TYPE_UNSIGNED_INTEGER_
 
 #include <vee/mpl.h>
+#include <type_traits>
+#include <cinttypes>
 
 namespace vee {
 
 /* Generic N-byte unsigned integer class for Little endian system */
+#pragma pack (push, 1)
 template <size_t TypeSize>
 class unsigned_integer final
 {
@@ -71,7 +74,7 @@ private:
         //x typename = typename std::enable_if< std::is_unsigned<ValueType>::value >::type,
         typename = typename std::enable_if< (TypeSize <= sizeof(ValueType)) >::type
     >
-        ref_t __thiscall assign(ReferType&& rhs, vee::binary_dispatch<true> /* TypeSize <= sizeof(ValueType) */)
+    ref_t __thiscall assign(ReferType&& rhs, mpl::binary_dispatch<true> /* TypeSize <= sizeof(ValueType) */)
     {
         // On the Little endian system
         memmove(data, &rhs, size);
@@ -87,7 +90,7 @@ private:
         //x typename = typename std::enable_if< std::is_unsigned<ValueType>::value >::type,
         typename = typename std::enable_if< (TypeSize > sizeof(ValueType)) >::type
     >
-        ref_t __thiscall assign(ReferType&& rhs, vee::binary_dispatch<false> /* TypeSize > sizeof(ValueType) */)
+    ref_t __thiscall assign(ReferType&& rhs, mpl::binary_dispatch<false> /* TypeSize > sizeof(ValueType) */)
     {
         memset(data, 0, size);
         // On the Little endian system
@@ -100,6 +103,7 @@ private:
 private:
     uint8_t data[size]{ 0, }; // signed 는 size -1 bit를 데이터로 사용하는 버전으로 만들 수 있을 것 같다.
 };
+#pragma pack(pop)
 
 } // !namespace vee
 
