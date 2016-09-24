@@ -273,7 +273,7 @@ public:
         key_t key = gen_key( binder_t{ std::forward<CallableObj>(obj) });
         auto  target = _cont.find(key);
         if (target == _cont.end())
-            throw target_not_found();
+            throw target_not_found_exception();
         _cont.erase(target);
         return *this;
     }

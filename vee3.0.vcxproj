@@ -19,20 +19,23 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="vee\console.h" />
+    <ClInclude Include="vee\comm.h" />
+    <ClInclude Include="vee\comm\ip.h" />
+    <ClInclude Include="vee\comm\shared_memory.h" />
+    <ClInclude Include="vee\comm\tcp.h" />
+    <ClInclude Include="vee\comm\udp.h" />
     <ClInclude Include="vee\core\noncopyable.h" />
     <ClInclude Include="vee\delegate.h" />
     <ClInclude Include="vee\enumeration.h" />
     <ClInclude Include="vee\exception.h" />
     <ClInclude Include="vee\exl.h" />
+    <ClInclude Include="vee\helper\bitmagic.h" />
+    <ClInclude Include="vee\helper\term.h" />
+    <ClInclude Include="vee\io.h" />
     <ClInclude Include="vee\io\detail\io_service_kernel.h" />
-    <ClInclude Include="vee\io\io_base.h" />
     <ClInclude Include="vee\io\io_service.h" />
-    <ClInclude Include="vee\io\stream.h" />
-    <ClInclude Include="vee\lockfree\list.h" />
-    <ClInclude Include="vee\net.h" />
-    <ClInclude Include="vee\net\tcp.h" />
-    <ClInclude Include="vee\net\udp.h" />
+    <ClInclude Include="vee\io\port_base.h" />
+    <ClInclude Include="vee\libtest.h" />
     <ClInclude Include="vee\platform.h" />
     <ClInclude Include="vee\lib_base.h" />
     <ClInclude Include="vee\lock.h" />
@@ -40,27 +43,30 @@
     <ClInclude Include="vee\lockfree\queue.h" />
     <ClInclude Include="vee\lockfree\stack.h" />
     <ClInclude Include="vee\queue.h" />
+    <ClInclude Include="vee\random.h" />
     <ClInclude Include="vee\test\testobj.h" />
     <ClInclude Include="vee\mpl.h" />
     <ClInclude Include="vee\mpmath.h" />
     <ClInclude Include="vee\test\timerec.h" />
     <ClInclude Include="vee\tupleupk.h" />
-    <ClInclude Include="vee\type\unsigned_integer.h" />
+    <ClInclude Include="vee\type\generic\unsigned_integer.h" />
     <ClInclude Include="vee\worker.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="console\print.cpp" />
-    <ClCompile Include="ex\exception.cpp" />
-    <ClCompile Include="ex\exl.cpp" />
-    <ClCompile Include="ex\exl_io.cpp" />
-    <ClCompile Include="ex\exl_net.cpp" />
-    <ClCompile Include="ex\exl_worker.cpp" />
-    <ClCompile Include="io\io_base.cpp" />
+    <ClCompile Include="comm\ip.cpp" />
+    <ClCompile Include="comm\shared_memory.cpp" />
+    <ClCompile Include="comm\tcp.cpp" />
+    <ClCompile Include="comm\udp.cpp" />
+    <ClCompile Include="exception\exception.cpp" />
+    <ClCompile Include="exception\exl.cpp" />
+    <ClCompile Include="exception\exl_io.cpp" />
+    <ClCompile Include="exception\exl_net.cpp" />
+    <ClCompile Include="exception\exl_worker.cpp" />
+    <ClCompile Include="helper\term.cpp" />
     <ClCompile Include="io\io_service.cpp" />
-    <ClCompile Include="io\stream.cpp" />
-    <ClCompile Include="net\net.cpp" />
-    <ClCompile Include="net\tcp.cpp" />
-    <ClCompile Include="net\udp.cpp" />
+    <ClCompile Include="io\port_base.cpp" />
+    <ClCompile Include="libtest\libtest.cpp" />
+    <ClCompile Include="libtest\test_type_generic.cpp" />
     <ClCompile Include="test\testobj.cpp" />
     <ClCompile Include="test\timerec.cpp" />
   </ItemGroup>
@@ -68,6 +74,7 @@
     <ProjectGuid>{A78FA93C-3A15-461D-BF81-F49D01DEFE35}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>vee20</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='VS2015-Debug|Win32'" Label="Configuration">
@@ -113,8 +120,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='VS2015-Debug|Win32'">
-    <OutDir>$(SolutionDir)\lib\x32\</OutDir>
-    <IntDir>$(SolutionDir)\obj\x32\Debug\$(ProjectName)\</IntDir>
+    <OutDir>$(SolutionDir)\lib32\</OutDir>
+    <IntDir>vsbuild\$(Configuration)-$(PlatformShortName)\</IntDir>
     <TargetName>$(ProjectName)-vc140-sgd-300</TargetName>
     <LibraryPath>$(SolutionDir)\lib\x32;$(BOOST_1_61_0)\stage32;$(LibraryPath)</LibraryPath>
     <IncludePath>$(SolutionDir);$(BOOST_1_61_0);$(IncludePath)</IncludePath>
@@ -122,13 +129,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='VS2015-Debug|x64'">
     <TargetName>$(ProjectName)-vc140-sgd-300</TargetName>
     <LibraryPath>$(SolutionDir)\lib\x64;$(BOOST_1_61_0)\stage64;$(LibraryPath)</LibraryPath>
-    <OutDir>$(SolutionDir)\lib\x64\</OutDir>
-    <IntDir>$(SolutionDir)\obj\x64\Debug\$(ProjectName)\</IntDir>
+    <OutDir>$(SolutionDir)\lib64\</OutDir>
+    <IntDir>vsbuild\$(Configuration)-$(PlatformShortName)\</IntDir>
     <IncludePath>$(SolutionDir);$(BOOST_1_61_0);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='VS2015-Release|Win32'">
-    <OutDir>$(SolutionDir)\lib\x32\</OutDir>
-    <IntDir>$(SolutionDir)\obj\x32\Release\$(ProjectName)\</IntDir>
+    <OutDir>$(SolutionDir)\lib32\</OutDir>
+    <IntDir>vsbuild\$(Configuration)-$(PlatformShortName)\</IntDir>
     <TargetName>$(ProjectName)-vc140-s-300</TargetName>
     <LibraryPath>$(SolutionDir)\lib\x32;$(BOOST_1_61_0)\stage32;$(LibraryPath)</LibraryPath>
     <IncludePath>$(SolutionDir);$(BOOST_1_61_0);$(IncludePath)</IncludePath>
@@ -136,8 +143,8 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='VS2015-Release|x64'">
     <TargetName>$(ProjectName)-vc140-s-300</TargetName>
     <LibraryPath>$(SolutionDir)\lib\x64;$(BOOST_1_61_0)\stage64;$(LibraryPath)</LibraryPath>
-    <OutDir>$(SolutionDir)\lib\x64\</OutDir>
-    <IntDir>$(SolutionDir)\obj\x64\Release\$(ProjectName)\</IntDir>
+    <OutDir>$(SolutionDir)\lib64\</OutDir>
+    <IntDir>vsbuild\$(Configuration)-$(PlatformShortName)\</IntDir>
     <IncludePath>$(SolutionDir);$(BOOST_1_61_0);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='VS2015-Debug|Win32'">

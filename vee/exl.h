@@ -45,6 +45,18 @@ public:
 	virtual char const* to_string() const noexcept override;
 };
 
+class not_implemented_exception: public vee::exception
+{
+public:
+    using base_t = vee::exception;
+    not_implemented_exception():
+        base_t{ "not implemented exception" }
+    {
+    }
+    virtual ~not_implemented_exception() = default;
+    virtual char const* to_string() const noexcept override;
+};
+
 } // !namespace vee
 
 #endif // !_VEE_EXL_H_

@@ -1,5 +1,5 @@
-#ifndef _VEE_IO_DETAIL_IO_SERVICE_KERNEL_H_
-#define _VEE_IO_DETAIL_IO_SERVICE_KERNEL_H_
+#ifndef _VEE_IOPORT_DETAIL_IOPORT_SERVICE_KERNEL_H_
+#define _VEE_IOPORT_DETAIL_IOPORT_SERVICE_KERNEL_H_
 
 #include <vee/platform.h>
 #ifdef VEE_PLATFORM_WINDOWS
@@ -8,7 +8,9 @@
 #include <boost/asio/io_service.hpp>
 
 namespace vee {
-    
+   
+namespace io {
+
 class io_service_kernel: public ::boost::asio::io_service
 {
 public:
@@ -18,6 +20,8 @@ public:
     }
 };
 
+} // !namespace io
+
 } // !namespace vee
 
-#endif // !_VEE_IO_DETAIL_IO_SERVICE_KERNEL_H_
+#endif // !_VEE_IOPORT_DETAIL_IOPORT_SERVICE_KERNEL_H_

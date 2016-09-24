@@ -2,6 +2,8 @@
 #define _VEE_ENUMERATION_H_
 
 #include <vee/exl.h>
+#include <vector>
+#include <map>
 
 #define Enumeration(__ENUM_TYPE__, Offset, __ENUMERATION_START__, ...)\
 class __ENUM_TYPE__\
@@ -36,7 +38,7 @@ public:\
         }\
         catch(...)\
         {\
-            throw vee::target_not_found()\
+            throw vee::target_not_found_exception()\
         }\
     }\
     class iterator\

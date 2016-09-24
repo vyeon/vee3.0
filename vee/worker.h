@@ -9,9 +9,7 @@
 #include <list>
 
 namespace vee {
-
-namespace exl {
-    
+ 
 class worker_is_busy: public vee::exception
 {
 public:
@@ -23,8 +21,6 @@ public:
     virtual ~worker_is_busy() = default;
     virtual char const* to_string() const noexcept override;
 };
-
-} // !namespace exl
 
 template <class FTy>
 class packaged_task;

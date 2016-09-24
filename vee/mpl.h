@@ -43,7 +43,7 @@ struct int_to_type
 template <class T>
 struct type_to_type
 {
-    using real_type = T;
+    using real_t = T;
     template <class Arg>
     explicit type_to_type(Arg&& arg):
         value(std::forward<Arg>(arg))

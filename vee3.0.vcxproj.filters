@@ -10,20 +10,20 @@
     <Filter Include="test">
       <UniqueIdentifier>{3133e53b-e6ab-4ae0-8dfe-a938e4d11260}</UniqueIdentifier>
     </Filter>
-    <Filter Include="io">
-      <UniqueIdentifier>{3546bbf1-b078-4684-910d-d81abeaf0a18}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vee\lockfree">
       <UniqueIdentifier>{1c137e37-8330-4cc0-a126-2a8acbda6c0a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vee\net">
-      <UniqueIdentifier>{b855bb26-4925-46d5-9917-30f8f4fcc699}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="net">
-      <UniqueIdentifier>{13b3740b-6262-48b8-9932-5f1e79b517ea}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vee\core">
       <UniqueIdentifier>{85b71d1d-09fe-43c4-bf77-f93ce9c3c0f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vee\type">
+      <UniqueIdentifier>{b10bc195-e9eb-4cfe-b292-5ddac46f13a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vee\helper">
+      <UniqueIdentifier>{bedbf7af-cb67-4ad1-ba94-e0bedf78f6fe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="exception">
+      <UniqueIdentifier>{143e12bd-f93d-4e4c-af21-4dbf49168aa2}</UniqueIdentifier>
     </Filter>
     <Filter Include="vee\io">
       <UniqueIdentifier>{bb2b49ec-4890-47bb-8065-22a89d9a02dd}</UniqueIdentifier>
@@ -31,14 +31,23 @@
     <Filter Include="vee\io\detail">
       <UniqueIdentifier>{b6f6b763-79dd-4b90-b708-aa14fa2cd367}</UniqueIdentifier>
     </Filter>
-    <Filter Include="exceptions">
-      <UniqueIdentifier>{143e12bd-f93d-4e4c-af21-4dbf49168aa2}</UniqueIdentifier>
+    <Filter Include="io">
+      <UniqueIdentifier>{3546bbf1-b078-4684-910d-d81abeaf0a18}</UniqueIdentifier>
     </Filter>
-    <Filter Include="console">
+    <Filter Include="helper">
       <UniqueIdentifier>{126f025b-2347-4467-bda8-60fa1988b7db}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vee\type">
-      <UniqueIdentifier>{b10bc195-e9eb-4cfe-b292-5ddac46f13a9}</UniqueIdentifier>
+    <Filter Include="vee\comm">
+      <UniqueIdentifier>{b855bb26-4925-46d5-9917-30f8f4fcc699}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="comm">
+      <UniqueIdentifier>{13b3740b-6262-48b8-9932-5f1e79b517ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="libtest">
+      <UniqueIdentifier>{5854fdc5-6cfd-42bd-9fc5-4e4cc46e2c62}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vee\type\generic">
+      <UniqueIdentifier>{f498176f-81bf-43bc-9c84-1b70ce8c0da4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -87,17 +96,8 @@
     <ClInclude Include="vee\lockfree\stack.h">
       <Filter>vee\lockfree</Filter>
     </ClInclude>
-    <ClInclude Include="vee\lockfree\list.h">
-      <Filter>vee\lockfree</Filter>
-    </ClInclude>
-    <ClInclude Include="vee\net.h">
-      <Filter>vee</Filter>
-    </ClInclude>
     <ClInclude Include="vee\platform.h">
       <Filter>vee</Filter>
-    </ClInclude>
-    <ClInclude Include="vee\net\tcp.h">
-      <Filter>vee\net</Filter>
     </ClInclude>
     <ClInclude Include="vee\lib_base.h">
       <Filter>vee</Filter>
@@ -105,70 +105,97 @@
     <ClInclude Include="vee\core\noncopyable.h">
       <Filter>vee\core</Filter>
     </ClInclude>
-    <ClInclude Include="vee\io\detail\io_service_kernel.h">
-      <Filter>vee\io\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="vee\io\stream.h">
-      <Filter>vee\io</Filter>
-    </ClInclude>
-    <ClInclude Include="vee\io\io_base.h">
-      <Filter>vee\io</Filter>
+    <ClInclude Include="vee\io.h">
+      <Filter>vee</Filter>
     </ClInclude>
     <ClInclude Include="vee\io\io_service.h">
       <Filter>vee\io</Filter>
     </ClInclude>
-    <ClInclude Include="vee\console.h">
+    <ClInclude Include="vee\io\port_base.h">
+      <Filter>vee\io</Filter>
+    </ClInclude>
+    <ClInclude Include="vee\io\detail\io_service_kernel.h">
+      <Filter>vee\io\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="vee\helper\term.h">
+      <Filter>vee\helper</Filter>
+    </ClInclude>
+    <ClInclude Include="vee\helper\bitmagic.h">
+      <Filter>vee\helper</Filter>
+    </ClInclude>
+    <ClInclude Include="vee\comm\tcp.h">
+      <Filter>vee\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="vee\comm\udp.h">
+      <Filter>vee\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="vee\comm\ip.h">
+      <Filter>vee\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="vee\comm.h">
       <Filter>vee</Filter>
     </ClInclude>
-    <ClInclude Include="vee\net\udp.h">
-      <Filter>vee\net</Filter>
+    <ClInclude Include="vee\comm\shared_memory.h">
+      <Filter>vee\comm</Filter>
     </ClInclude>
-    <ClInclude Include="vee\type\unsigned_integer.h">
-      <Filter>vee\type</Filter>
+    <ClInclude Include="vee\random.h">
+      <Filter>vee</Filter>
+    </ClInclude>
+    <ClInclude Include="vee\type\generic\unsigned_integer.h">
+      <Filter>vee\type\generic</Filter>
+    </ClInclude>
+    <ClInclude Include="vee\libtest.h">
+      <Filter>vee</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="test\testobj.cpp">
       <Filter>test</Filter>
     </ClCompile>
-    <ClCompile Include="ex\exception.cpp">
-      <Filter>exceptions</Filter>
-    </ClCompile>
-    <ClCompile Include="ex\exl.cpp">
-      <Filter>exceptions</Filter>
-    </ClCompile>
     <ClCompile Include="test\timerec.cpp">
       <Filter>test</Filter>
     </ClCompile>
-    <ClCompile Include="ex\exl_worker.cpp">
-      <Filter>exceptions</Filter>
+    <ClCompile Include="exception\exl.cpp">
+      <Filter>exception</Filter>
     </ClCompile>
-    <ClCompile Include="net\tcp.cpp">
-      <Filter>net</Filter>
+    <ClCompile Include="exception\exl_io.cpp">
+      <Filter>exception</Filter>
     </ClCompile>
-    <ClCompile Include="ex\exl_net.cpp">
-      <Filter>exceptions</Filter>
+    <ClCompile Include="exception\exl_net.cpp">
+      <Filter>exception</Filter>
     </ClCompile>
-    <ClCompile Include="io\io_base.cpp">
+    <ClCompile Include="exception\exl_worker.cpp">
+      <Filter>exception</Filter>
+    </ClCompile>
+    <ClCompile Include="exception\exception.cpp">
+      <Filter>exception</Filter>
+    </ClCompile>
+    <ClCompile Include="io\port_base.cpp">
       <Filter>io</Filter>
     </ClCompile>
     <ClCompile Include="io\io_service.cpp">
       <Filter>io</Filter>
     </ClCompile>
-    <ClCompile Include="ex\exl_io.cpp">
-      <Filter>exceptions</Filter>
+    <ClCompile Include="helper\term.cpp">
+      <Filter>helper</Filter>
     </ClCompile>
-    <ClCompile Include="console\print.cpp">
-      <Filter>console</Filter>
+    <ClCompile Include="comm\tcp.cpp">
+      <Filter>comm</Filter>
     </ClCompile>
-    <ClCompile Include="net\udp.cpp">
-      <Filter>net</Filter>
+    <ClCompile Include="comm\udp.cpp">
+      <Filter>comm</Filter>
     </ClCompile>
-    <ClCompile Include="io\stream.cpp">
-      <Filter>io</Filter>
+    <ClCompile Include="comm\ip.cpp">
+      <Filter>comm</Filter>
     </ClCompile>
-    <ClCompile Include="net\net.cpp">
-      <Filter>net</Filter>
+    <ClCompile Include="comm\shared_memory.cpp">
+      <Filter>comm</Filter>
+    </ClCompile>
+    <ClCompile Include="libtest\test_type_generic.cpp">
+      <Filter>libtest</Filter>
+    </ClCompile>
+    <ClCompile Include="libtest\libtest.cpp">
+      <Filter>libtest</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
