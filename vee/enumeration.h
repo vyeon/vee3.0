@@ -2,8 +2,10 @@
 #define _VEE_ENUMERATION_H_
 
 #include <vee/exl.h>
+#include <string>
 #include <vector>
 #include <map>
+#include <vee/helper/strmagic.h>
 
 #define Enumeration(__ENUM_TYPE__, Offset, __ENUMERATION_START__, ...)\
 class __ENUM_TYPE__\
@@ -22,12 +24,12 @@ public:\
             std::string raw(#__ENUMERATION_START__);\
             raw.append(", ");\
             raw.append(#__VA_ARGS__);\
-            std::vector<std::string> strings = vee::strutils::split(raw, ",");\
+            std::vector<std::string> strings = vee::strmagic::split(raw, ",");\
             std::map<int, std::string>* result = new std::map<int, std::string>();\
             int key = Offset;\
             for (unsigned int i = 0; i < strings.size(); ++i)\
             {\
-                result->insert(make_pair(key++, vee::strutils::trim(strings[i])));\
+                result->insert(make_pair(key++, vee::strmagic::trim(strings[i])));\
             }\
             return result;\
         };\
@@ -38,7 +40,7 @@ public:\
         }\
         catch(...)\
         {\
-            throw vee::target_not_found_exception()\
+            throw vee::target_not_found_exception();\
         }\
     }\
     class iterator\

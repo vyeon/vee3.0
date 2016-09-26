@@ -30,6 +30,7 @@
     <ClInclude Include="vee\exception.h" />
     <ClInclude Include="vee\exl.h" />
     <ClInclude Include="vee\helper\bitmagic.h" />
+    <ClInclude Include="vee\helper\strmagic.h" />
     <ClInclude Include="vee\helper\term.h" />
     <ClInclude Include="vee\io.h" />
     <ClInclude Include="vee\io\detail\io_service_kernel.h" />
@@ -62,6 +63,7 @@
     <ClCompile Include="exception\exl_io.cpp" />
     <ClCompile Include="exception\exl_net.cpp" />
     <ClCompile Include="exception\exl_worker.cpp" />
+    <ClCompile Include="helper\strmagic.cpp" />
     <ClCompile Include="helper\term.cpp" />
     <ClCompile Include="io\io_service.cpp" />
     <ClCompile Include="io\port_base.cpp" />

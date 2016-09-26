@@ -147,6 +147,9 @@
     <ClInclude Include="vee\libtest.h">
       <Filter>vee</Filter>
     </ClInclude>
+    <ClInclude Include="vee\helper\strmagic.h">
+      <Filter>vee\helper</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="test\testobj.cpp">
@@ -196,6 +199,9 @@
     </ClCompile>
     <ClCompile Include="libtest\libtest.cpp">
       <Filter>libtest</Filter>
+    </ClCompile>
+    <ClCompile Include="helper\strmagic.cpp">
+      <Filter>helper</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
