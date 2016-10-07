@@ -2,6 +2,9 @@
 #define _VEE_MPL_H_
 
 #include <utility>
+#include <type_traits>
+
+#define VEE_DECLARE_TYPE(name) struct name{}
 
 namespace vee {
 

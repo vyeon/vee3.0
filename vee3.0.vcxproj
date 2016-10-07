@@ -50,6 +50,7 @@
     <ClInclude Include="vee\mpmath.h" />
     <ClInclude Include="vee\test\timerec.h" />
     <ClInclude Include="vee\tupleupk.h" />
+    <ClInclude Include="vee\type\generic\unsigned_integral_comparator.h" />
     <ClInclude Include="vee\type\generic\unsigned_integer.h" />
     <ClInclude Include="vee\worker.h" />
   </ItemGroup>

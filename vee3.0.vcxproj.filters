@@ -150,6 +150,9 @@
     <ClInclude Include="vee\helper\strmagic.h">
       <Filter>vee\helper</Filter>
     </ClInclude>
+    <ClInclude Include="vee\type\generic\unsigned_integral_comparator.h">
+      <Filter>vee\type\generic</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="test\testobj.cpp">
